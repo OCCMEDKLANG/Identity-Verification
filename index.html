@@ -6,32 +6,31 @@
 </head>
 <body>
   <h1>ระบบลงทะเบียน</h1>
-  <p id="status">กำลังโหลด...</p>
+  <p id="status">กำลังตรวจสอบการเชื่อมต่อ...</p>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-    // --- แก้ไขตรงนี้ ---
-    const LIFF_ID = "2010419960-jJFrolbW";
+    // --- แก้ไข ID ให้เป็นของคุณ ---
+    const LIFF_ID = "2010419960-jJFrolbW"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzBNUP8mNvVmKERWOrmGF7FxdMETlxzS5YIIrNQHeZJpJWuKTZNahdDjAVqAVJSnGPwWw/exec"; 
-    // ------------------
 
     async function initLiff() {
       try {
         await liff.init({ liffId: LIFF_ID });
-        document.getElementById('status').innerText = "LIFF สำเร็จ";
         
-        // ทดสอบยิง API
+        // ทดสอบส่งข้อมูลไปหา GAS
         const response = await fetch(GAS_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: "test" })
         });
+        
         const data = await response.json();
-        document.getElementById('status').innerText = data.message;
+        // ถ้าเชื่อมต่อสำเร็จ จะแสดงข้อความจาก GAS
+        document.getElementById('status').innerText = "สถานะ: " + data.message;
         
       } catch (err) {
-        // ถ้าพัง มันจะฟ้องที่หน้าจอ ไม่ขึ้นแค่ Load failed อีกต่อไป
-        alert("เกิดข้อผิดพลาด: " + err.message);
-        document.getElementById('status').innerText = "พังที่: " + err.message;
+        document.getElementById('status').innerText = "เกิดข้อผิดพลาด: " + err.message;
       }
     }
     initLiff();
