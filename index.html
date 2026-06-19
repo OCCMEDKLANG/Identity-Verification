@@ -57,19 +57,26 @@
   </div>
 
   <script>
-  // ⚠️ แก้ไข LIFF_ID ของคุณ
+  // ⚠️ อย่าลืมใส่ LIFF_ID ของคุณ
   const LIFF_ID = "2010419960-jJFrolbW";
-  // ⚠️ แก้ไข URL ของ Web App GAS ของคุณ
+  // ⚠️ เอา Web App URL อันล่าสุดมาใส่ที่นี่
   const GAS_URL = "https://script.google.com/macros/s/AKfycbzBNUP8mNvVmKERWOrmGF7FxdMETlxzS5YIIrNQHeZJpJWuKTZNahdDjAVqAVJSnGPwWw/exec";
 
   let globalUserId = null;
 
+  // --- จุดที่แก้ไข: ทะลุระบบป้องกัน CORS ของ Google ---
   async function callAPI(action, data = {}) {
+    const payloadString = JSON.stringify({ action: action, ...data });
+    
+    // แปลงข้อมูลเป็นแบบ Form Data
+    const formData = new URLSearchParams();
+    formData.append('payload', payloadString);
+
     const response = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: action, ...data })
+      body: formData // ส่งเป็นฟอร์มแทน JSON
     });
+    
     return await response.json();
   }
 
