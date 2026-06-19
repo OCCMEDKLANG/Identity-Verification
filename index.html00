@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงทะเบียนผูกบัญชี</title>
+    <!-- นำเข้า LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: 'Arial', sans-serif; padding: 20px; background-color: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #06C755; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:disabled { background-color: #ccc; }
+        #status { margin-top: 10px; color: red; font-size: 14px; text-align: center;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center;">ลงทะเบียนสมาชิก</h2>
+        <input type="text" id="name" placeholder="ชื่อ - นามสกุล" required>
+        <input type="text" id="idCard" placeholder="เลขบัตรประชาชน 13 หลัก" maxlength="13" required>
+        <button id="btnSubmit" onclick="submitData()">บันทึกข้อมูล</button>
+        <div id="status">กำลังโหลดระบบ...</div>
+    </div>
+
+    <script>
+        // 🛑 1. ใส่ LIFF ID ที่ได้จาก LINE Developer
+        const LIFF_ID = "2010419960-jJFrolbW"; 
+        
+        // 🛑 2. ใส่ URL Web App ที่ได้จาก Google Apps Script
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzBNUP8mNvVmKERWOrmGF7FxdMETlxzS5YIIrNQHeZJpJWuKTZNahdDjAVqAVJSnGPwWw/exec"; 
+
+        let userProfile = null;
+
+        // เริ่มการทำงานของ LIFF ทันทีที่เปิดหน้าเว็บ
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                if (liff.isLoggedIn()) {
+                    userProfile = await liff.getProfile();
+                    document.getElementById('status').innerText = "ดึงข้อมูล LINE สำเร็จ พร้อมลงทะเบียน";
+                    document.getElementById('status').style.color = "green";
+                } else {
+                    liff.login();
+                }
+            } catch (err) {
+                document.getElementById('status').innerText = "เกิดข้อผิดพลาด: " + err.message;
+            }
+        }
+        initializeLiff();
+
+        async function submitData() {
+            const name = document.getElementById('name').value.trim();
+            const idCard = document.getElementById('idCard').value.trim();
+            
+            if (!name || idCard.length !== 13 || isNaN(idCard)) {
+                alert('กรุณากรอกชื่อ และเลขบัตร 13 หลักให้ถูกต้อง');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerText = "กำลังบันทึกข้อมูล...";
+            document.getElementById('status').innerText = "กำลังส่งข้อมูลไปยัง Google Sheets...";
+            document.getElementById('status').style.color = "blue";
+
+            const payload = {
+                uid: userProfile.userId,
+                name: name,
+                idCard: idCard
+            };
+
+            try {
+                // ยิงข้อมูลไปที่ Google Apps Script
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    // ใช้ text/plain เพื่อแก้ปัญหา CORS Block จาก Browser
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    document.getElementById('status').innerText = "ลงทะเบียนสำเร็จ!";
+                    document.getElementById('status').style.color = "green";
+                    
+                    // ปิดหน้าต่าง LIFF ทันทีเมื่อบันทึกเสร็จ
+                    liff.sendMessages([{ type: 'text', text: 'ระบบบันทึกข้อมูลเรียบร้อยแล้ว' }])
+                        .then(() => { liff.closeWindow(); })
+                        .catch(err => { liff.closeWindow(); });
+                }
+            } catch (error) {
+                document.getElementById('status').innerText = "Error: " + error.message;
+                document.getElementById('status').style.color = "red";
+                btn.disabled = false;
+                btn.innerText = "บันทึกข้อมูล";
+            }
+        }
+    </script>
+</body>
+</html>
