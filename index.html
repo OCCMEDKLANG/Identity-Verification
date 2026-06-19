@@ -57,27 +57,29 @@
   </div>
 
   <script>
-  // ⚠️ อย่าลืมใส่ LIFF_ID ของคุณ
+  // ⚠️ เปลี่ยนเป็นของตัวเองเหมือนเดิมครับ
   const LIFF_ID = "2010419960-jJFrolbW";
-  // ⚠️ เอา Web App URL อันล่าสุดมาใส่ที่นี่
   const GAS_URL = "https://script.google.com/macros/s/AKfycbzBNUP8mNvVmKERWOrmGF7FxdMETlxzS5YIIrNQHeZJpJWuKTZNahdDjAVqAVJSnGPwWw/exec";
 
   let globalUserId = null;
 
-  // --- จุดที่แก้ไข: ทะลุระบบป้องกัน CORS ของ Google ---
   async function callAPI(action, data = {}) {
     const payloadString = JSON.stringify({ action: action, ...data });
-    
-    // แปลงข้อมูลเป็นแบบ Form Data
     const formData = new URLSearchParams();
     formData.append('payload', payloadString);
 
-    const response = await fetch(GAS_URL, {
-      method: 'POST',
-      body: formData // ส่งเป็นฟอร์มแทน JSON
-    });
-    
-    return await response.json();
+    try {
+      const response = await fetch(GAS_URL, { method: 'POST', body: formData });
+      const text = await response.text(); 
+      try {
+        return JSON.parse(text); 
+      } catch (e) {
+        // ดัก Error ป้องกันระบบรวนเวลา Google ตอบกลับมาเป็นหน้าเว็บผิดพลาด
+        throw new Error("ระบบล่าช้าเกินไป โปรดลองใหม่อีกครั้ง");
+      }
+    } catch (err) {
+      throw err;
+    }
   }
 
   async function main() {
@@ -145,6 +147,7 @@
     callAPI('saveUserData', { userId: globalUserId, formData: formData })
       .then(res => {
         if (res.success) { Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success').then(() => { liff.closeWindow(); }); }
+        else { Swal.fire('ล้มเหลว', res.message, 'error'); }
       }).catch(err => { Swal.fire('บันทึกล้มเหลว', err.message, 'error'); });
   }
 
