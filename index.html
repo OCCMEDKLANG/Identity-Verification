@@ -57,7 +57,7 @@
   </div>
 
   <script>
-  // ⚠️ เปลี่ยนเป็นของตัวเองเหมือนเดิมครับ
+  // ⚠️ เปลี่ยนเป็นค่า LIFF และ URL ของ Web App คุณ
   const LIFF_ID = "2010419960-jJFrolbW";
   const GAS_URL = "https://script.google.com/macros/s/AKfycbzBNUP8mNvVmKERWOrmGF7FxdMETlxzS5YIIrNQHeZJpJWuKTZNahdDjAVqAVJSnGPwWw/exec";
 
@@ -74,7 +74,6 @@
       try {
         return JSON.parse(text); 
       } catch (e) {
-        // ดัก Error ป้องกันระบบรวนเวลา Google ตอบกลับมาเป็นหน้าเว็บผิดพลาด
         throw new Error("ระบบล่าช้าเกินไป โปรดลองใหม่อีกครั้ง");
       }
     } catch (err) {
