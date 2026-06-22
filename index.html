@@ -352,20 +352,48 @@
       callAPI('saveUserData', { userId: globalUserId, formData: data })
         .then(res => {
           if (res.success) {
-            Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success').then(() => {
-              
-              // เช็คจาก URL ว่ามีคำว่า from=stamp ติดมาด้วยไหม
-              const urlParams = new URLSearchParams(window.location.search);
-              if (urlParams.get('from') === 'stamp') {
-                // ⚠️ เอา LIFF ID ของหน้าแสตมป์มาใส่ตรงนี้
-                window.location.replace("https://liff.line.me/ใส่_LIFF_ID_หน้าแสตมป์_ที่นี่");
-              } else {
-                // ถ้ามาจากเมนูอื่น ปิดหน้าต่างตามปกติ
-                liff.sendMessages([{ type: 'text', text: 'ฉันกรอกข้อมูลลงทะเบียน/อัปเดตข้อมูลเรียบร้อยแล้ว' }])
-                    .then(() => liff.closeWindow());
-              }
+            
+            // เช็คว่ามาจากหน้าแสตมป์หรือไม่
+            const urlParams = new URLSearchParams(window.location.search);
+            const isFromStamp = urlParams.get('from') === 'stamp';
 
-            });
+            if (isFromStamp) {
+              // 1. ถ้ามาจากหน้าแสตมป์ -> สร้างปุ่มให้กดกลับไป
+              Swal.fire({
+                title: 'สำเร็จ!',
+                text: 'ผูกบัญชีเรียบร้อยแล้ว กดปุ่มด้านล่างเพื่อกลับไปรับแสตมป์ได้เลยครับ',
+                icon: 'success',
+                confirmButtonText: '🎟️ กลับไปหน้าสะสมแสตมป์',
+                confirmButtonColor: '#16a34a',
+                allowOutsideClick: false
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // ⚠️ อย่าลืมแก้ LIFF_ID หน้าแสตมป์ตรงนี้นะครับ
+                  window.location.replace("https://liff.line.me/ใส่_LIFF_ID_หน้าแสตมป์_ที่นี่");
+                }
+              });
+              
+            } else {
+              // 2. ถ้ามาจากเมนูอื่น -> สร้างปุ่มปิดหน้าต่างปกติ
+              Swal.fire({
+                title: 'สำเร็จ!',
+                text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                icon: 'success',
+                confirmButtonText: 'ปิดหน้าต่าง',
+                confirmButtonColor: '#3085d6',
+                allowOutsideClick: false
+              }).then(() => {
+                // ดักจับ Error ไว้ด้วย กัน LINE เด้งข้อผิดพลาดสีเทาอีก
+                if (liff.isInClient()) {
+                  liff.sendMessages([{ type: 'text', text: 'ฉันกรอกข้อมูลลงทะเบียน/อัปเดตข้อมูลเรียบร้อยแล้ว' }])
+                    .then(() => liff.closeWindow())
+                    .catch(() => liff.closeWindow()); // ถ้าส่งข้อความไม่ได้ ก็บังคับปิดหน้าต่างไปเลย
+                } else {
+                  window.close();
+                }
+              });
+            }
+
           } else { 
             Swal.fire('ล้มเหลว', res.message, 'error'); 
           }
