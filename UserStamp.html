@@ -14,6 +14,8 @@
     .stamp-box { transition: all 0.3s ease; }
     .stamp-active { background-color: #22c55e; color: white; transform: scale(1.05); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .stamp-inactive { background-color: #e5e7eb; color: #9ca3af; }
+    .gacha-box { animation: shake 1s infinite alternate; }
+    @keyframes shake { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-5deg); } 50% { transform: translateY(0) rotate(5deg); } 75% { transform: translateY(-10px) rotate(-5deg); } 100% { transform: translateY(0) rotate(0deg); } }
   </style>
 </head>
 <body class="p-4 pb-10">
@@ -32,7 +34,7 @@
 
   <div id="stampSection" class="hidden max-w-md mx-auto">
     
-    <div class="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center border-t-4 border-green-500">
+    <div class="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center border-t-4 border-green-500">
       <h1 class="text-2xl font-bold text-green-700 mb-1">Passport สุขภาพ</h1>
       <p id="userNameDisplay" class="text-gray-800 font-semibold text-lg mb-4">-</p>
       
@@ -41,7 +43,17 @@
       </div>
       
       <p id="timerDisplay" class="text-sm font-bold text-red-500 mt-2">QR Code รีเฟรชใน: 60 วิ</p>
-      <p class="text-xs text-gray-500 mt-1">ยื่น QR Code นี้ให้เจ้าหน้าที่สแกนเพื่อรับแสตมป์</p>
+      <p class="text-xs text-gray-500 mt-1">ยื่น QR Code ให้เจ้าหน้าที่สแกนรับแสตมป์ (วันละ 1 ครั้ง)</p>
+    </div>
+
+    <!-- กล่องแลกสิทธิ์กาชาปอง (ซ่อนไว้ถ้าไม่มีสิทธิ์) -->
+    <div id="gachaSection" class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 rounded-3xl shadow-lg p-5 mb-4 text-center text-white relative overflow-hidden">
+      <div class="absolute -right-4 -top-4 text-6xl opacity-30">🎁</div>
+      <h2 class="text-lg font-bold mb-1 shadow-sm">คุณมีสิทธิ์ลุ้นรางวัล!</h2>
+      <p class="text-sm mb-3">สะสมครบทุก 5 ครั้ง รับ 1 สิทธิ์เปิดกล่อง</p>
+      <button onclick="playGacha()" class="bg-white text-orange-600 font-bold px-6 py-2 rounded-full shadow-md hover:scale-105 transition-transform">
+        กดเปิดกล่องเลย (เหลือ <span id="ticketCount">0</span> สิทธิ์)
+      </button>
     </div>
 
     <div class="bg-white rounded-3xl shadow-lg p-6 border-t-4 border-blue-500">
@@ -50,16 +62,14 @@
         <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full"><span id="stampCount">0</span>/14 ครั้ง</span>
       </div>
       
-      <div id="stampGrid" class="grid grid-cols-4 gap-3">
-        </div>
+      <div id="stampGrid" class="grid grid-cols-4 gap-3"></div>
     </div>
 
   </div>
 
   <script>
-    // ⚠️ 1. ใส่ข้อมูลตั้งค่าของคุณที่นี่
     const LIFF_ID_STAMP = "2010469434-OPy0wuua"; 
-    const URL_REGISTER_LIFF = "https://liff.line.me/2010419960-jJFrolbW"; // ให้กดแล้วเด้งไปหน้าผูกบัญชี
+    const URL_REGISTER_LIFF = "https://liff.line.me/2010419960-jJFrolbW"; 
     const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbwe0c85_shFvZ8UnH1Rqk1GLDc33xsWqNlUXuRi2ezkaIb9IBXKyn2HXXXP8Z70IpWo/exec"; 
 
     let globalUserId = "";
@@ -87,9 +97,7 @@
         const profile = await liff.getProfile();
         globalUserId = profile.userId;
 
-        loadStampData(true); // โหลดครั้งแรก (โชว์ Loading)
-        
-        // ตั้งเวลารีเฟรชข้อมูลทุกๆ 3 วินาที (รอเจ้าหน้าที่สแกน)
+        loadStampData(true); 
         fetchInterval = setInterval(() => loadStampData(false), 3000);
 
       } catch (err) {
@@ -106,27 +114,32 @@
           
           if (!res.isLinked) {
             document.getElementById('notLinkedSection').classList.remove('hidden');
-            clearInterval(fetchInterval); // หยุดรีเฟรชถ้ายังไม่ผูกบัญชี
+            clearInterval(fetchInterval); 
             return;
           }
 
           document.getElementById('stampSection').classList.remove('hidden');
           document.getElementById('userNameDisplay').innerText = res.name;
           
-          // ถ้ามีแสตมป์เพิ่มขึ้น ให้เล่นเอฟเฟกต์แจ้งเตือน
+          // ระบบแจ้งเตือนเมื่อได้แสตมป์ครบ 5 ดวง
           if (res.stamps > currentStamps && !showLoading) {
-            Swal.fire({
-              title: 'ยินดีด้วย! 🎉',
-              text: `คุณได้รับแสตมป์ครั้งที่ ${res.stamps} แล้ว`,
-              icon: 'success',
-              timer: 3000,
-              showConfirmButton: false
-            });
+            if (res.stamps % 5 === 0) {
+              Swal.fire({ title: 'ยอดเยี่ยมมาก! 🏆', text: `คุณสะสมแสตมป์ครบ ${res.stamps} ดวง ได้รับสิทธิ์เปิดกล่องลุ้นรางวัล 1 สิทธิ์!`, icon: 'success' });
+            } else {
+              Swal.fire({ title: 'สำเร็จ! ✅', text: `คุณได้รับแสตมป์ครั้งที่ ${res.stamps} แล้ว`, icon: 'success', timer: 2000, showConfirmButton: false });
+            }
           }
           currentStamps = res.stamps;
           renderStamps(currentStamps);
 
-          // สร้าง QR Code ครั้งแรก
+          // อัปเดตกล่องกาชาปอง
+          if (res.tickets > 0) {
+            document.getElementById('gachaSection').classList.remove('hidden');
+            document.getElementById('ticketCount').innerText = res.tickets;
+          } else {
+            document.getElementById('gachaSection').classList.add('hidden');
+          }
+
           if (showLoading) generateSecureQR();
 
         }).catch(err => { console.log(err); });
@@ -135,16 +148,14 @@
     function renderStamps(count) {
       document.getElementById('stampCount').innerText = count;
       const grid = document.getElementById('stampGrid');
-      grid.innerHTML = ''; // ล้างของเก่า
+      grid.innerHTML = ''; 
 
       for (let i = 1; i <= 14; i++) {
         const div = document.createElement('div');
         if (i <= count) {
-          // ช่องที่ได้แสตมป์แล้ว
           div.className = 'stamp-box stamp-active aspect-square rounded-2xl flex flex-col items-center justify-center';
           div.innerHTML = `<span class="text-2xl mb-1">🏆</span><span class="text-[10px] font-bold">ครั้งที่ ${i}</span>`;
         } else {
-          // ช่องที่ยังไม่ได้
           div.className = 'stamp-box stamp-inactive aspect-square rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-300';
           div.innerHTML = `<span class="text-xl mb-1 opacity-50">🔒</span><span class="text-[10px] font-semibold">ครั้งที่ ${i}</span>`;
         }
@@ -152,22 +163,40 @@
       }
     }
 
+    function playGacha() {
+      // แอนิเมชันกล่องร่วงลงมา
+      Swal.fire({
+        title: 'เตรียมลุ้นรางวัล...',
+        html: '<div class="gacha-box text-8xl mt-4 drop-shadow-xl">🎁</div><p class="mt-4 text-sm text-gray-500">กรุณารอสักครู่...</p>',
+        showConfirmButton: false,
+        allowOutsideClick: false
+      });
+
+      // ยิงสุ่มหลังบ้าน
+      callBackend('drawGacha', { userId: globalUserId }).then(res => {
+        if (!res.success) { Swal.fire('เกิดข้อผิดพลาด', res.message, 'error'); return; }
+        
+        setTimeout(() => {
+          if (res.isWin) {
+            Swal.fire({ title: '🎉 ยินดีด้วย!', text: `คุณได้รับรางวัล: ${res.prize}`, icon: 'success', confirmButtonText: 'สุดยอดไปเลย!' });
+          } else {
+            Swal.fire({ title: 'เสียใจด้วย 😭', text: 'คุณไม่ได้รับรางวัล โอกาสหน้าลองใหม่นะ!', icon: 'error', confirmButtonText: 'ตกลง' });
+          }
+          loadStampData(true); // รีเฟรชข้อมูลเพื่อหักสิทธิ์หน้าจอ
+        }, 1500); // ดีเลย์ให้คนลุ้น 1.5 วินาที
+        
+      });
+    }
+
     function generateSecureQR() {
-      // สร้าง Payload : UID|เวลาหมดอายุ (ปัจจุบัน + 60 วินาที)
       const expireTime = Date.now() + (60 * 1000); 
       const qrData = `${globalUserId}|${expireTime}`;
 
-      document.getElementById('qrcodeDisplay').innerHTML = ''; // ล้างของเก่า
+      document.getElementById('qrcodeDisplay').innerHTML = ''; 
       qrCodeObj = new QRCode(document.getElementById('qrcodeDisplay'), {
-        text: qrData,
-        width: 180,
-        height: 180,
-        colorDark : "#15803d",
-        colorLight : "#f9fafb",
-        correctLevel : QRCode.CorrectLevel.H
+        text: qrData, width: 180, height: 180, colorDark : "#15803d", colorLight : "#f9fafb", correctLevel : QRCode.CorrectLevel.H
       });
 
-      // รีเซ็ตตัวนับเวลา
       secondsLeft = 60;
       clearInterval(refreshInterval);
       refreshInterval = setInterval(updateTimer, 1000);
@@ -176,14 +205,10 @@
     function updateTimer() {
       secondsLeft--;
       document.getElementById('timerDisplay').innerText = `QR Code รีเฟรชใน: ${secondsLeft} วิ`;
-      if (secondsLeft <= 0) {
-        generateSecureQR(); // หมดเวลาให้เจเนอเรตใหม่
-      }
+      if (secondsLeft <= 0) generateSecureQR(); 
     }
 
-    function goToRegister() {
-      window.location.href = URL_REGISTER_LIFF;
-    }
+    function goToRegister() { window.location.replace(URL_REGISTER_LIFF); }
 
     main();
   </script>
