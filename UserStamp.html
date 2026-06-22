@@ -209,10 +209,8 @@
     }
 
     function goToRegister() { 
-      // แนบคำว่า ?from=stamp ส่งติดไปกับ URL ด้วย
-      let url = URL_REGISTER_LIFF;
-      url += url.includes('?') ? '&from=stamp' : '?from=stamp';
-      window.location.replace(url); 
+      // สลับไปไฟล์ index.html ที่อยู่ในโฟลเดอร์เดียวกันตรงๆ
+      window.location.href = "index.html?from=stamp"; 
     }
 
     main();
