@@ -208,7 +208,11 @@
       if (secondsLeft <= 0) generateSecureQR(); 
     }
 
-    function goToRegister() { window.location.replace(URL_REGISTER_LIFF); }
+    function goToRegister() { 
+      // แอบฝังความจำไว้ว่าผู้ใช้คนนี้มาจากหน้ากิจกรรมแสตมป์
+      localStorage.setItem('returnToStamp', 'true');
+      window.location.replace(URL_REGISTER_LIFF); 
+    }
 
     main();
   </script>
