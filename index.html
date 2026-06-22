@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบลงทะเบียน</title>
+  <title>ระบบลงทะเบียนผูกบัญชี</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -13,7 +13,7 @@
 <body class="p-4">
 
   <div id="loading" class="text-center mt-20">
-    <div class="animate-spin inline-block w-10 h-10 border-[4px] border-current border-t-transparent text-green-600 rounded-full" role="status"></div>
+    <div class="animate-spin inline-block w-10 h-10 border-[4px] border-green-600 rounded-full" role="status"></div>
     <p class="mt-4 text-gray-600">กำลังเชื่อมต่อข้อมูล...</p>
   </div>
 
@@ -29,10 +29,13 @@
     <div class="space-y-4">
       <div><label class="block text-sm text-gray-600 mb-1">ชื่อ-นามสกุล</label>
       <input type="text" id="f_name" class="w-full border p-2 rounded-lg"></div>
+
       <div><label class="block text-sm text-gray-600 mb-1">เลขบัตรประชาชน 13 หลัก</label>
       <input type="text" id="f_idCard" class="w-full border p-2 rounded-lg" maxlength="13"></div>
+
       <div><label class="block text-sm text-gray-600 mb-1">ตำแหน่ง</label>
       <input type="text" id="f_position" class="w-full border p-2 rounded-lg"></div>
+
       <div><label class="block text-sm text-gray-600 mb-1">ประเภทบุคลากร</label>
       <select id="f_type" class="w-full border p-2 rounded-lg bg-white">
         <option value="">-- เลือกประเภท --</option>
@@ -40,6 +43,7 @@
         <option value="BB">BB</option>
         <option value="CC">CC</option>
       </select></div>
+
       <div><label class="block text-sm text-gray-600 mb-1">หน่วยงานที่ปฏิบัติงานจริง</label>
       <select id="f_dept" class="w-full border p-2 rounded-lg bg-white">
         <option value="">-- เลือกหน่วยงาน --</option>
@@ -47,122 +51,141 @@
         <option value="B">B</option>
         <option value="C">C</option>
       </select></div>
+
       <div><label class="block text-sm text-gray-600 mb-1">วัน/เดือน/ปีพ.ศ.เกิด (เช่น 01/01/2542)</label>
       <input type="text" id="f_dob" class="w-full border p-2 rounded-lg"></div>
+
       <div><label class="block text-sm text-gray-600 mb-1">เบอร์โทรศัพท์ส่วนตัว</label>
       <input type="tel" id="f_phone" class="w-full border p-2 rounded-lg" maxlength="10"></div>
     </div>
+
     <button id="btnSave" onclick="saveData()" class="w-full bg-green-600 text-white font-bold p-3 rounded-lg mt-6 hover:bg-green-700">บันทึกข้อมูล</button>
     <button id="btnUnlink" onclick="unlinkAccount()" class="w-full bg-red-100 text-red-600 font-bold p-3 rounded-lg mt-3 hover:bg-red-200 hidden">ยกเลิกการผูกบัญชี (ลบข้อมูล)</button>
   </div>
 
   <script>
-  // ⚠️ เปลี่ยนเป็นค่า LIFF และ URL ของ Web App คุณ
-  const LIFF_ID = "2010419960-jJFrolbW";
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwqpHVKFKzCP_ICyDtdltZ4Nk-foKmytN92nT5YFPzH0wJoxfWlZ1Y0i6MiAFVdBZosdw/exec";
+    // ⚠️ นำ LIFF ID และ GAS Web App URL ใส่ให้ตรงนะครับ
+    const LIFF_ID = "ใส่_LIFF_ID_ของคุณที่นี่";
+    const GAS_URL = "ใส่_WEB_APP_URL_ของคุณที่นี่";
 
-  let globalUserId = null;
+    let globalUserId = null;
 
-  async function callAPI(action, data = {}) {
-    const payloadString = JSON.stringify({ action: action, ...data });
-    const formData = new URLSearchParams();
-    formData.append('payload', payloadString);
+    // ฟังก์ชันเชื่อมต่อฐานข้อมูล Google Script
+    async function callAPI(action, data = {}) {
+      const payloadString = JSON.stringify({ action: action, ...data });
+      const response = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payloadString
+      });
+      return await response.json();
+    }
 
-    try {
-      const response = await fetch(GAS_URL, { method: 'POST', body: formData });
-      const text = await response.text(); 
+    // เปิดหน้าแรก
+    async function main() {
       try {
-        return JSON.parse(text); 
-      } catch (e) {
-        throw new Error("ระบบล่าช้าเกินไป โปรดลองใหม่อีกครั้ง");
+        await liff.init({ liffId: LIFF_ID });
+        if (!liff.isLoggedIn()) { liff.login(); return; }
+        
+        const profile = await liff.getProfile();
+        globalUserId = profile.userId;
+        
+        callAPI('checkUserLinkStatus', { userId: globalUserId })
+          .then(res => {
+            document.getElementById('loading').classList.add('hidden');
+            if (res && res.isLinked) {
+              document.getElementById('verifySection').classList.remove('hidden');
+            } else {
+              document.getElementById('formSection').classList.remove('hidden');
+            }
+          })
+          .catch(err => {
+            document.getElementById('loading').classList.add('hidden');
+            Swal.fire("ข้อผิดพลาด", err.message, "error");
+          });
+      } catch (err) {
+        document.getElementById('loading').classList.add('hidden');
+        Swal.fire("LIFF Error", err.message, "error");
       }
-    } catch (err) {
-      throw err;
     }
-  }
 
-  async function main() {
-    try {
-      await liff.init({ liffId: LIFF_ID });
-      if (!liff.isLoggedIn()) { liff.login(); return; }
-      const profile = await liff.getProfile();
-      globalUserId = profile.userId;
+    // ยืนยันข้อมูลวันเกิด
+    function verifyDOB() {
+      const dob = document.getElementById('v_dob').value.trim();
+      if (!dob) { Swal.fire('แจ้งเตือน', 'กรุณากรอกวันเดือนปีเกิด', 'warning'); return; }
       
-      callAPI('checkUserLinkStatus', { userId: globalUserId })
+      Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+      
+      callAPI('verifyAndGetUserData', { userId: globalUserId, dob: dob })
         .then(res => {
-          document.getElementById('loading').classList.add('hidden');
-          if (res && res.isLinked) {
-            document.getElementById('verifySection').classList.remove('hidden');
-          } else {
+          if (res.success) {
+            Swal.close();
+            document.getElementById('verifySection').classList.add('hidden');
             document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('formTitle').innerText = "⚙️ จัดการข้อมูลบัญชี";
+            
+            document.getElementById('f_name').value = res.data.name;
+            document.getElementById('f_idCard').value = res.data.idCard;
+            document.getElementById('f_position').value = res.data.position;
+            document.getElementById('f_type').value = res.data.type;
+            document.getElementById('f_dept').value = res.data.dept;
+            document.getElementById('f_dob').value = res.data.dob;
+            document.getElementById('f_phone').value = res.data.phone;
+            
+            document.getElementById('btnSave').innerText = "อัปเดตข้อมูล";
+            document.getElementById('btnUnlink').classList.remove('hidden');
+          } else { 
+            Swal.fire('ข้อมูลไม่ถูกต้อง', res.message, 'error'); 
           }
-        })
-        .catch(err => {
-          document.getElementById('loading').classList.add('hidden');
-          Swal.fire("ข้อผิดพลาด", err.message, "error");
-        });
-    } catch (err) {
-      document.getElementById('loading').classList.add('hidden');
-      Swal.fire("LIFF Error", err.message, "error");
+        }).catch(err => { Swal.fire('เกิดข้อผิดพลาด', err.message, 'error'); });
     }
-  }
 
-  function verifyDOB() {
-    const dob = document.getElementById('v_dob').value.trim();
-    if (!dob) { Swal.fire('แจ้งเตือน', 'กรุณากรอกวันเดือนปีเกิด', 'warning'); return; }
-    Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-    callAPI('verifyAndGetUserData', { userId: globalUserId, dob: dob })
-      .then(res => {
-        if (res.success) {
-          Swal.close();
-          document.getElementById('verifySection').classList.add('hidden');
-          document.getElementById('formSection').classList.remove('hidden');
-          document.getElementById('formTitle').innerText = "⚙️ จัดการข้อมูลบัญชี";
-          document.getElementById('f_name').value = res.data.name;
-          document.getElementById('f_idCard').value = res.data.idCard;
-          document.getElementById('f_position').value = res.data.position;
-          document.getElementById('f_type').value = res.data.type;
-          document.getElementById('f_dept').value = res.data.dept;
-          document.getElementById('f_dob').value = res.data.dob;
-          document.getElementById('f_phone').value = res.data.phone;
-          document.getElementById('btnSave').innerText = "อัปเดตข้อมูล";
-          document.getElementById('btnUnlink').classList.remove('hidden');
-        } else { Swal.fire('ข้อมูลไม่ถูกต้อง', res.message, 'error'); }
-      }).catch(err => { Swal.fire('เกิดข้อผิดพลาด', err.message, 'error'); });
-  }
+    // ส่งบันทึกข้อมูล
+    function saveData() {
+      const data = {
+        name: document.getElementById('f_name').value.trim(),
+        idCard: document.getElementById('f_idCard').value.trim(),
+        position: document.getElementById('f_position').value.trim(),
+        type: document.getElementById('f_type').value,
+        dept: document.getElementById('f_dept').value,
+        dob: document.getElementById('f_dob').value.trim(),
+        phone: document.getElementById('f_phone').value.trim()
+      };
 
-  function saveData() {
-    const formData = { 
-        name: document.getElementById('f_name').value.trim(), 
-        idCard: document.getElementById('f_idCard').value.trim(), 
-        position: document.getElementById('f_position').value.trim(), 
-        type: document.getElementById('f_type').value, 
-        dept: document.getElementById('f_dept').value, 
-        dob: document.getElementById('f_dob').value.trim(), 
-        phone: document.getElementById('f_phone').value.trim() 
-    };
-    if (!formData.name || !formData.idCard || !formData.dob) { Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลที่จำเป็น', 'warning'); return; }
-    Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-    callAPI('saveUserData', { userId: globalUserId, formData: formData })
-      .then(res => {
-        if (res.success) { Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success').then(() => { liff.closeWindow(); }); }
-        else { Swal.fire('ล้มเหลว', res.message, 'error'); }
-      }).catch(err => { Swal.fire('บันทึกล้มเหลว', err.message, 'error'); });
-  }
-
-  function unlinkAccount() {
-    Swal.fire({
-      title: 'ยืนยันการยกเลิก?', text: "ระบบจะลบข้อมูลการผูกบัญชีของคุณ", icon: 'warning',
-      showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'ยกเลิกการผูกบัญชี'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        callAPI('unlinkUserData', { userId: globalUserId }).then(res => {
-          if (res.success) Swal.fire('สำเร็จ', 'ลบข้อมูลเรียบร้อย', 'success').then(() => { window.location.reload(); });
-        });
+      if (!data.name || !data.idCard || !data.dob) { 
+        Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลที่จำเป็น', 'warning'); return; 
       }
-    });
-  }
-  main();
+      
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+      
+      callAPI('saveUserData', { userId: globalUserId, formData: data })
+        .then(res => {
+          if (res.success) {
+            Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success').then(() => {
+              liff.sendMessages([{ type: 'text', text: 'ฉันกรอกข้อมูลลงทะเบียน/อัปเดตข้อมูลเรียบร้อยแล้ว' }])
+                  .then(() => liff.closeWindow());
+            });
+          } else { 
+            Swal.fire('ล้มเหลว', res.message, 'error'); 
+          }
+        }).catch(err => { Swal.fire('บันทึกล้มเหลว', err.message, 'error'); });
+    }
+
+    // ลบบัญชี
+    function unlinkAccount() {
+      Swal.fire({
+        title: 'ยืนยันการยกเลิก?', text: "ระบบจะลบข้อมูลการผูกบัญชีของคุณ", icon: 'warning',
+        showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'ยกเลิกการผูกบัญชี'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          callAPI('unlinkUserData', { userId: globalUserId }).then(res => {
+            if (res.success) Swal.fire('สำเร็จ', 'ลบข้อมูลเรียบร้อย', 'success').then(() => { window.location.reload(); });
+          });
+        }
+      });
+    }
+
+    main();
   </script>
 </body>
 </html>
