@@ -348,49 +348,40 @@
       const data = { name: combinedName, idCard: idCard, position: position, type: type, dept: dept, dob: dob, phone: phone };
 
       Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-      
+
       callAPI('saveUserData', { userId: globalUserId, formData: data })
         .then(res => {
           if (res.success) {
             
-            // เช็คว่ามาจากหน้าแสตมป์หรือไม่
+            // เช็คว่ามีคำว่า from=stamp ติดมากับ URL หรือไม่
             const urlParams = new URLSearchParams(window.location.search);
             const isFromStamp = urlParams.get('from') === 'stamp';
 
             if (isFromStamp) {
-              // 1. ถ้ามาจากหน้าแสตมป์ -> สร้างปุ่มให้กดกลับไป
+              // 1. ถ้ามาจากหน้าแสตมป์ -> เด้งกลับหน้าแสตมป์แบบตรงๆ
               Swal.fire({
-                title: 'สำเร็จ!',
-                text: 'ผูกบัญชีเรียบร้อยแล้ว กดปุ่มด้านล่างเพื่อกลับไปรับแสตมป์ได้เลยครับ',
+                title: 'ผูกบัญชีสำเร็จ!',
+                text: 'กำลังพากลับไปหน้าสะสมแสตมป์...',
                 icon: 'success',
-                confirmButtonText: '🎟️ กลับไปหน้าสะสมแสตมป์',
-                confirmButtonColor: '#16a34a',
+                showConfirmButton: false, // ซ่อนปุ่มไปเลย ให้เด้งเอง
+                timer: 2000,              // หน่วงเวลา 2 วินาทีให้ผู้ใช้อ่าน
                 allowOutsideClick: false
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  // ⚠️ อย่าลืมแก้ LIFF_ID หน้าแสตมป์ตรงนี้นะครับ
-                  window.location.replace("https://liff.line.me/ใส่_LIFF_ID_หน้าแสตมป์_ที่นี่");
-                }
+              }).then(() => {
+                // สลับกลับไปไฟล์ UserStamp.html ที่อยู่ในโฟลเดอร์เดียวกัน
+                window.location.href = "UserStamp.html";
               });
               
             } else {
-              // 2. ถ้ามาจากเมนูอื่น -> สร้างปุ่มปิดหน้าต่างปกติ
+              // 2. ถ้ามาจากเมนูทั่วไป -> ปิดหน้าต่างปกติ
               Swal.fire({
                 title: 'สำเร็จ!',
                 text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
                 icon: 'success',
                 confirmButtonText: 'ปิดหน้าต่าง',
-                confirmButtonColor: '#3085d6',
+                confirmButtonColor: '#16a34a',
                 allowOutsideClick: false
               }).then(() => {
-                // ดักจับ Error ไว้ด้วย กัน LINE เด้งข้อผิดพลาดสีเทาอีก
-                if (liff.isInClient()) {
-                  liff.sendMessages([{ type: 'text', text: 'ฉันกรอกข้อมูลลงทะเบียน/อัปเดตข้อมูลเรียบร้อยแล้ว' }])
-                    .then(() => liff.closeWindow())
-                    .catch(() => liff.closeWindow()); // ถ้าส่งข้อความไม่ได้ ก็บังคับปิดหน้าต่างไปเลย
-                } else {
-                  window.close();
-                }
+                liff.closeWindow(); // สั่งปิด LIFF กลับสู่แชท
               });
             }
 
