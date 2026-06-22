@@ -209,9 +209,10 @@
     }
 
     function goToRegister() { 
-      // แอบฝังความจำไว้ว่าผู้ใช้คนนี้มาจากหน้ากิจกรรมแสตมป์
-      localStorage.setItem('returnToStamp', 'true');
-      window.location.replace(URL_REGISTER_LIFF); 
+      // แนบคำว่า ?from=stamp ส่งติดไปกับ URL ด้วย
+      let url = URL_REGISTER_LIFF;
+      url += url.includes('?') ? '&from=stamp' : '?from=stamp';
+      window.location.replace(url); 
     }
 
     main();
