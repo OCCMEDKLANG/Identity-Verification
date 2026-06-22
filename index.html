@@ -351,10 +351,23 @@
       
       callAPI('saveUserData', { userId: globalUserId, formData: data })
         .then(res => {
+          // เปลี่ยนโค้ดตรงส่วนที่บันทึกสำเร็จ ใน Index.html
           if (res.success) {
             Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success').then(() => {
-              liff.sendMessages([{ type: 'text', text: 'ฉันกรอกข้อมูลลงทะเบียน/อัปเดตข้อมูลเรียบร้อยแล้ว' }])
-                  .then(() => liff.closeWindow());
+              
+              // เช็คความจำว่าผู้ใช้คนนี้มาจากหน้าแสตมป์หรือไม่
+              if (localStorage.getItem('returnToStamp') === 'true') {
+                localStorage.removeItem('returnToStamp'); // ลบความจำทิ้งเพื่อไม่ให้ค้าง
+                
+                // ⚠️ นำ LIFF ID หน้าแสตมป์ของคุณมาใส่ตรงนี้
+                window.location.replace("https://liff.line.me/ใส่_LIFF_ID_หน้าแสตมป์_ที่นี่"); 
+                
+              } else {
+                // ถ้ามาจากเมนูอื่น ให้ส่งข้อความแล้วปิดหน้าต่างกลับสู่แชทตามปกติ
+                liff.sendMessages([{ type: 'text', text: 'ฉันกรอกข้อมูลลงทะเบียน/อัปเดตข้อมูลเรียบร้อยแล้ว' }])
+                    .then(() => liff.closeWindow());
+              }
+              
             });
           } else { 
             Swal.fire('ล้มเหลว', res.message, 'error'); 
