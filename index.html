@@ -1,26 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบลงทะเบียนผูกบัญชี</title>
+  <title>ข้อมูลของฉัน</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
-  <style> body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; } </style>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+  <style> 
+    body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; } 
+    .tab-active { border-bottom-color: #16a34a; color: #16a34a; font-weight: 700; }
+  </style>
 </head>
 <body class="p-4 pb-20">
 
-  <div id="loading" class="text-center mt-20">
+  <div id="loading" class="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
     <div class="animate-spin inline-block w-10 h-10 border-[4px] border-green-600 border-t-transparent rounded-full" role="status"></div>
     <p class="mt-4 text-gray-600">กำลังเชื่อมต่อข้อมูล...</p>
   </div>
 
-  <!-- หน้าต่างตรวจสอบวันเกิด (กรณีผูกแล้วจะเข้ามาดู) -->
   <div id="verifySection" class="hidden max-w-md mx-auto bg-white p-6 rounded-xl shadow-md mt-4">
-    <h2 class="text-xl font-bold mb-2 text-gray-800">🔒 ยืนยันตัวตน</h2>
-    <p class="text-sm text-gray-500 mb-6">กรุณาระบุวันเดือนปีเกิดของท่านเพื่อเข้าดูข้อมูลส่วนบุคคล</p>
+    <h2 class="text-xl font-bold mb-2 text-gray-800">🔒 ยืนยันตัวตนเพื่อเข้าถึงข้อมูล</h2>
+    <p class="text-sm text-gray-500 mb-6">กรุณาระบุวันเดือนปีเกิดของท่านเพื่อเข้าดูเมนูข้อมูลของฉันค่ะ</p>
     
     <div class="relative mb-4">
       <input type="text" id="v_dob" placeholder="วว/ดด/ปปปป (เช่น 01/01/2542)" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -31,87 +33,107 @@
     <button onclick="verifyDOB()" class="w-full bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700">ตรวจสอบข้อมูล</button>
   </div>
 
-  <!-- หน้าต่างฟอร์มหลัก -->
-  <div id="formSection" class="hidden max-w-md mx-auto bg-white p-6 rounded-xl shadow-md mt-4">
-    <h2 id="formTitle" class="text-xl font-bold mb-4 text-gray-800">📝 ลงทะเบียนผูกบัญชี</h2>
-    <div class="space-y-4">
+  <div id="mainDashboard" class="hidden max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden mt-4">
+    
+    <div class="flex border-b border-gray-200 bg-gray-50">
+      <button onclick="switchTab('profileTab')" id="btn-profileTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700 tab-active">
+        ประวัติส่วนบุคคล
+      </button>
+      <button onclick="switchTab('vaccineTab')" id="btn-vaccineTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+        ประวัติวัคซีน
+      </button>
+      <button onclick="switchTab('mentalTab')" id="btn-mentalTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+        ประเมินสุขภาพจิต
+      </button>
+    </div>
+
+    <div class="p-6">
       
-      <!-- คำนำหน้า และ ชื่อ-สกุล -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
-        <select id="f_prefix" onchange="togglePrefix(); removeError(this)" class="w-full border p-2 rounded-lg bg-white mb-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-          <option value="">-- เลือกคำนำหน้า --</option>
-          <option value="นาย">นาย</option>
-          <option value="นาง">นาง</option>
-          <option value="นางสาว">นางสาว</option>
-          <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
-        </select>
-        <input type="text" id="f_other_prefix" placeholder="โปรดระบุคำนำหน้า" oninput="removeError(this)" class="w-full border p-2 rounded-lg mb-2 hidden focus:outline-none focus:ring-2 focus:ring-green-500">
-        
-        <div class="flex gap-2">
-          <input type="text" id="f_firstname" placeholder="ชื่อจริง" oninput="removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-          <input type="text" id="f_lastname" placeholder="นามสกุล" oninput="removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+      <div id="content-profileTab" class="tab-content">
+        <h2 id="formTitle" class="text-lg font-bold mb-4 text-gray-800">📝 ลงทะเบียนข้อมูลผู้ใช้งาน</h2>
+        <div class="space-y-4">
+          
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
+            <select id="f_prefix" onchange="togglePrefix(); removeError(this)" class="w-full border p-2 rounded-lg bg-white mb-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="">-- เลือกคำนำหน้า --</option>
+              <option value="นาย">นาย</option>
+              <option value="นาง">นาง</option>
+              <option value="นางสาว">นางสาว</option>
+              <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
+            </select>
+            <input type="text" id="f_other_prefix" placeholder="โปรดระบุคำนำหน้า" oninput="removeError(this)" class="w-full border p-2 rounded-lg mb-2 hidden focus:outline-none focus:ring-2 focus:ring-green-500">
+            <div class="flex gap-2">
+              <input type="text" id="f_firstname" placeholder="ชื่อจริง" oninput="removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              <input type="text" id="f_lastname" placeholder="นามสกุล" oninput="removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">เลขบัตรประชาชน 13 หลัก <span class="text-red-500">*</span></label>
+            <input type="text" id="f_idCard" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, ''); removeError(this)" placeholder="กรอกเฉพาะตัวเลข 13 หลัก">
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">วันเกิด (วว/ดด/ปปปป พ.ศ.) <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <input type="text" id="f_dob" placeholder="เช่น 01/01/2542" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              <input type="date" class="absolute top-0 right-0 w-10 h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'f_dob'); removeError(document.getElementById('f_dob'))">
+              <div class="absolute right-3 top-2 pointer-events-none text-gray-400">📅</div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">เบอร์โทรศัพท์มือถือ 10 หลัก <span class="text-red-500">*</span></label>
+            <input type="tel" id="f_phone" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, ''); removeError(this)" placeholder="ตัวอย่าง 0812345678">
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">ตำแหน่ง <span class="text-red-500">*</span></label>
+            <input type="text" id="f_position" oninput="removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">ประเภทบุคลากร <span class="text-red-500">*</span></label>
+            <select id="f_type" onchange="removeError(this)" class="w-full border p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="">-- เลือกประเภท --</option>
+              <option value="AA">AA</option>
+              <option value="BB">BB</option>
+              <option value="CC">CC</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">หน่วยงานที่ปฏิบัติงานจริง <span class="text-red-500">*</span></label>
+            <input list="dept_list" id="f_dept" class="w-full border p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="พิมพ์ค้นหา หรือเลือกหน่วยงาน" oninput="removeError(this)">
+            <datalist id="dept_list">
+              <option value="สำนักการแพทย์">
+              <option value="สำนักอนามัย">
+              <option value="โรงพยาบาลกลาง">
+              <option value="โรงพยาบาลตากสิน">
+              <option value="สำนักงานเขต กทม.">
+            </datalist>
+          </div>
+
         </div>
+
+        <button id="btnSave" onclick="saveData()" class="w-full bg-green-600 text-white font-bold p-3 rounded-lg mt-6 hover:bg-green-700 shadow-md">บันทึกข้อมูล</button>
+        <button id="btnUnlink" onclick="unlinkAccount()" class="w-full bg-red-100 text-red-600 font-bold p-3 rounded-lg mt-3 hover:bg-red-200 hidden">ยกเลิกการผูกบัญชี (ลบข้อมูลออกจากระบบ)</button>
       </div>
 
-      <!-- เลขบัตร 13 หลัก -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">เลขบัตรประชาชน 13 หลัก <span class="text-red-500">*</span></label>
-        <input type="text" id="f_idCard" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, ''); removeError(this)" placeholder="กรอกเฉพาะตัวเลข 13 หลัก">
+      <div id="content-vaccineTab" class="tab-content hidden text-center py-10">
+        <div class="text-5xl mb-4 text-green-500">💉</div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">ระบบประวัติการรับวัคซีน</h3>
+        <p class="text-sm text-gray-500 max-w-xs mx-auto">ระบบฐานข้อมูลวัคซีนส่วนบุคคลกำลังอยู่ระหว่างจัดเตรียมโครงสร้างข้อมูลเพื่อเชื่อมต่อกับ Main Sheet ค่ะ</p>
       </div>
 
-      <!-- วันเกิด -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">วันเกิด (วว/ดด/ปปปป พ.ศ.) <span class="text-red-500">*</span></label>
-        <div class="relative">
-          <input type="text" id="f_dob" placeholder="เช่น 01/01/2542" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-          <input type="date" class="absolute top-0 right-0 w-10 h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'f_dob'); removeError(document.getElementById('f_dob'))">
-          <div class="absolute right-3 top-2 pointer-events-none text-gray-400">📅</div>
-        </div>
-      </div>
-
-      <!-- เบอร์โทร 10 หลัก -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">เบอร์โทรศัพท์มือถือ 10 หลัก <span class="text-red-500">*</span></label>
-        <input type="tel" id="f_phone" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, ''); removeError(this)" placeholder="ตัวอย่าง 0812345678">
-      </div>
-
-      <!-- ตำแหน่ง -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">ตำแหน่ง <span class="text-red-500">*</span></label>
-        <input type="text" id="f_position" oninput="removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-      </div>
-
-      <!-- ประเภทบุคลากร -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">ประเภทบุคลากร <span class="text-red-500">*</span></label>
-        <select id="f_type" onchange="removeError(this)" class="w-full border p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
-          <option value="">-- เลือกประเภท --</option>
-          <option value="AA">AA</option>
-          <option value="BB">BB</option>
-          <option value="CC">CC</option>
-        </select>
-      </div>
-
-      <!-- หน่วยงาน (พิมพ์ค้นหาได้จาก Datalist) -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">หน่วยงานที่ปฏิบัติงานจริง <span class="text-red-500">*</span></label>
-        <input list="dept_list" id="f_dept" class="w-full border p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="พิมพ์ค้นหา หรือกดเลือกหน่วยงาน" oninput="removeError(this)">
-        
-        <!-- คุณสามารถเพิ่มรายชื่อหน่วยงานในนี้ได้เรื่อยๆ ครับ -->
-        <datalist id="dept_list">
-          <option value="สำนักการแพทย์">
-          <option value="สำนักอนามัย">
-          <option value="โรงพยาบาลกลาง">
-          <option value="โรงพยาบาลตากสิน">
-          <option value="สำนักงานเขต กทม.">
-        </datalist>
+      <div id="content-mentalTab" class="tab-content hidden text-center py-10">
+        <div class="text-5xl mb-4 text-pink-500">🧠</div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">ระบบประเมินสุขภาพจิต</h3>
+        <p class="text-sm text-gray-500 max-w-xs mx-auto">แบบประเมินดัชนีชี้วัดความสุขและระดับความเครียด กำลังอยู่ระหว่างการพัฒนาคลังข้อคำถามร่วมกับคณะกรรมการแพทย์ค่ะ</p>
       </div>
 
     </div>
-
-    <button id="btnSave" onclick="saveData()" class="w-full bg-green-600 text-white font-bold p-3 rounded-lg mt-8 hover:bg-green-700">บันทึกข้อมูล</button>
-    <button id="btnUnlink" onclick="unlinkAccount()" class="w-full bg-red-100 text-red-600 font-bold p-3 rounded-lg mt-3 hover:bg-red-200 hidden">ยกเลิกการผูกบัญชี (ลบข้อมูล)</button>
   </div>
 
   <script>
@@ -119,9 +141,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwqpHVKFKzCP_ICyDtdltZ4Nk-foKmytN92nT5YFPzH0wJoxfWlZ1Y0i6MiAFVdBZosdw/exec";
     let globalUserId = null;
 
-    // --- ฟังก์ชันช่วยเหลือ UI ---
-    
-    // พิมพ์วันเกิดแล้วเติมเครื่องหมาย / ให้อัตโนมัติ
+    // ฟังก์ชันจัดฟอร์แมตวันที่พิมพ์อัตโนมัติ
     function formatDate(input) {
       let v = input.value.replace(/\D/g, '');
       if (v.length > 8) v = v.substring(0, 8);
@@ -134,7 +154,7 @@
       }
     }
 
-    // แปลง ค.ศ. จากปฏิทินเป็น พ.ศ.
+    // ซิงก์ข้อมูลปฏิทินแปลงเป็น ค.ศ. -> พ.ศ.
     function syncDate(dateInput, targetId) {
       if (!dateInput.value) return;
       const parts = dateInput.value.split('-'); 
@@ -144,33 +164,27 @@
       }
     }
 
-    // เปิด/ปิดช่องกรอกคำนำหน้า "อื่นๆ"
     function togglePrefix() {
       const val = document.getElementById('f_prefix').value;
       const otherInput = document.getElementById('f_other_prefix');
-      if (val === "อื่นๆ") {
-        otherInput.classList.remove("hidden");
-      } else {
-        otherInput.classList.add("hidden");
-        otherInput.value = "";
-      }
+      if (val === "อื่นๆ") otherInput.classList.remove("hidden");
+      else { otherInput.classList.add("hidden"); otherInput.value = ""; }
     }
 
-    // เอาไฮไลท์สีแดงออกเมื่อผู้ใช้เริ่มพิมพ์แก้ไข
-    function removeError(el) {
-      el.classList.remove('border-red-500', 'ring-2', 'ring-red-500', 'bg-red-50');
-    }
-
-    // เช็คเงื่อนไข ถ้าไม่ผ่านให้ใส่ไฮไลท์สีแดง
+    function removeError(el) { el.classList.remove('border-red-500', 'ring-2', 'ring-red-500', 'bg-red-50'); }
     function checkError(el, condition) {
-      if (!condition) {
-        el.classList.add('border-red-500', 'ring-2', 'ring-red-500', 'bg-red-50');
-        return el;
-      }
+      if (!condition) { el.classList.add('border-red-500', 'ring-2', 'ring-red-500', 'bg-red-50'); return el; }
       return null;
     }
 
-    // ---------------------------------
+    // ฟังก์ชันสลับแท็บ
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+      document.querySelectorAll('[id^="btn-"]').forEach(btn => btn.classList.remove('tab-active'));
+      
+      document.getElementById('content-' + tabId).classList.remove('hidden');
+      document.getElementById('btn-' + tabId).classList.add('tab-active');
+    }
 
     async function callAPI(action, data = {}) {
       const payloadString = JSON.stringify({ action: action, ...data });
@@ -196,7 +210,7 @@
             if (res && res.isLinked) {
               document.getElementById('verifySection').classList.remove('hidden');
             } else {
-              document.getElementById('formSection').classList.remove('hidden');
+              document.getElementById('mainDashboard').classList.remove('hidden');
             }
           })
           .catch(err => {
@@ -212,48 +226,35 @@
     function verifyDOB() {
       const dobInput = document.getElementById('v_dob');
       const dob = dobInput.value.trim();
+      if (!dob) { checkError(dobInput, false); Swal.fire('แจ้งเตือน', 'กรุณากรอกวันเกิดเพื่อตรวจสอบยืนยันสิทธิ์', 'warning'); return; }
       
-      if (!dob) { 
-        checkError(dobInput, false);
-        Swal.fire('แจ้งเตือน', 'กรุณากรอกวันเดือนปีเกิด', 'warning'); 
-        return; 
-      }
-      
-      Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+      Swal.fire({ title: 'กำลังตรวจสอบสิทธิ์...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       
       callAPI('verifyAndGetUserData', { userId: globalUserId, dob: dob })
         .then(res => {
           if (res.success) {
             Swal.close();
             document.getElementById('verifySection').classList.add('hidden');
-            document.getElementById('formSection').classList.remove('hidden');
-            document.getElementById('formTitle').innerText = "⚙️ จัดการข้อมูลบัญชี";
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('formTitle').innerText = "⚙️ จัดการข้อมูลบัญชีผู้ใช้งาน";
             
-            // แตกคำนำหน้า ชื่อ นามสกุล เพื่อใส่กลับไปในฟอร์มให้ถูกต้อง
             let fullName = res.data.name;
-            let prefix = "อื่นๆ";
-            let fname = fullName;
-            let lname = "";
+            let prefix = "อื่นๆ"; let fname = fullName; let lname = "";
             const prefixes = ["นาย", "นางสาว", "นาง"];
             for (let p of prefixes) {
               if (fullName.startsWith(p)) {
                 prefix = p;
                 let rest = fullName.substring(p.length).trim();
                 let parts = rest.split(' ');
-                fname = parts[0] || '';
-                lname = parts.slice(1).join(' ') || '';
+                fname = parts[0] || ''; lname = parts.slice(1).join(' ') || '';
                 break;
               }
             }
             
             document.getElementById('f_prefix').value = prefix;
             togglePrefix();
-            if (prefix === "อื่นๆ") {
-              document.getElementById('f_other_prefix').value = fname;
-            } else {
-              document.getElementById('f_firstname').value = fname;
-              document.getElementById('f_lastname').value = lname;
-            }
+            if (prefix === "อื่นๆ") document.getElementById('f_other_prefix').value = fname;
+            else { document.getElementById('f_firstname').value = fname; document.getElementById('f_lastname').value = lname; }
 
             document.getElementById('f_idCard').value = res.data.idCard;
             document.getElementById('f_position').value = res.data.position;
@@ -265,140 +266,95 @@
             document.getElementById('btnSave').innerText = "อัปเดตข้อมูล";
             document.getElementById('btnUnlink').classList.remove('hidden');
           } else { 
-            Swal.fire('ข้อมูลไม่ถูกต้อง', res.message, 'error'); 
+            Swal.fire('ข้อมูลสิทธิ์ไม่ถูกต้อง', res.message, 'error'); 
           }
         }).catch(err => { Swal.fire('เกิดข้อผิดพลาด', err.message, 'error'); });
     }
 
     function saveData() {
-      // เคลียร์ Error เดิมออกก่อนเช็คใหม่
       document.querySelectorAll('input, select').forEach(el => removeError(el));
       let firstErrorEl = null;
 
-      // 1. ตรวจสอบคำนำหน้า
       let prefixEl = document.getElementById('f_prefix');
       let prefix = prefixEl.value;
-      let errEl = checkError(prefixEl, prefix !== "");
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      let errEl = checkError(prefixEl, prefix !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
       if (prefix === 'อื่นๆ') {
         let otherPrefixEl = document.getElementById('f_other_prefix');
         prefix = otherPrefixEl.value.trim();
-        errEl = checkError(otherPrefixEl, prefix !== "");
-        if (errEl && !firstErrorEl) firstErrorEl = errEl;
+        errEl = checkError(otherPrefixEl, prefix !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
       }
 
-      // 2. ตรวจสอบชื่อ-นามสกุล
       let fnameEl = document.getElementById('f_firstname');
       let fname = fnameEl.value.trim();
-      errEl = checkError(fnameEl, fname !== "");
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(fnameEl, fname !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
       let lnameEl = document.getElementById('f_lastname');
       let lname = lnameEl.value.trim();
-      errEl = checkError(lnameEl, lname !== "");
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(lnameEl, lname !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
-      // 3. ตรวจสอบเลขบัตร (ต้องครบ 13 หลัก)
       let idCardEl = document.getElementById('f_idCard');
       let idCard = idCardEl.value.trim();
-      errEl = checkError(idCardEl, idCard.length === 13 && /^\d{13}$/.test(idCard));
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(idCardEl, idCard.length === 13 && /^\d{13}$/.test(idCard)); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
-      // 4. ตรวจสอบวันเกิด (ต้องเป็นรูปแบบ วว/ดด/ปปปป)
       let dobEl = document.getElementById('f_dob');
       let dob = dobEl.value.trim();
-      errEl = checkError(dobEl, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(dob));
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(dobEl, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(dob)); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
-      // 5. ตรวจสอบเบอร์โทร (ต้องครบ 10 หลัก)
       let phoneEl = document.getElementById('f_phone');
       let phone = phoneEl.value.trim();
-      errEl = checkError(phoneEl, phone.length === 10 && /^\d{10}$/.test(phone));
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(phoneEl, phone.length === 10 && /^\d{10}$/.test(phone)); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
-      // 6. ตรวจสอบตำแหน่ง และ ประเภท
       let positionEl = document.getElementById('f_position');
       let position = positionEl.value.trim();
-      errEl = checkError(positionEl, position !== "");
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(positionEl, position !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
       let typeEl = document.getElementById('f_type');
       let type = typeEl.value;
-      errEl = checkError(typeEl, type !== "");
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(typeEl, type !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
-      // 7. ตรวจสอบหน่วยงาน (ดึงเฉพาะรายชื่อที่มีอยู่ใน datalist มาเทียบ)
       let deptEl = document.getElementById('f_dept');
       let dept = deptEl.value.trim();
       let validDepts = Array.from(document.getElementById('dept_list').options).map(opt => opt.value);
-      errEl = checkError(deptEl, dept !== "" && validDepts.includes(dept));
-      if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      errEl = checkError(deptEl, dept !== "" && validDepts.includes(dept)); if (errEl && !firstErrorEl) firstErrorEl = errEl;
 
-      // หากมีการกรอกผิดพลาด ให้เลื่อนจอไปที่ช่องนั้น
       if (firstErrorEl) {
-        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        firstErrorEl.focus();
-        Swal.fire('ข้อมูลไม่สมบูรณ์', 'กรุณากรอกข้อมูลในช่องที่ไฮไลท์สีแดงให้ครบถ้วนและถูกต้อง', 'warning');
-        return;
+        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstErrorEl.focus();
+        Swal.fire('ข้อมูลไม่สมบูรณ์', 'กรุณากรอกข้อมูลในช่องสีแดงให้ถูกต้องครบถ้วนค่ะ', 'warning'); return;
       }
 
-      // รวมชื่อ-นามสกุลก่อนบันทึก
       let combinedName = `${prefix}${fname} ${lname}`.trim();
       const data = { name: combinedName, idCard: idCard, position: position, type: type, dept: dept, dob: dob, phone: phone };
 
-      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-
+      Swal.fire({ title: 'กำลังประมวลผลเซิร์ฟเวอร์...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+      
       callAPI('saveUserData', { userId: globalUserId, formData: data })
         .then(res => {
           if (res.success) {
-            
-            // เช็คว่ามีคำว่า from=stamp ติดมากับ URL หรือไม่
             const urlParams = new URLSearchParams(window.location.search);
             const isFromStamp = urlParams.get('from') === 'stamp';
 
             if (isFromStamp) {
-              // 1. ถ้ามาจากหน้าแสตมป์ -> เด้งกลับหน้าแสตมป์แบบตรงๆ
               Swal.fire({
-                title: 'ผูกบัญชีสำเร็จ!',
-                text: 'กำลังพากลับไปหน้าสะสมแสตมป์...',
-                icon: 'success',
-                showConfirmButton: false, // ซ่อนปุ่มไปเลย ให้เด้งเอง
-                timer: 2000,              // หน่วงเวลา 2 วินาทีให้ผู้ใช้อ่าน
-                allowOutsideClick: false
-              }).then(() => {
-                // สลับกลับไปไฟล์ UserStamp.html ที่อยู่ในโฟลเดอร์เดียวกัน
-                window.location.href = "UserStamp.html";
-              });
-              
+                title: 'บันทึกสำเร็จ!', text: 'อัปเดตโปรไฟล์เรียบร้อยแล้ว ระบบกำลังนำทางกลับไปหน้ากิจกรรมแสตมป์...', icon: 'success', showConfirmButton: false, timer: 2000
+              }).then(() => { window.location.href = "UserStamp.html"; });
             } else {
-              // 2. ถ้ามาจากเมนูทั่วไป -> ปิดหน้าต่างปกติ
               Swal.fire({
-                title: 'สำเร็จ!',
-                text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
-                icon: 'success',
-                confirmButtonText: 'ปิดหน้าต่าง',
-                confirmButtonColor: '#16a34a',
-                allowOutsideClick: false
-              }).then(() => {
-                liff.closeWindow(); // สั่งปิด LIFF กลับสู่แชท
-              });
+                title: 'สำเร็จ!', text: 'ระบบบันทึกและเชื่อมข้อมูลของท่านเรียบร้อยค่ะ', icon: 'success', confirmButtonText: 'ปิดหน้าต่าง', confirmButtonColor: '#16a34a'
+              }).then(() => { liff.closeWindow(); });
             }
-
-          } else { 
-            Swal.fire('ล้มเหลว', res.message, 'error'); 
-          }
-        }).catch(err => { Swal.fire('บันทึกล้มเหลว', err.message, 'error'); });
+          } else { Swal.fire('ล้มเหลว', res.message, 'error'); }
+        }).catch(err => { Swal.fire('เกิดข้อผิดพลาดในการบันทึก', err.message, 'error'); });
     }
 
     function unlinkAccount() {
       Swal.fire({
-        title: 'ยืนยันการยกเลิก?', text: "ระบบจะลบข้อมูลการผูกบัญชีของคุณ", icon: 'warning',
-        showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'ยกเลิกการผูกบัญชี'
+        title: 'ยืนยันการลบการผูกบัญชี?', text: "ระบบจะลบข้อมูลประวัติส่วนบุคคลทั้งหมดออกจากฐานข้อมูลคลังไฟล์กลางทันที", icon: 'warning',
+        showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'ลบข้อมูลและยกเลิกผูกบัญชี', cancelButtonText: 'ยกเลิก'
       }).then((result) => {
         if (result.isConfirmed) {
           callAPI('unlinkUserData', { userId: globalUserId }).then(res => {
-            if (res.success) Swal.fire('สำเร็จ', 'ลบข้อมูลเรียบร้อย', 'success').then(() => { window.location.reload(); });
+            if (res.success) Swal.fire('สำเร็จ', 'ลบประวัติความเชื่อมโยงเรียบร้อย', 'success').then(() => { window.location.reload(); });
           });
         }
       });
