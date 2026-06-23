@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
   <style> 
     body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; } 
-    .tab-active { border-bottom-color: #16a34a; color: #16a34a; font-weight: 700; }
     .radio-card { display: flex; align-items: center; padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s; background: white;}
     .radio-card:hover { background-color: #f9fafb; border-color: #22c55e; }
     input[type="radio"], input[type="checkbox"] { accent-color: #16a34a; width: 1.2rem; height: 1.2rem; margin-right: 0.75rem; }
@@ -39,13 +38,13 @@
   <div id="mainDashboard" class="hidden max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden mt-4">
     
     <div class="flex border-b border-gray-200 bg-gray-50">
-      <button onclick="switchTab('profileTab')" id="btn-profileTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700 tab-active">ประวัติส่วนบุคคล</button>
-      <button onclick="switchTab('vaccineTab')" id="btn-vaccineTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700">ประวัติวัคซีน</button>
-      <button onclick="switchTab('mentalTab')" id="btn-mentalTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700">ประเมินสุขภาพจิต</button>
+      <button onclick="switchTab('profileTab')" id="btn-profileTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-green-600 text-green-600 bg-green-50 transition-all">ประวัติส่วนบุคคล</button>
+      <button onclick="switchTab('vaccineTab')" id="btn-vaccineTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 transition-all">ประวัติวัคซีน</button>
+      <button onclick="switchTab('mentalTab')" id="btn-mentalTab" class="w-1/3 text-center py-3 text-xs font-semibold border-b-2 border-transparent text-gray-500 transition-all">ประเมินสุขภาพจิต</button>
     </div>
 
     <div class="p-4">
-      <div id="content-profileTab" class="tab-content">
+      <div id="content-profileTab" class="tab-content block">
         <h2 id="formTitle" class="text-lg font-bold mb-4 text-gray-800">📝 ลงทะเบียนข้อมูลผู้ใช้งาน</h2>
         <div class="space-y-4">
           <div>
@@ -71,7 +70,16 @@
       </div>
 
       <div id="content-vaccineTab" class="tab-content hidden">
-        <div id="vac-loading" class="text-center py-10"><div class="animate-spin inline-block w-8 h-8 border-[3px] border-green-600 border-t-transparent rounded-full"></div><p class="text-gray-500 mt-2">กำลังตรวจสอบประวัติ...</p></div>
+        <div id="vac-unlinked" class="hidden text-center py-10 px-2">
+          <div class="text-5xl mb-4">📄</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2">ท่านยังไม่มีประวัติการรับวัคซีน</h3>
+          <p class="text-sm text-gray-500 mb-6">กรุณาคลิกปุ่มด้านล่างเพื่อบันทึกข้อมูลเข้าระบบ</p>
+          <button onclick="window.location.href=VACCINE_STANDALONE_URL" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-700 flex items-center justify-center gap-2">
+            📝 บันทึกข้อมูลประวัติการได้รับวัคซีน
+          </button>
+        </div>
+
+        <div id="vac-loading" class="hidden text-center py-10"><div class="animate-spin inline-block w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full"></div><p class="text-gray-500 mt-2">กำลังตรวจสอบประวัติ...</p></div>
         
         <div id="vac-nodata" class="hidden text-center py-10 px-2">
           <div class="text-5xl mb-4">📄</div>
@@ -81,9 +89,9 @@
         </div>
 
         <div id="vac-history" class="hidden">
-          <div class="bg-green-50 p-4 text-center border-b border-green-100 rounded-t-xl">
+          <div class="bg-blue-50 p-4 text-center border-b border-blue-100 rounded-t-xl">
             <div class="text-4xl mb-2">💉</div>
-            <h2 class="text-lg font-bold text-green-700">ประวัติการได้รับวัคซีน</h2>
+            <h2 class="text-lg font-bold text-blue-700">ประวัติการได้รับวัคซีน</h2>
             <p class="text-xs text-gray-600 mt-1" id="vh_name">-</p>
           </div>
           <div class="p-2 pt-4">
@@ -98,7 +106,7 @@
               <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Diphtheria</span><span id="vh_diphtheria" class="text-right text-gray-600 max-w-[50%]"></span></div>
               <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Tetanus</span><span id="vh_tetanus" class="text-right text-gray-600 max-w-[50%]"></span></div>
               <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">COVID-19</span><span id="vh_covid" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div id="vh_covidType_container" class="hidden flex justify-between items-center bg-gray-50/50 p-2 rounded ml-4 border-l-2 border-green-500">
+              <div id="vh_covidType_container" class="hidden flex justify-between items-center bg-gray-50/50 p-2 rounded ml-4 border-l-2 border-blue-500">
                 <span class="text-[10px] text-gray-500">↳ ชนิดวัคซีนที่ได้รับ</span><span id="vh_covidType" class="text-[10px] text-right text-gray-500 max-w-[50%]"></span>
               </div>
               <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">วัคซีนอื่นๆ</span><span id="vh_otherVac" class="text-right text-gray-600 max-w-[50%]"></span></div>
@@ -179,7 +187,7 @@
               <label class="radio-card"><input type="radio" name="v_covid" value="ไม่เคยฉีด"> <span class="text-sm">ไม่เคยฉีด</span></label>
               <label class="radio-card"><input type="radio" name="v_covid" value="ไม่ทราบ"> <span class="text-sm">ไม่ทราบ</span></label></div>
 
-              <div id="v_covidTypeSection" class="hidden ml-4 pl-4 border-l-2 border-green-400">
+              <div id="v_covidTypeSection" class="hidden ml-4 pl-4 border-l-2 border-blue-400">
                 <label class="block text-sm font-semibold text-gray-800 mb-2">9.1 ชนิดวัคซีนที่ได้รับ</label>
                 <label class="radio-card"><input type="checkbox" name="v_covidType" value="Pfizer (ไฟเซอร์)"> <span class="text-sm">Pfizer (ไฟเซอร์)</span></label>
                 <label class="radio-card"><input type="checkbox" name="v_covidType" value="Moderna (โมเดอร์นา)"> <span class="text-sm">Moderna (โมเดอร์นา)</span></label>
@@ -220,47 +228,54 @@
             <button type="button" id="v_btnCancel" onclick="cancelVacEdit()" class="hidden w-full bg-red-500 text-white font-bold p-3 rounded-xl mt-3 hover:bg-red-600 shadow-md transition">❌ ยกเลิกการแก้ไข</button>
           </form>
         </div>
-
       </div>
 
       <div id="content-mentalTab" class="tab-content hidden">
-        
-        <div id="m-section1" class="m-form-section block">
-          <div class="bg-blue-50 p-4 text-center border-b border-blue-100 rounded-t-xl mb-4">
+        <div id="m-unlinked" class="hidden text-center py-10 px-2">
+          <div class="text-5xl mb-4 text-pink-500">🧠</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2">ระบบประเมินสุขภาพจิต</h3>
+          <p class="text-sm text-gray-500 mb-6">คัดกรองภาวะซึมเศร้าและความเครียด กรุณาคลิกปุ่มด้านล่างเพื่อเริ่มทำแบบประเมิน</p>
+          <button onclick="window.location.href=MENTAL_STANDALONE_URL" class="w-full bg-pink-500 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-pink-600 flex items-center justify-center gap-2">
+            🧠 ทำแบบประเมินสุขภาพจิต
+          </button>
+        </div>
+
+        <div id="m-section1" class="m-form-section hidden">
+          <div class="bg-pink-50 p-4 text-center border-b border-pink-100 rounded-t-xl mb-4">
             <div class="text-4xl mb-2">🧠</div>
-            <h2 class="text-lg font-bold text-blue-700">แบบประเมินสุขภาพจิต</h2>
+            <h2 class="text-lg font-bold text-pink-600">แบบประเมินสุขภาพจิต</h2>
             <p class="text-xs text-gray-600 mt-1" id="m_intro_name">-</p>
           </div>
-          <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 mb-4">
-            <h3 class="font-bold text-blue-800 mb-2">📌 วัตถุประสงค์</h3>
+          <div class="p-4 bg-white rounded-xl border border-gray-200 mb-4 shadow-sm">
+            <h3 class="font-bold text-pink-600 mb-2">📌 วัตถุประสงค์</h3>
             <p class="text-sm text-gray-700 mb-3">คัดกรองภาวะซึมเศร้าและความเครียดเบื้องต้น เพื่อให้ท่านได้รับคำแนะนำที่เหมาะสม ข้อมูลจะถูกเก็บเป็นความลับสูงสุด</p>
-            <label class="radio-card bg-white hover:bg-blue-50 border-gray-300">
-              <input type="checkbox" id="m_consentCheck" class="w-5 h-5 mr-3 accent-blue-600">
+            <label class="radio-card bg-gray-50 hover:bg-pink-50 border-gray-300">
+              <input type="checkbox" id="m_consentCheck" class="w-5 h-5 mr-3 accent-pink-500">
               <span class="text-sm font-semibold text-gray-800">ยินยอมให้ประมวลผลข้อมูล</span>
             </label>
           </div>
-          <button type="button" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="startMentalAssessment()">เริ่มทำแบบประเมิน</button>
+          <button type="button" class="w-full bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 shadow-md transition" onclick="startMentalAssessment()">เริ่มทำแบบประเมิน</button>
         </div>
 
         <div id="m-section3" class="m-form-section hidden">
           <div class="mb-4">
-            <h3 class="font-bold text-lg text-blue-700">แบบประเมินด่านแรก (2Q Plus)</h3>
+            <h3 class="font-bold text-lg text-pink-600">แบบประเมินด่านแรก (2Q Plus)</h3>
             <p class="text-sm text-gray-500">ใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้...</p>
           </div>
           <form id="m_form3">
             <div class="space-y-4">
-              <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+              <div class="bg-pink-50 p-4 rounded-xl border border-pink-100">
                 <label class="block text-sm font-semibold text-gray-800 mb-3">1. รู้สึกหดหู่ เศร้า หรือท้อแท้สิ้นหวัง หรือไม่?</label>
                 <div class="flex flex-col">
-                  <label class="radio-card"><input type="radio" name="m_q2_1" value="มี" required> <span>มี</span></label>
-                  <label class="radio-card"><input type="radio" name="m_q2_1" value="ไม่มี"> <span>ไม่มี</span></label>
+                  <label class="radio-card"><input type="radio" name="m_q2_1" value="มี" required style="accent-color: #ec4899;"> <span>มี</span></label>
+                  <label class="radio-card"><input type="radio" name="m_q2_1" value="ไม่มี" style="accent-color: #ec4899;"> <span>ไม่มี</span></label>
                 </div>
               </div>
-              <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+              <div class="bg-pink-50 p-4 rounded-xl border border-pink-100">
                 <label class="block text-sm font-semibold text-gray-800 mb-3">2. รู้สึกเบื่อ ทำอะไรก็ไม่เพลิดเพลิน หรือไม่?</label>
                 <div class="flex flex-col">
-                  <label class="radio-card"><input type="radio" name="m_q2_2" value="มี" required> <span>มี</span></label>
-                  <label class="radio-card"><input type="radio" name="m_q2_2" value="ไม่มี"> <span>ไม่มี</span></label>
+                  <label class="radio-card"><input type="radio" name="m_q2_2" value="มี" required style="accent-color: #ec4899;"> <span>มี</span></label>
+                  <label class="radio-card"><input type="radio" name="m_q2_2" value="ไม่มี" style="accent-color: #ec4899;"> <span>ไม่มี</span></label>
                 </div>
               </div>
               <div class="bg-red-50 p-4 rounded-xl border border-red-200">
@@ -274,20 +289,20 @@
           </form>
           <div class="flex gap-2 mt-6">
             <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="m_goBackToStart()">ย้อนกลับ</button>
-            <button type="button" class="w-2/3 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="m_evaluate2QPlus()">คำนวณผลประเมิน</button>
+            <button type="button" class="w-2/3 bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 shadow-md transition" onclick="m_evaluate2QPlus()">คำนวณผลประเมิน</button>
           </div>
         </div>
 
         <div id="m-section9Q" class="m-form-section hidden">
           <div class="mb-4">
-            <h3 class="font-bold text-lg text-blue-700">แบบประเมินโรคซึมเศร้า (9Q)</h3>
+            <h3 class="font-bold text-lg text-pink-600">แบบประเมินโรคซึมเศร้า (9Q)</h3>
           </div>
           <form id="m_form9Q">
             <div id="m_questions9QContainer" class="space-y-4"></div>
           </form>
           <div class="flex gap-2 mt-6">
             <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="m_switchSec('m-section9Q', 'm-section3')">ย้อนกลับ</button>
-            <button type="button" class="w-2/3 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="m_handle9QNext()">ถัดไป</button>
+            <button type="button" class="w-2/3 bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 shadow-md transition" onclick="m_handle9QNext()">ถัดไป</button>
           </div>
         </div>
 
@@ -316,19 +331,23 @@
 
           <div id="m_resultAdvice" class="p-4 rounded-xl text-sm text-left mb-6 font-medium"></div>
 
-          <button type="button" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="m_resetAssessment()">🔄 ประเมินอีกครั้ง</button>
+          <button type="button" class="w-full bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 shadow-md transition" onclick="m_resetAssessment()">🔄 ประเมินอีกครั้ง</button>
         </div>
 
       </div>
 
-    </div>
+    </div>s
   </div>
 
   <script>
     const LIFF_ID = "2010419960-jJFrolbW";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwqpHVKFKzCP_ICyDtdltZ4Nk-foKmytN92nT5YFPzH0wJoxfWlZ1Y0i6MiAFVdBZosdw/exec";
-    const VACCINE_API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; 
+    const VACCINE_API_URL = "https://script.google.com/macros/s/AKfycbwSiR2e9yAGLbHUG90TIToUt13JwUJWIY0l8yQys-eIn32L7EzXYxVsz3TG3Qx6mI3sMQ/exec"; 
     const MENTAL_API_URL = "https://script.google.com/macros/s/AKfycbwSiR2e9yAGLbHUG90TIToUt13JwUJWIY0l8yQys-eIn32L7EzXYxVsz3TG3Qx6mI3sMQ/exec"; 
+
+    // 🌟 ใส่ URL หน้าเว็บ Standalone ของวัคซีนและสุขภาพจิตตรงนี้ 🌟
+    const VACCINE_STANDALONE_URL = "https://occmedklang.github.io/vaccine.html";
+    const MENTAL_STANDALONE_URL = "https://occmedklang.github.io/mental.html";
 
     let globalUserId = null;
     let mainUserProfile = null;
@@ -362,15 +381,52 @@
       return null;
     }
 
+    // 🌟 ฟังก์ชันสลับแท็บพร้อมปรับสี 🌟
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-      document.querySelectorAll('[id^="btn-"]').forEach(btn => btn.classList.remove('tab-active'));
-      document.getElementById('content-' + tabId).classList.remove('hidden');
-      document.getElementById('btn-' + tabId).classList.add('tab-active');
+      
+      // ล้างสีสถานะ active ของทุกปุ่ม
+      document.querySelectorAll('[id^="btn-"]').forEach(btn => {
+        btn.classList.remove('border-green-600', 'text-green-600', 'bg-green-50', 'border-blue-600', 'text-blue-600', 'bg-blue-50', 'border-pink-600', 'text-pink-600', 'bg-pink-50');
+        btn.classList.add('border-transparent', 'text-gray-500');
+      });
 
-      if(tabId === 'vaccineTab' && !vaccineDataFetched && mainUserProfile) {
-        fetchVaccineData();
+      document.getElementById('content-' + tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('btn-' + tabId);
+      activeBtn.classList.remove('border-transparent', 'text-gray-500');
+
+      // กำหนดสีตามแท็บที่กด
+      if (tabId === 'profileTab') {
+        activeBtn.classList.add('border-green-600', 'text-green-600', 'bg-green-50');
+      } else if (tabId === 'vaccineTab') {
+        activeBtn.classList.add('border-blue-600', 'text-blue-600', 'bg-blue-50');
+        if (mainUserProfile) {
+          if (!vaccineDataFetched) fetchVaccineData();
+        } else {
+          showUnlinkedVaccine();
+        }
+      } else if (tabId === 'mentalTab') {
+        activeBtn.classList.add('border-pink-600', 'text-pink-600', 'bg-pink-50');
+        if (mainUserProfile) {
+          document.getElementById('m-unlinked').classList.add('hidden');
+          document.getElementById('m-section1').classList.remove('hidden');
+        } else {
+          showUnlinkedMental();
+        }
       }
+    }
+
+    function showUnlinkedVaccine() {
+      document.getElementById('vac-loading').classList.add('hidden');
+      document.getElementById('vac-history').classList.add('hidden');
+      document.getElementById('vac-form').classList.add('hidden');
+      document.getElementById('vac-nodata').classList.add('hidden');
+      document.getElementById('vac-unlinked').classList.remove('hidden');
+    }
+
+    function showUnlinkedMental() {
+      document.querySelectorAll('.m-form-section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById('m-unlinked').classList.remove('hidden');
     }
 
     async function callAPI(url, action, data = {}) {
@@ -415,7 +471,6 @@
             }
             mainUserProfile = { prefix: prefix, fname: fname, lname: lname, idCard: res.data.idCard, dob: res.data.dob, position: res.data.position, dept: res.data.dept };
             
-            // ส่งชื่อไปแสดงที่หน้าประเมินสุขภาพจิต
             document.getElementById('m_intro_name').innerText = (mainUserProfile.prefix === "อื่นๆ" ? "" : mainUserProfile.prefix) + mainUserProfile.fname + " " + mainUserProfile.lname;
 
             document.getElementById('f_prefix').value = prefix;
@@ -436,17 +491,35 @@
     function saveData() {
       document.querySelectorAll('input, select').forEach(el => removeError(el));
       let firstErrorEl = null;
-      let prefixEl = document.getElementById('f_prefix'); let prefix = prefixEl.value; let errEl = checkError(prefixEl, prefix !== "");
+      let errEl;
+
+      let prefixEl = document.getElementById('f_prefix'); let prefix = prefixEl.value; errEl = checkError(prefixEl, prefix !== "");
       if (errEl && !firstErrorEl) firstErrorEl = errEl;
       if (prefix === 'อื่นๆ') { let otherPrefixEl = document.getElementById('f_other_prefix'); prefix = otherPrefixEl.value.trim();
       errEl = checkError(otherPrefixEl, prefix !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl; }
+      
       let fnameEl = document.getElementById('f_firstname'); let fname = fnameEl.value.trim(); errEl = checkError(fnameEl, fname !== "");
       if (errEl && !firstErrorEl) firstErrorEl = errEl;
       let lnameEl = document.getElementById('f_lastname'); let lname = lnameEl.value.trim();
       errEl = checkError(lnameEl, lname !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      
       let idCardEl = document.getElementById('f_idCard');
       let idCard = idCardEl.value.trim(); errEl = checkError(idCardEl, idCard.length === 13 && /^\d{13}$/.test(idCard)); if (errEl && !firstErrorEl) firstErrorEl = errEl;
-      let dobEl = document.getElementById('f_dob'); let dob = dobEl.value.trim(); errEl = checkError(dobEl, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(dob)); if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      
+      // 🌟 ดักจับปี พ.ศ. (ต้องมากกว่าหรือเท่ากับ 2400) 🌟
+      let dobEl = document.getElementById('f_dob'); 
+      let dob = dobEl.value.trim(); 
+      let dobValid = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(dob);
+      let year = dobValid ? parseInt(dob.split('/')[2]) : 0;
+      
+      if (!dobValid || year < 2400) {
+        errEl = checkError(dobEl, false); 
+        if (!firstErrorEl) firstErrorEl = errEl;
+        Swal.fire('แจ้งเตือน', 'กรุณากรอกปีเกิดเป็น พ.ศ. ให้ถูกต้อง (เช่น 2542)', 'warning');
+        if (firstErrorEl) firstErrorEl.focus();
+        return; // สกัดไม่ให้ไปต่อทันที
+      }
+
       let phoneEl = document.getElementById('f_phone'); let phone = phoneEl.value.trim(); errEl = checkError(phoneEl, phone.length === 10 && /^\d{10}$/.test(phone));
       if (errEl && !firstErrorEl) firstErrorEl = errEl;
       let positionEl = document.getElementById('f_position'); let position = positionEl.value.trim();
@@ -455,6 +528,7 @@
       let type = typeEl.value; errEl = checkError(typeEl, type !== ""); if (errEl && !firstErrorEl) firstErrorEl = errEl;
       let deptEl = document.getElementById('f_dept'); let dept = deptEl.value.trim(); let validDepts = Array.from(document.getElementById('dept_list').options).map(opt => opt.value);
       errEl = checkError(deptEl, dept !== "" && validDepts.includes(dept)); if (errEl && !firstErrorEl) firstErrorEl = errEl;
+      
       if (firstErrorEl) { firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstErrorEl.focus(); Swal.fire('ข้อมูลไม่สมบูรณ์', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); return; }
 
       let combinedName = `${prefix}${fname} ${lname}`.trim();
@@ -479,6 +553,7 @@
     // ==========================================
     function fetchVaccineData() {
       vaccineDataFetched = true;
+      document.getElementById('vac-unlinked').classList.add('hidden');
       document.getElementById('vac-loading').classList.remove('hidden');
       document.getElementById('vac-nodata').classList.add('hidden'); document.getElementById('vac-history').classList.add('hidden'); document.getElementById('vac-form').classList.add('hidden');
       
@@ -508,20 +583,16 @@
       document.getElementById('vac-nodata').classList.add('hidden'); document.getElementById('vac-form').classList.add('hidden'); document.getElementById('vac-history').classList.remove('hidden');
       document.getElementById('vh_name').innerText = `${data[0]} ${data[1]}`;
       document.getElementById('vh_hepA').innerText = data[9] || '-'; document.getElementById('vh_hepB').innerText = data[10] || '-';
-      document.getElementById('vh_flu').innerText = data[11] || '-';
-      document.getElementById('vh_mmr').innerText = data[12] || '-';
+      document.getElementById('vh_flu').innerText = data[11] || '-'; document.getElementById('vh_mmr').innerText = data[12] || '-';
       document.getElementById('vh_varicella').innerText = data[13] || '-'; document.getElementById('vh_pertussis').innerText = data[14] || '-';
-      document.getElementById('vh_diphtheria').innerText = data[15] || '-';
-      document.getElementById('vh_tetanus').innerText = data[16] || '-';
+      document.getElementById('vh_diphtheria').innerText = data[15] || '-'; document.getElementById('vh_tetanus').innerText = data[16] || '-';
       document.getElementById('vh_otherVac').innerText = data[19] || '-'; document.getElementById('vh_allergy').innerText = data[20] || '-';
-      document.getElementById('vh_chickenpox').innerText = data[21] || '-';
-      document.getElementById('vh_xray').innerText = data[22] || '-';
+      document.getElementById('vh_chickenpox').innerText = data[21] || '-'; document.getElementById('vh_xray').innerText = data[22] || '-';
       
       const covidVal = data[17] || '-'; const covidTypeVal = data[18] || '-';
       document.getElementById('vh_covid').innerText = covidVal;
       if (covidVal.includes('ได้รับวัคซีน') && covidTypeVal !== '-' && covidTypeVal !== '') {
-        document.getElementById('vh_covidType_container').classList.remove('hidden');
-        document.getElementById('vh_covidType').innerText = covidTypeVal;
+        document.getElementById('vh_covidType_container').classList.remove('hidden'); document.getElementById('vh_covidType').innerText = covidTypeVal;
       } else { document.getElementById('vh_covidType_container').classList.add('hidden'); }
     }
 
@@ -537,8 +608,7 @@
 
       const d = globalVaccineData;
       setVacRadio('v_hepA', d[9]); setVacRadio('v_hepB', d[10]); setVacRadio('v_flu', d[11]); setVacRadio('v_mmr', d[12]);
-      setVacRadio('v_varicella', d[13]);
-      setVacRadio('v_pertussis', d[14]); setVacRadio('v_diphtheria', d[15]); setVacRadio('v_tetanus', d[16]);
+      setVacRadio('v_varicella', d[13]); setVacRadio('v_pertussis', d[14]); setVacRadio('v_diphtheria', d[15]); setVacRadio('v_tetanus', d[16]);
       setVacRadio('v_covid', d[17]); setVacRadio('v_chickenpox', d[21]); setVacRadio('v_xray', d[22]);
 
       document.querySelectorAll('input[name="v_covidType"]').forEach(cb => cb.checked = false);
@@ -550,15 +620,11 @@
         });
       }
 
-      if (d[19] && d[19].startsWith('มี')) { setVacRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').value = d[19].replace('มี (', '').replace(')', '');
-      } else { setVacRadio('v_otherVac', 'ไม่มี'); }
-      if (d[20] && d[20].startsWith('มี')) { setVacRadio('v_allergy', 'มี');
-      document.getElementById('v_allergyDetail').value = d[20].replace('มี (', '').replace(')', ''); } else { setVacRadio('v_allergy', 'ไม่มี');
-      }
+      if (d[19] && d[19].startsWith('มี')) { setVacRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').value = d[19].replace('มี (', '').replace(')', ''); } else { setVacRadio('v_otherVac', 'ไม่มี'); }
+      if (d[20] && d[20].startsWith('มี')) { setVacRadio('v_allergy', 'มี'); document.getElementById('v_allergyDetail').value = d[20].replace('มี (', '').replace(')', ''); } else { setVacRadio('v_allergy', 'ไม่มี'); }
     }
 
-    function cancelVacEdit() { document.getElementById('vac-form').classList.add('hidden'); document.getElementById('vac-history').classList.remove('hidden');
-    }
+    function cancelVacEdit() { document.getElementById('vac-form').classList.add('hidden'); document.getElementById('vac-history').classList.remove('hidden'); }
 
     document.querySelectorAll('#vForm input[type="radio"], #vForm input[type="checkbox"]').forEach(r => {
       r.addEventListener('change', function() {
@@ -567,26 +633,42 @@
           if (this.value.includes('ได้รับวัคซีน')) tSec.classList.remove('hidden');
           else { tSec.classList.add('hidden'); document.querySelectorAll('input[name="v_covidType"]').forEach(cb => cb.checked = false); document.getElementById('v_covidTypeOther').style.display='none'; }
         }
-        if(this.classList.contains('v-covid-other-cb')) { 
-          const el = document.getElementById('v_covidTypeOther'); el.style.display = this.checked ? 'block' : 'none'; el.required = this.checked; }
-        if(this.name === 'v_otherVac') { const el = document.getElementById('v_otherVacDetail'); el.style.display = this.value === 'มี' ? 'block' : 'none'; el.required = this.value === 'มี';
-        }
-        if(this.name === 'v_allergy') { const el = document.getElementById('v_allergyDetail');
-          el.style.display = this.value === 'มี' ? 'block' : 'none'; el.required = this.value === 'มี';
-        }
+        if(this.classList.contains('v-covid-other-cb')) { const el = document.getElementById('v_covidTypeOther'); el.style.display = this.checked ? 'block' : 'none'; el.required = this.checked; }
+        if(this.name === 'v_otherVac') { const el = document.getElementById('v_otherVacDetail'); el.style.display = this.value === 'มี' ? 'block' : 'none'; el.required = this.value === 'มี'; }
+        if(this.name === 'v_allergy') { const el = document.getElementById('v_allergyDetail'); el.style.display = this.value === 'มี' ? 'block' : 'none'; el.required = this.value === 'มี'; }
       });
     });
 
     function submitVacForm(e) {
       e.preventDefault();
       const cTypes = Array.from(document.querySelectorAll('input[name="v_covidType"]:checked')).map(cb => cb.value);
-      if(document.querySelector('input[name="v_covid"]:checked').value.includes('ได้รับวัคซีน') && cTypes.length === 0) { Swal.fire('แจ้งเตือน', 'กรุณาเลือกชนิดวัคซีน COVID-19 อย่างน้อย 1 ข้อ', 'warning'); return;
+      if(document.querySelector('input[name="v_covid"]:checked').value.includes('ได้รับวัคซีน') && cTypes.length === 0) { Swal.fire('แจ้งเตือน', 'กรุณาเลือกชนิดวัคซีน COVID-19 อย่างน้อย 1 ข้อ', 'warning'); return; }
+
+      let finalPrefix = "", finalName = "", finalPos = "", finalDept = "";
+      
+      // ถ้าเป็นการกรอกครั้งแรก (ไม่เคยมีข้อมูลวัคซีน) 
+      if (!globalVaccineData) {
+        // 🌟 ดึงข้อมูลจากระบบผูกบัญชี (Line Profile) มาใช้เลยอัตโนมัติ
+        finalPrefix = mainUserProfile.prefix === "อื่นๆ" ? "" : mainUserProfile.prefix;
+        let fName = mainUserProfile.fname.trim();
+        let lName = mainUserProfile.lname.trim();
+        
+        // 🌟 มัดรวมคำนำหน้า ชื่อ สกุล เข้าด้วยกัน เพื่อบันทึกลงคอลัมน์ B (ชื่อ-สกุล)
+        finalName = (finalPrefix + fName + " " + lName).trim();
+        
+        finalPos = mainUserProfile.position;
+        finalDept = mainUserProfile.dept;
+      } else {
+        // ถ้าเป็นการแก้ไข ให้ใช้ข้อมูลเดิมจากที่ดึงมา
+        finalPrefix = globalVaccineData[0] || ""; 
+        finalName = globalVaccineData[1] || "";   
+        finalPos = globalVaccineData[4] || "-";   
+        finalDept = globalVaccineData[5] || "-";  
       }
 
       const vData = {
-        prefix: mainUserProfile.prefix === "อื่นๆ" ? mainUserProfile.fname : mainUserProfile.prefix, prefixOther: "",
-        name: mainUserProfile.prefix === "อื่นๆ" ? mainUserProfile.lname : (mainUserProfile.fname + " " + mainUserProfile.lname).trim(),
-        position: mainUserProfile.position, dept: mainUserProfile.dept, dob: mainUserProfile.dob, idCard: mainUserProfile.idCard,
+        prefix: finalPrefix, prefixOther: "",
+        name: finalName, position: finalPos, dept: finalDept, dob: mainUserProfile.dob, idCard: mainUserProfile.idCard,
         hepA: document.querySelector('input[name="v_hepA"]:checked').value, hepB: document.querySelector('input[name="v_hepB"]:checked').value,
         flu: document.querySelector('input[name="v_flu"]:checked').value, mmr: document.querySelector('input[name="v_mmr"]:checked').value,
         varicella: document.querySelector('input[name="v_varicella"]:checked').value, pertussis: document.querySelector('input[name="v_pertussis"]:checked').value,
@@ -597,6 +679,7 @@
         allergy: document.querySelector('input[name="v_allergy"]:checked').value, allergyDetail: document.getElementById('v_allergyDetail').value,
         chickenpox: document.querySelector('input[name="v_chickenpox"]:checked').value, xray: document.querySelector('input[name="v_xray"]:checked').value 
       };
+
       Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
       callAPI(VACCINE_API_URL, 'saveData', { formData: vData }).then(res => {
         if(res.status === 'success') {
@@ -605,7 +688,6 @@
         }
       }).catch(err => { Swal.fire('Error', err.message, 'error'); });
     }
-
 
     // ==========================================
     // ส่วนเชื่อมต่อระบบประเมินสุขภาพจิต (แท็บ 3)
@@ -636,7 +718,7 @@
         Swal.fire('แจ้งเตือน', 'กรุณากดยินยอมข้อตกลงเพื่อเริ่มทำแบบประเมินครับ', 'warning'); return;
       }
       m_switchSec('m-section1', 'm-section3');
-      m_render9Q(); m_render8Q(); // เตรียมข้อสอบไว้ก่อน
+      m_render9Q(); m_render8Q(); 
     }
 
     function m_goBackToStart() { m_switchSec('m-section3', 'm-section1'); }
@@ -645,13 +727,13 @@
       let html = '';
       m_questions9Q.forEach((q, i) => {
         html += `
-          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+          <div class="bg-pink-50 p-4 rounded-xl border border-pink-100">
             <label class="block text-sm font-semibold text-gray-800 mb-3">${i+1}. ${q}</label>
             <div class="flex flex-col text-sm">
-              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="0" required> <span>ไม่มีเลย</span></label>
-              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="1"> <span>มีบางวัน</span></label>
-              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="2"> <span>บ่อย</span></label>
-              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="3"> <span>ทุกวัน</span></label>
+              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="0" required style="accent-color: #ec4899;"> <span>ไม่มีเลย</span></label>
+              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="1" style="accent-color: #ec4899;"> <span>มีบางวัน</span></label>
+              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="2" style="accent-color: #ec4899;"> <span>บ่อย</span></label>
+              <label class="radio-card"><input type="radio" name="m_9q_${i}" value="3" style="accent-color: #ec4899;"> <span>ทุกวัน</span></label>
             </div>
           </div>`;
       });
@@ -773,6 +855,7 @@
           if(m_need9Q) { document.getElementById('m_r_9q_box').classList.remove('hidden'); document.getElementById('m_r_9q').innerText = `${score9Q} คะแนน (${result9Q})`; }
           if(m_need8Q) { document.getElementById('m_r_8q_box').classList.remove('hidden'); document.getElementById('m_r_8q').innerText = `${score8Q} คะแนน (${result8Q})`; }
           
+          // ⚠️ แก้ไขจุดตกหล่นตรงนี้แล้ว เปลี่ยนจาก resultAdvice เป็น m_resultAdvice ครับ
           document.getElementById('m_resultAdvice').innerHTML = adviceHtml;
           document.getElementById('m_resultAdvice').className = `p-4 rounded-xl text-sm text-left mb-6 font-medium bg-${themeColor}-50 text-${themeColor}-800 border border-${themeColor}-200`;
           window.scrollTo(0, 0);
