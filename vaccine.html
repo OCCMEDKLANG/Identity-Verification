@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมุดประวัติวัคซีน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', sans-serif; background-color: #f0fdf4; }
+    .required::after { content: " *"; color: #ef4444; }
+    .radio-card { display: flex; align-items: center; padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s; background: white;}
+    .radio-card:hover { background-color: #f9fafb; border-color: #22c55e; }
+    input[type="radio"] { accent-color: #16a34a; width: 1.2rem; height: 1.2rem; margin-right: 0.75rem; }
+  </style>
+</head>
+<body class="p-4 pb-12">
+
+  <!-- โหลดหน้าจอ -->
+  <div id="loading" class="hidden fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
+    <div class="animate-spin inline-block w-12 h-12 border-[4px] border-green-600 border-t-transparent rounded-full"></div>
+    <p class="mt-4 text-gray-700 font-semibold" id="loadingText">กำลังโหลด...</p>
+  </div>
+
+  <!-- ส่วนที่ 1: ล็อกอิน (UI ใหม่) -->
+  <div id="loginSection" class="max-w-md mx-auto mt-8">
+    <div class="bg-white p-8 rounded-3xl shadow-lg border-t-4 border-green-500">
+      <div class="text-center mb-6">
+        <div class="text-5xl mb-2">🛡️</div>
+        <h2 class="text-xl font-bold text-green-700">สมุดประวัติการได้รับวัคซีน</h2>
+        <p class="text-sm text-gray-500">เข้าสู่ระบบเพื่อตรวจสอบข้อมูลของคุณ</p>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1 required">เลขประจำตัวประชาชน 13 หลัก</label>
+          <input type="text" id="loginId" required pattern="\d{13}" class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="ไม่ต้องใส่ขีดกำกับ">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1 required">รหัสผ่าน (วันเดือนปีเกิด)</label>
+          <input type="password" id="loginPassword" required class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="เช่น 01012500">
+          <p class="text-xs text-gray-500 mt-2">ตัวอย่าง: เกิด 1 มกราคม พ.ศ. 2500 รหัสคือ <span class="font-bold text-red-500">01012500</span></p>
+        </div>
+        <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl mt-4 hover:bg-green-700 transition shadow-md">เข้าสู่ระบบ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 2: แบบสำรวจ (แสดงเมื่อไม่พบข้อมูลเก่า) -->
+  <div id="surveySection" class="hidden max-w-xl mx-auto">
+    <div class="bg-white p-6 rounded-3xl shadow-lg">
+      <div class="text-center mb-6 border-b pb-4">
+        <h2 class="text-2xl font-bold text-blue-600">แบบสำรวจประวัติวัคซีน</h2>
+        <p class="text-sm text-gray-500 mt-2">สำหรับบุคลากรที่ยังไม่เคยมีประวัติในระบบ</p>
+      </div>
+
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6 text-sm text-blue-800">
+        <strong>วัตถุประสงค์:</strong> เพื่อเก็บรวบรวมข้อมูลวัคซีนของบุคลากร และนำไปใช้วางแผนการให้บริการฉีดวัคซีน
+      </div>
+
+      <form id="surveyForm" onsubmit="submitForm(event)" class="space-y-6">
+        
+        <!-- ข้อมูลทั่วไป -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <h3 class="font-bold text-gray-800 mb-4 flex items-center"><span class="bg-blue-100 text-blue-600 p-1 rounded mr-2 text-xs">ส่วนที่ 1</span> ข้อมูลทั่วไป</h3>
+          
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1 required">ชื่อ-นามสกุล (ไม่รวมคำนำหน้า)</label>
+              <input type="text" id="name" required class="w-full border p-2 rounded-lg">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1 required">ตำแหน่ง</label>
+                <input type="text" id="position" required class="w-full border p-2 rounded-lg">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1 required">วันเกิด (พ.ศ.)</label>
+                <input type="date" id="dobInput" required class="w-full border p-2 rounded-lg text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1 required">เลขบัตรประชาชน</label>
+              <input type="text" id="idCardForm" required readonly class="w-full border p-2 rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed">
+            </div>
+            
+            <!-- จำลองหน่วยงาน (ใช้ Datalist แบบพิมพ์ค้นหาได้ เพื่อความสวยงาม) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1 required">หน่วยงาน</label>
+              <input list="dept_list" id="dept" required class="w-full border p-2 rounded-lg" placeholder="พิมพ์ค้นหาหน่วยงาน">
+              <datalist id="dept_list">
+                <option value="กลุ่มงานเวชศาสตร์ฉุกเฉินและนิติเวชวิทยา">
+                <option value="กลุ่มงานรังสีวิทยา">
+                <option value="ห้องตรวจศัลยกรรมทั่วไป">
+                <!-- ใส่รายชื่อเพิ่มเติมจากของเดิมได้เลยครับ -->
+              </datalist>
+            </div>
+          </div>
+        </div>
+
+        <!-- ประวัติวัคซีน -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <h3 class="font-bold text-gray-800 mb-4 flex items-center"><span class="bg-blue-100 text-blue-600 p-1 rounded mr-2 text-xs">ส่วนที่ 2</span> ประวัติการรับวัคซีน</h3>
+          
+          <div class="space-y-4" id="vaccineQuestions">
+            <!-- ข้อ 1 -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-2 required">1. Hepatitis A (ไวรัสตับอักเสบ A)</label>
+              <label class="radio-card"><input type="radio" name="hepA" value="ได้รับวัคซีนครบ 3 เข็ม หรือมีภูมิคุ้มกัน" required> <span class="text-sm">ได้รับครบ หรือมีภูมิคุ้มกัน</span></label>
+              <label class="radio-card"><input type="radio" name="hepA" value="ได้รับวัคซีนไม่ครบ หรือยังไม่มีภูมิคุ้มกัน"> <span class="text-sm">ได้รับไม่ครบ หรือยังไม่มีภูมิคุ้มกัน</span></label>
+              <label class="radio-card"><input type="radio" name="hepA" value="ยังไม่เคยได้รับวัคซีน"> <span class="text-sm">ยังไม่เคยได้รับวัคซีน</span></label>
+            </div>
+
+            <!-- ข้อ 2 -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-2 required">2. Influenza (ไข้หวัดใหญ่)</label>
+              <label class="radio-card"><input type="radio" name="flu" value="ได้รับวัคซีนครั้งล่าสุด ไม่เกิน 1 ปี" required> <span class="text-sm">ได้รับครั้งล่าสุด ไม่เกิน 1 ปี</span></label>
+              <label class="radio-card"><input type="radio" name="flu" value="ได้รับวัคซีนล่าสุด เกิน 1 ปี"> <span class="text-sm">ได้รับล่าสุด เกิน 1 ปี</span></label>
+              <label class="radio-card"><input type="radio" name="flu" value="ไม่เคยได้รับวัคซีน"> <span class="text-sm">ไม่เคยได้รับวัคซีน</span></label>
+            </div>
+
+            <!-- หมายเหตุ: สำหรับแบบฟอร์มเต็ม ให้ Copy โครงสร้าง <label class="radio-card"> ไปสร้างข้อที่เหลือได้เลยครับ โค้ดจะสวยงามมาก -->
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-4 hover:bg-blue-700 transition shadow-md">บันทึกข้อมูลและเข้าดูประวัติ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 3: หน้าแสดงประวัติ -->
+  <div id="historySection" class="hidden max-w-md mx-auto mt-8">
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border-t-4 border-green-500">
+      <div class="bg-green-50 p-6 text-center border-b border-green-100">
+        <div class="text-4xl mb-2">🩺</div>
+        <h2 class="text-xl font-bold text-green-700">ประวัติการได้รับวัคซีน</h2>
+        <p class="text-sm text-gray-600 mt-1" id="h_name">ชื่อ-สกุล</p>
+      </div>
+      
+      <div class="p-6">
+        <h3 class="font-bold text-gray-800 mb-3 text-sm border-b pb-2">ข้อมูลเบื้องต้น</h3>
+        <div class="space-y-2 text-sm text-gray-600 mb-6">
+          <div class="flex justify-between"><span>หน่วยงาน:</span><span id="h_dept" class="font-semibold text-gray-800 text-right"></span></div>
+          <div class="flex justify-between"><span>ผล X-ray ปอด:</span><span id="h_xray" class="font-semibold text-gray-800 text-right"></span></div>
+        </div>
+
+        <h3 class="font-bold text-gray-800 mb-3 text-sm border-b pb-2">รายการวัคซีน</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between items-center bg-gray-50 p-2 rounded">
+            <span class="font-semibold text-gray-700">Hepatitis A</span>
+            <span id="h_hepA" class="text-xs text-right max-w-[50%]"></span>
+          </div>
+          <div class="flex justify-between items-center bg-gray-50 p-2 rounded">
+            <span class="font-semibold text-gray-700">Influenza</span>
+            <span id="h_flu" class="text-xs text-right max-w-[50%]"></span>
+          </div>
+          <!-- เพิ่มรายการวัคซีนโชว์ตรงนี้ได้เลย -->
+        </div>
+
+        <button onclick="location.reload()" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl mt-8 hover:bg-gray-300 transition">ออกจากระบบ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ ใส่ URL ของ Web App โปรเจกต์วัคซีนที่คุณเพิ่ง Deploy ใหม่
+    const VACCINE_API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; 
+
+    function showLoading(text) {
+      document.getElementById('loadingText').innerText = text;
+      document.getElementById('loading').classList.remove('hidden');
+    }
+    function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+
+    async function callAPI(action, data = {}) {
+      const payload = JSON.stringify({ action: action, ...data });
+      const res = await fetch(VACCINE_API_URL, { method: 'POST', body: payload });
+      return await res.json();
+    }
+
+    // 1. ฟังก์ชันล็อกอิน
+    function handleLogin(e) {
+      e.preventDefault();
+      const id = document.getElementById('loginId').value;
+      const dob = document.getElementById('loginPassword').value;
+      
+      showLoading('กำลังตรวจสอบข้อมูล...');
+
+      callAPI('checkLogin', { id: id, dob: dob }).then(res => {
+        hideLoading();
+        if (res.status === 'found') {
+          renderHistory(res.data);
+        } else if (res.status === 'wrong_password') {
+          Swal.fire('รหัสผ่านไม่ถูกต้อง', 'กรุณาตรวจสอบวันเดือนปีเกิดอีกครั้ง', 'error');
+        } else if (res.status === 'not_found') {
+          // ไม่พบข้อมูล -> โชว์ฟอร์ม[cite: 2]
+          document.getElementById('loginSection').classList.add('hidden');
+          document.getElementById('surveySection').classList.remove('hidden');
+          document.getElementById('idCardForm').value = id;
+          
+          if(dob.length === 8) {
+            const dd = dob.substring(0,2); const mm = dob.substring(2,4); const yyyy = dob.substring(4,8);
+            document.getElementById('dobInput').value = `${yyyy}-${mm}-${dd}`;
+          }
+          Swal.fire('ไม่พบประวัติเดิม', 'กรุณากรอกแบบสำรวจเพื่อบันทึกข้อมูลเข้าระบบใหม่ค่ะ', 'info');
+        }
+      }).catch(err => {
+        hideLoading(); Swal.fire('Error', err.message, 'error');
+      });
+    }
+
+    // 2. ฟังก์ชันเซฟฟอร์ม
+    function submitForm(e) {
+      e.preventDefault();
+      
+      const dobVal = document.getElementById('dobInput').value;
+      const year = parseInt(dobVal.split('-')[0]);
+      if (year < 2400) { Swal.fire('แจ้งเตือน', 'กรุณาระบุปีเกิดเป็น พ.ศ. ให้ถูกต้อง', 'warning'); return; }
+
+      // จัดรูป Object แบบเดิมเป๊ะๆ เพื่อส่งให้ API[cite: 2]
+      const formData = {
+        prefix: "นาย", // โค้ดย่อเพื่อการทดสอบ คุณสามารถใส่ฟังก์ชันดึงค่าจริงๆ เพิ่มเติมได้
+        name: document.getElementById('name').value,
+        position: document.getElementById('position').value,
+        dept: document.getElementById('dept').value,
+        dob: dobVal,
+        idCard: document.getElementById('idCardForm').value,
+        hepA: document.querySelector('input[name="hepA"]:checked').value,
+        flu: document.querySelector('input[name="flu"]:checked').value,
+        // ... (ดึงข้อมูลข้ออื่นๆ เข้ามาใส่ตรงนี้ได้เลย)
+        allergy: "ไม่มี", chickenpox: "ไม่ทราบ", xray: "ไม่ทราบ" 
+      };
+
+      showLoading('กำลังบันทึกข้อมูล...');
+      
+      callAPI('saveData', { formData: formData }).then(res => {
+        hideLoading();
+        if(res.status === 'success') {
+          Swal.fire('สำเร็จ', 'บันทึกข้อมูลประวัติการรับวัคซีนเรียบร้อย', 'success').then(() => {
+            renderHistory(res.data);
+          });
+        }
+      }).catch(err => { hideLoading(); Swal.fire('Error', err.message, 'error'); });
+    }
+
+    // 3. ฟังก์ชันนำข้อมูลมาโชว์หน้า UI
+    function renderHistory(data) {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('surveySection').classList.add('hidden');
+      document.getElementById('historySection').classList.remove('hidden');
+
+      // ดึงข้อมูลจาก Array แบบเดิมเป๊ะๆ[cite: 2]
+      document.getElementById('h_name').innerText = `${data[0]} ${data[1]}`;
+      document.getElementById('h_dept').innerText = data[5];
+      document.getElementById('h_xray').innerText = data[22] || '-';
+      
+      document.getElementById('h_hepA').innerText = data[9];
+      document.getElementById('h_flu').innerText = data[11];
+    }
+  </script>
+</body>
+</html>
