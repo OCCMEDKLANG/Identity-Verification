@@ -3,89 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aerobic Dance STAMP</title>
+  <title>บัตรสะสมแต้ม</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Sarabun', sans-serif; background-color: #f0fdf4; }
-    .stamp-box { transition: all 0.3s ease; }
-    .stamp-active { background-color: #22c55e; color: white; transform: scale(1.05); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .stamp-inactive { background-color: #e5e7eb; color: #9ca3af; }
-    .gacha-box { animation: shake 1s infinite alternate; }
-    @keyframes shake { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-10px) rotate(-5deg); } 50% { transform: translateY(0) rotate(5deg); } 75% { transform: translateY(-10px) rotate(-5deg); } 100% { transform: translateY(0) rotate(0deg); } }
+    body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+    .stamp-circle { transition: transform 0.2s; }
+    .stamp-circle:active { transform: scale(0.95); }
+    .gacha-box { animation: float 2s ease-in-out infinite; }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
   </style>
 </head>
-<body class="p-4 pb-10">
+<body class="pb-10">
 
   <div id="loading" class="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
     <div class="animate-spin inline-block w-12 h-12 border-[4px] border-green-600 border-t-transparent rounded-full"></div>
-    <p class="mt-4 text-gray-700 font-semibold">กำลังโหลดข้อมูล...</p>
+    <p class="mt-4 text-gray-700 font-semibold">กำลังเชื่อมต่อฐานข้อมูล...</p>
   </div>
 
-  <div id="notLinkedSection" class="hidden text-center mt-20 bg-white p-6 rounded-2xl shadow-lg">
+  <div id="notLinkedSection" class="hidden text-center mt-20 p-6">
     <div class="text-5xl mb-4">🔒</div>
     <h2 class="text-xl font-bold text-gray-800 mb-2">ยังไม่ได้ผูกบัญชี</h2>
-    <p class="text-gray-600 mb-6 text-sm">คุณต้องทำการผูกบัญชีกับระบบก่อน จึงจะสามารถเข้าร่วมกิจกรรมสะสมแต้มได้ครับ</p>
-    <button onclick="goToRegister()" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg shadow-md hover:bg-green-700">ไปหน้าผูกบัญชี</button>
+    <p class="text-gray-600 mb-6 text-sm">กรุณาผูกบัญชีกับระบบก่อนเข้าร่วมกิจกรรมครับ</p>
+    <button onclick="window.location.href='index.html?from=stamp'" class="w-full max-w-xs bg-green-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-green-700">ไปหน้าผูกบัญชี</button>
   </div>
 
-  <div id="stampSection" class="hidden max-w-md mx-auto">
+  <div id="stampSection" class="hidden max-w-md mx-auto bg-white min-h-screen shadow-md">
     
-    <div class="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center border-t-4 border-green-500">
-      <h1 class="text-2xl font-bold text-green-700 mb-1">Aerobic Dance STAMP</h1>
-      <p id="userNameDisplay" class="text-gray-800 font-semibold text-lg mb-4">-</p>
+    <!-- ส่วนหัวบัตร (Header Card) โทนสีเขียว LINE -->
+    <div class="bg-gradient-to-b from-[#4caf50] to-[#22c55e] px-6 pt-8 pb-10 rounded-b-[35px] shadow-sm relative text-center text-white">
+      <div class="w-16 h-16 mx-auto bg-white rounded-full shadow-md mb-3 flex items-center justify-center text-3xl">🏃‍♂️</div>
+      <h2 class="text-xl font-bold">กลุ่มงานอาชีวเวชกรรม</h2>
+      <p class="text-sm opacity-90 mb-4">Aerobic Dance @ KLANG</p>
       
-      <div class="bg-gray-50 p-4 rounded-2xl inline-block mb-2 shadow-inner">
-        <div id="qrcodeDisplay" class="mx-auto flex justify-center"></div>
+      <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-left border border-white/30 flex justify-between items-center">
+        <div>
+          <span class="bg-[#166534] text-white text-[10px] px-2 py-1 rounded-md font-bold mb-1 inline-block">ของรางวัล</span>
+          <div class="text-sm mt-1">แสตมป์สะสม <span id="stampCountText" class="text-2xl font-bold text-yellow-300 mx-1">0</span> ดวง</div>
+        </div>
+        
+        <!-- QR Code สำหรับสแกน -->
+        <div class="bg-white p-2 rounded-xl shadow-sm" onclick="Swal.fire('แสกนรับสิทธิ์', 'ยื่น QR นี้ให้เจ้าหน้าที่สแกน', 'info')">
+          <div id="qrcodeDisplay"></div>
+          <div class="text-[9px] text-center text-gray-800 mt-1 font-bold" id="timerDisplay">รีเฟรช 60s</div>
+        </div>
       </div>
-      
-      <p id="timerDisplay" class="text-sm font-bold text-red-500 mt-2">QR Code รีเฟรชใน: 60 วิ</p>
-      <p class="text-xs text-gray-500 mt-1">ยื่น QR Code ให้เจ้าหน้าที่สแกนรับแสตมป์ (วันละ 1 ครั้ง)</p>
     </div>
 
-    <!-- กล่องแลกสิทธิ์กาชาปอง (ซ่อนไว้ถ้าไม่มีสิทธิ์) -->
-    <div id="gachaSection" class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 rounded-3xl shadow-lg p-5 mb-4 text-center text-white relative overflow-hidden">
-      <div class="absolute -right-4 -top-4 text-6xl opacity-30">🎁</div>
-      <h2 class="text-lg font-bold mb-1 shadow-sm">คุณมีสิทธิ์ลุ้นรางวัล!</h2>
-      <p class="text-sm mb-3">สะสมครบทุก 5 ครั้ง รับ 1 สิทธิ์เปิดกล่อง</p>
-      <button onclick="playGacha()" class="bg-white text-orange-600 font-bold px-6 py-2 rounded-full shadow-md hover:scale-105 transition-transform">
-        กดเปิดกล่องเลย (เหลือ <span id="ticketCount">0</span> สิทธิ์)
-      </button>
+    <!-- ส่วนแลกรางวัล (Gacha) -->
+    <div id="gachaSection" class="hidden -mt-5 mx-6 relative z-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl shadow-lg p-4 text-center text-white">
+      <div class="absolute -right-2 -top-2 text-5xl opacity-30">🎁</div>
+      <h3 class="font-bold text-md">คุณมีสิทธิ์ลุ้นรางวัล! <span id="ticketCount" class="bg-red-500 text-white rounded-full px-2 text-xs">0</span></h3>
+      <button onclick="playGacha()" class="mt-2 bg-white text-orange-600 text-sm font-bold px-6 py-2 rounded-full shadow-md hover:scale-105 transition-transform">กดเปิดกล่องเลย!</button>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-lg p-6 border-t-4 border-blue-500">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold text-gray-800">แสตมป์สะสมของคุณ</h2>
-        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full"><span id="stampCount">0</span>/14 ครั้ง</span>
+    <!-- ตารางแสตมป์ 14 สัปดาห์ -->
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h3 class="font-bold text-gray-800">บัตรสะสมแต้ม (14 สัปดาห์)</h3>
       </div>
-      
-      <div id="stampGrid" class="grid grid-cols-4 gap-3"></div>
-    </div>
 
+      <div id="stampGrid" class="grid grid-cols-4 gap-y-6 gap-x-2"></div>
+
+      <div class="mt-8 flex justify-center gap-4 text-[10px] text-gray-500 bg-gray-50 py-2 rounded-lg">
+        <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-green-500"></div> ได้รับ</div>
+        <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-red-100 border border-red-300"></div> ขาด/พลาด</div>
+        <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-gray-100"></div> ยังไม่ถึง</div>
+      </div>
+    </div>
   </div>
 
   <script>
+    // ⚠️ ใส่ LIFF ID แสตมป์ และ URL ของ API แสตมป์
     const LIFF_ID_STAMP = "2010469434-OPy0wuua"; 
-    const URL_REGISTER_LIFF = "https://liff.line.me/2010419960-jJFrolbW"; 
-    const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbwe0c85_shFvZ8UnH1Rqk1GLDc33xsWqNlUXuRi2ezkaIb9IBXKyn2HXXXP8Z70IpWo/exec"; 
+    const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbwqpHVKFKzCP_ICyDtdltZ4Nk-foKmytN92nT5YFPzH0wJoxfWlZ1Y0i6MiAFVdBZosdw/exec"; 
+
+    const dateLabels = ['1 ก.ค.', '8 ก.ค.', '13 ก.ค.', '20 ก.ค.', '27 ก.ค.', '3 ส.ค.', '13 ส.ค.', '19 ส.ค.', '26 ส.ค.', '2 ก.ย.', '9 ก.ย.', '16 ก.ย.', '23 ก.ย.', '30 ก.ย.'];
 
     let globalUserId = "";
     let currentStamps = 0;
-    let qrCodeObj = null;
+    let secondsLeft = 60;
     let refreshInterval = null;
     let fetchInterval = null;
-    let secondsLeft = 60;
 
     async function callBackend(action, data = {}) {
       const payloadString = JSON.stringify({ action: action, ...data });
-      const response = await fetch(GAS_BACKEND_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: payloadString
-      });
+      const response = await fetch(GAS_BACKEND_URL, { method: 'POST', body: payloadString });
       return await response.json();
     }
 
@@ -93,124 +99,94 @@
       try {
         await liff.init({ liffId: LIFF_ID_STAMP });
         if (!liff.isLoggedIn()) { liff.login(); return; }
-        
-        const profile = await liff.getProfile();
-        globalUserId = profile.userId;
+        globalUserId = (await liff.getProfile()).userId;
 
         loadStampData(true); 
-        fetchInterval = setInterval(() => loadStampData(false), 3000);
-
-      } catch (err) {
-        Swal.fire("ข้อผิดพลาด", err.message, "error");
-      }
+        fetchInterval = setInterval(() => loadStampData(false), 3000); // ดึงข้อมูลทุก 3 วินาทีเพื่ออัปเดตหน้าจอทันทีที่เจ้าหน้าที่สแกน
+      } catch (err) { Swal.fire("ข้อผิดพลาด", err.message, "error"); }
     }
 
     function loadStampData(showLoading = false) {
       if (showLoading) document.getElementById('loading').classList.remove('hidden');
       
-      callBackend('getUserStamp', { userId: globalUserId })
-        .then(res => {
-          document.getElementById('loading').classList.add('hidden');
-          
-          if (!res.isLinked) {
-            document.getElementById('notLinkedSection').classList.remove('hidden');
-            clearInterval(fetchInterval); 
-            return;
-          }
+      callBackend('getUserStamp', { userId: globalUserId }).then(res => {
+        document.getElementById('loading').classList.add('hidden');
+        if (!res.isLinked) { document.getElementById('notLinkedSection').classList.remove('hidden'); clearInterval(fetchInterval); return; }
 
-          document.getElementById('stampSection').classList.remove('hidden');
-          document.getElementById('userNameDisplay').innerText = res.name;
-          
-          // ระบบแจ้งเตือนเมื่อได้แสตมป์ครบ 5 ดวง
-          if (res.stamps > currentStamps && !showLoading) {
-            if (res.stamps % 5 === 0) {
-              Swal.fire({ title: 'ยอดเยี่ยมมาก! 🏆', text: `คุณสะสมแสตมป์ครบ ${res.stamps} ดวง ได้รับสิทธิ์เปิดกล่องลุ้นรางวัล 1 สิทธิ์!`, icon: 'success' });
-            } else {
-              Swal.fire({ title: 'สำเร็จ! ✅', text: `คุณได้รับแสตมป์ครั้งที่ ${res.stamps} แล้ว`, icon: 'success', timer: 2000, showConfirmButton: false });
-            }
-          }
-          currentStamps = res.stamps;
-          renderStamps(currentStamps);
+        document.getElementById('stampSection').classList.remove('hidden');
+        
+        if (res.stamps > currentStamps && !showLoading) {
+          if (res.stamps % 5 === 0) Swal.fire('ยอดเยี่ยม! 🏆', `สะสมครบ ${res.stamps} ดวง ได้รับ 1 สิทธิ์เปิดกล่อง!`, 'success');
+          else Swal.fire('สำเร็จ! ✅', `ได้รับแสตมป์ดวงที่ ${res.stamps} แล้ว`, 'success');
+        }
+        currentStamps = res.stamps;
+        document.getElementById('stampCountText').innerText = currentStamps;
+        
+        renderStamps(res.history);
 
-          // อัปเดตกล่องกาชาปอง
-          if (res.tickets > 0) {
-            document.getElementById('gachaSection').classList.remove('hidden');
-            document.getElementById('ticketCount').innerText = res.tickets;
-          } else {
-            document.getElementById('gachaSection').classList.add('hidden');
-          }
+        if (res.tickets > 0) { document.getElementById('gachaSection').classList.remove('hidden'); document.getElementById('ticketCount').innerText = res.tickets; } 
+        else { document.getElementById('gachaSection').classList.add('hidden'); }
 
-          if (showLoading) generateSecureQR();
+        if (showLoading) generateSecureQR();
 
-        }).catch(err => { console.log(err); });
+      }).catch(err => console.log(err));
     }
 
-    function renderStamps(count) {
-      document.getElementById('stampCount').innerText = count;
+    function renderStamps(historyArray) {
       const grid = document.getElementById('stampGrid');
       grid.innerHTML = ''; 
 
-      for (let i = 1; i <= 14; i++) {
+      historyArray.forEach((status, index) => {
         const div = document.createElement('div');
-        if (i <= count) {
-          div.className = 'stamp-box stamp-active aspect-square rounded-2xl flex flex-col items-center justify-center';
-          div.innerHTML = `<span class="text-2xl mb-1">🏆</span><span class="text-[10px] font-bold">ครั้งที่ ${i}</span>`;
+        div.className = 'flex flex-col items-center stamp-circle';
+        
+        let circleClass, icon;
+        if (status === 'stamped') {
+          circleClass = 'bg-green-500 text-white border-2 border-green-600 shadow-sm';
+          icon = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
+        } else if (status === 'missed') {
+          circleClass = 'bg-red-50 text-red-400 border-2 border-red-200 border-dashed';
+          icon = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
         } else {
-          div.className = 'stamp-box stamp-inactive aspect-square rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-gray-300';
-          div.innerHTML = `<span class="text-xl mb-1 opacity-50">🔒</span><span class="text-[10px] font-semibold">ครั้งที่ ${i}</span>`;
+          circleClass = 'bg-gray-50 text-gray-300 border-2 border-gray-200';
+          icon = '<svg class="w-5 h-5 opacity-60" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>';
         }
+
+        div.innerHTML = `
+          <div class="w-[52px] h-[52px] rounded-full flex items-center justify-center ${circleClass} mb-1">
+            ${icon}
+          </div>
+          <span class="text-[10px] ${status === 'missed' ? 'text-red-400 font-bold' : 'text-gray-500 font-semibold'}">
+            ${status === 'missed' ? 'ขาด' : dateLabels[index]}
+          </span>
+        `;
         grid.appendChild(div);
-      }
+      });
     }
 
     function playGacha() {
-      // แอนิเมชันกล่องร่วงลงมา
-      Swal.fire({
-        title: 'เตรียมลุ้นรางวัล...',
-        html: '<div class="gacha-box text-8xl mt-4 drop-shadow-xl">🎁</div><p class="mt-4 text-sm text-gray-500">กรุณารอสักครู่...</p>',
-        showConfirmButton: false,
-        allowOutsideClick: false
-      });
+      Swal.fire({ title: 'ลุ้นของรางวัล...', html: '<div class="gacha-box text-7xl mt-4 drop-shadow-xl">🎁</div><p class="mt-4 text-sm text-gray-500">กรุณารอสักครู่...</p>', showConfirmButton: false, allowOutsideClick: false });
 
-      // ยิงสุ่มหลังบ้าน
       callBackend('drawGacha', { userId: globalUserId }).then(res => {
         if (!res.success) { Swal.fire('เกิดข้อผิดพลาด', res.message, 'error'); return; }
-        
         setTimeout(() => {
-          if (res.isWin) {
-            Swal.fire({ title: '🎉 ยินดีด้วย!', text: `คุณได้รับรางวัล: ${res.prize}`, icon: 'success', confirmButtonText: 'สุดยอดไปเลย!' });
-          } else {
-            Swal.fire({ title: 'เสียใจด้วย 😭', text: 'คุณไม่ได้รับรางวัล โอกาสหน้าลองใหม่นะ!', icon: 'error', confirmButtonText: 'ตกลง' });
-          }
-          loadStampData(true); // รีเฟรชข้อมูลเพื่อหักสิทธิ์หน้าจอ
-        }, 1500); // ดีเลย์ให้คนลุ้น 1.5 วินาที
-        
+          if (res.isWin) Swal.fire({ title: '🎉 ยินดีด้วย!', text: `คุณได้รับรางวัล: ${res.prize}`, icon: 'success' });
+          else Swal.fire({ title: 'เสียใจด้วย 😭', text: 'คุณไม่ได้รับรางวัล โอกาสหน้าลองใหม่นะ!', icon: 'error' });
+          loadStampData(true);
+        }, 1500); 
       });
     }
 
     function generateSecureQR() {
       const expireTime = Date.now() + (60 * 1000); 
-      const qrData = `${globalUserId}|${expireTime}`;
-
       document.getElementById('qrcodeDisplay').innerHTML = ''; 
-      qrCodeObj = new QRCode(document.getElementById('qrcodeDisplay'), {
-        text: qrData, width: 180, height: 180, colorDark : "#15803d", colorLight : "#f9fafb", correctLevel : QRCode.CorrectLevel.H
-      });
-
+      new QRCode(document.getElementById('qrcodeDisplay'), { text: `${globalUserId}|${expireTime}`, width: 64, height: 64, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
       secondsLeft = 60;
       clearInterval(refreshInterval);
-      refreshInterval = setInterval(updateTimer, 1000);
-    }
-
-    function updateTimer() {
-      secondsLeft--;
-      document.getElementById('timerDisplay').innerText = `QR Code รีเฟรชใน: ${secondsLeft} วิ`;
-      if (secondsLeft <= 0) generateSecureQR(); 
-    }
-
-    function goToRegister() { 
-      // สลับไปไฟล์ index.html ที่อยู่ในโฟลเดอร์เดียวกันตรงๆ
-      window.location.href = "index.html?from=stamp"; 
+      refreshInterval = setInterval(() => {
+        secondsLeft--; document.getElementById('timerDisplay').innerText = `รีเฟรช ${secondsLeft}s`;
+        if (secondsLeft <= 0) generateSecureQR(); 
+      }, 1000);
     }
 
     main();
