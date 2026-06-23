@@ -170,9 +170,9 @@
               <label class="radio-card"><input type="radio" name="covid" value="ไม่เคยฉีด"> <span class="text-sm">ไม่เคยฉีด</span></label>
               <label class="radio-card"><input type="radio" name="covid" value="ไม่ทราบ"> <span class="text-sm">ไม่ทราบ</span></label>
             </div>
-            <div>
+            <div id="covidTypeSection" class="hidden ml-4 pl-4 border-l-2 border-green-400">
               <label class="block text-sm font-semibold text-gray-800 mb-2 required">9.1 ชนิดวัคซีน COVID-19 (โควิด 19) ที่ได้รับ</label>
-              <label class="radio-card"><input type="radio" name="covidType" value="Pfizer (ไฟเซอร์ )" required> <span class="text-sm">Pfizer (ไฟเซอร์ )</span></label>
+              <label class="radio-card"><input type="radio" name="covidType" value="Pfizer (ไฟเซอร์ )"> <span class="text-sm">Pfizer (ไฟเซอร์ )</span></label>
               <label class="radio-card"><input type="radio" name="covidType" value="Moderna (โมเดอร์นา)"> <span class="text-sm">Moderna (โมเดอร์นา)</span></label>
               <label class="radio-card"><input type="radio" name="covidType" value="AstraZeneca (แอสตร้าเซนเนก้า)"> <span class="text-sm">AstraZeneca (แอสตร้าเซนเนก้า)</span></label>
               <label class="radio-card"><input type="radio" name="covidType" value="Sinovac (ซิโนแวค)"> <span class="text-sm">Sinovac (ซิโนแวค)</span></label>
@@ -216,6 +216,7 @@
         </div>
 
         <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-4 hover:bg-blue-700 shadow-md">บันทึกข้อมูลและเข้าดูประวัติ</button>
+        <button type="button" id="btnCancelEdit" onclick="cancelEdit()" class="hidden w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl mt-3 hover:bg-gray-300 shadow-md transition">❌ ยกเลิกการแก้ไข</button>
       </form>
     </div>
   </div>
@@ -239,8 +240,13 @@
           <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Pertussis</span><span id="h_pertussis" class="text-xs text-right text-gray-600 max-w-[50%]"></span></div>
           <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Diphtheria</span><span id="h_diphtheria" class="text-xs text-right text-gray-600 max-w-[50%]"></span></div>
           <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Tetanus</span><span id="h_tetanus" class="text-xs text-right text-gray-600 max-w-[50%]"></span></div>
+          
           <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">COVID-19</span><span id="h_covid" class="text-xs text-right text-gray-600 max-w-[50%]"></span></div>
-          <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">ชนิด COVID-19</span><span id="h_covidType" class="text-xs text-right text-gray-600 max-w-[50%]"></span></div>
+          <div id="h_covidType_container" class="hidden flex justify-between items-center bg-gray-50/50 p-2 rounded ml-4 border-l-2 border-green-500">
+            <span class="font-normal text-[11px] text-gray-500">↳ ชนิดวัคซีน COVID-19 ที่ได้รับ</span>
+            <span id="h_covidType" class="text-[11px] text-right text-gray-500 max-w-[50%]"></span>
+          </div>
+
           <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">วัคซีนอื่นๆ</span><span id="h_otherVac" class="text-xs text-right text-gray-600 max-w-[50%]"></span></div>
         </div>
 
@@ -259,13 +265,12 @@
 
   <script>
     // ⚠️ อย่าลืมใส่ URL จาก Google Script ตัววัคซีนของคุณ (ที่ Deploy ใหม่)
-    const VACCINE_API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; 
+    const VACCINE_API_URL = "ใส่_URL_Web_App_ของ_โปรเจกต์วัคซีน_ที่นี่"; 
     let globalVaccineData = null;
 
     function showLoading(text) { document.getElementById('loadingText').innerText = text; document.getElementById('loading').classList.remove('hidden'); }
     function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
 
-    // ฟังก์ชันจัดฟอร์แมตวันเกิดให้มี Slash และซิงก์ปฏิทิน (เหมือนระบบหลัก)
     function formatDate(input) {
       let v = input.value.replace(/\D/g, '');
       if (v.length > 8) v = v.substring(0, 8);
@@ -287,9 +292,25 @@
       else { otherInput.style.display = 'none'; otherInput.required = false; otherInput.value = ''; }
     }
 
-    // เปิด/ปิด ช่องระบุเพิ่มเติมของ Radio
+    // ซ่อน/แสดง ฟิลด์ย่อยจาก Radio 
     document.querySelectorAll('input[type="radio"]').forEach(r => {
       r.addEventListener('change', function() {
+        
+        // จัดการซ่อน/แสดง 9.1 ชนิดโควิด
+        if(this.name === 'covid') {
+          const typeSection = document.getElementById('covidTypeSection');
+          const typeRadios = document.querySelectorAll('input[name="covidType"]');
+          if (this.value.includes('ได้รับวัคซีน')) { // ครอบคลุมทั้ง ไม่เกิน 1 ปี และ เกิน 1 ปี
+            typeSection.classList.remove('hidden');
+            typeRadios.forEach(radio => radio.required = true);
+          } else {
+            typeSection.classList.add('hidden');
+            typeRadios.forEach(radio => { radio.required = false; radio.checked = false; });
+            document.getElementById('covidTypeOther').style.display = 'none';
+            document.getElementById('covidTypeOther').value = '';
+          }
+        }
+
         if(this.name === 'covidType') {
           const el = document.getElementById('covidTypeOther');
           el.style.display = this.value === 'อื่น ๆ' ? 'block' : 'none';
@@ -330,6 +351,14 @@
         } else if (res.status === 'not_found') {
           document.getElementById('loginSection').classList.add('hidden');
           document.getElementById('surveySection').classList.remove('hidden');
+          
+          // โหมดกรอกใหม่ (ซ่อนปุ่มยกเลิก และรีเซ็ตฟอร์ม)
+          document.getElementById('formTitle').innerText = "แบบสำรวจประวัติวัคซีน";
+          document.getElementById('formSubtitle').innerText = "สำหรับบุคลากรที่ยังไม่เคยมีประวัติในระบบ";
+          document.getElementById('btnCancelEdit').classList.add('hidden');
+          document.getElementById('surveyForm').reset();
+          document.getElementById('covidTypeSection').classList.add('hidden');
+
           document.getElementById('idCardForm').value = id;
           if(dob.length === 8) {
             const dd = dob.substring(0,2); const mm = dob.substring(2,4); const yyyy = dob.substring(4,8);
@@ -348,6 +377,10 @@
       const year = parseInt(dobVal.split('/')[2]);
       if (year < 2400) { Swal.fire('แจ้งเตือน', 'กรุณาระบุปีเกิดเป็น พ.ศ. ให้ถูกต้อง (ต้องมากกว่า 2400)', 'warning'); return; }
 
+      // จัดการค่า Covid Type ให้ดึงค่าที่ติ๊ก หรือค่าว่างถ้าโดนซ่อน
+      const covidTypeChecked = document.querySelector('input[name="covidType"]:checked');
+      const covidTypeValue = covidTypeChecked ? covidTypeChecked.value : "";
+
       const formData = {
         prefix: document.getElementById('prefix').value,
         prefixOther: document.getElementById('prefixOther').value,
@@ -365,7 +398,7 @@
         diphtheria: document.querySelector('input[name="diphtheria"]:checked').value,
         tetanus: document.querySelector('input[name="tetanus"]:checked').value,
         covid: document.querySelector('input[name="covid"]:checked').value,
-        covidType: document.querySelector('input[name="covidType"]:checked').value,
+        covidType: covidTypeValue,
         covidTypeOther: document.getElementById('covidTypeOther').value,
         otherVac: document.querySelector('input[name="otherVac"]:checked').value,
         otherVacDetail: document.getElementById('otherVacDetail').value,
@@ -394,6 +427,7 @@
       document.getElementById('historySection').classList.remove('hidden');
 
       document.getElementById('h_name').innerText = `${data[0]} ${data[1]}`;
+      
       document.getElementById('h_hepA').innerText = data[9] || '-';
       document.getElementById('h_hepB').innerText = data[10] || '-';
       document.getElementById('h_flu').innerText = data[11] || '-';
@@ -402,13 +436,22 @@
       document.getElementById('h_pertussis').innerText = data[14] || '-';
       document.getElementById('h_diphtheria').innerText = data[15] || '-';
       document.getElementById('h_tetanus').innerText = data[16] || '-';
-      document.getElementById('h_covid').innerText = data[17] || '-';
-      document.getElementById('h_covidType').innerText = data[18] || '-';
       document.getElementById('h_otherVac').innerText = data[19] || '-';
-      
       document.getElementById('h_allergy').innerText = data[20] || '-';
       document.getElementById('h_chickenpox').innerText = data[21] || '-';
       document.getElementById('h_xray').innerText = data[22] || '-';
+
+      // จัดการแสดงผลกล่องย่อย ชนิด COVID
+      const covidVal = data[17] || '-';
+      const covidTypeVal = data[18] || '-';
+      document.getElementById('h_covid').innerText = covidVal;
+
+      if (covidVal.includes('ได้รับวัคซีน') && covidTypeVal !== '-' && covidTypeVal !== '') {
+        document.getElementById('h_covidType_container').classList.remove('hidden');
+        document.getElementById('h_covidType').innerText = covidTypeVal;
+      } else {
+        document.getElementById('h_covidType_container').classList.add('hidden');
+      }
     }
 
     function setRadioChecked(name, value) {
@@ -420,8 +463,11 @@
     function editData() {
       document.getElementById('historySection').classList.add('hidden');
       document.getElementById('surveySection').classList.remove('hidden');
+      
+      // โหมดแก้ไข (แสดงปุ่มยกเลิก)
       document.getElementById('formTitle').innerText = "แก้ไขข้อมูลวัคซีน";
       document.getElementById('formSubtitle').innerText = "ท่านสามารถอัปเดตประวัติวัคซีนให้เป็นปัจจุบันได้";
+      document.getElementById('btnCancelEdit').classList.remove('hidden');
 
       const data = globalVaccineData;
       
@@ -446,8 +492,9 @@
       setRadioChecked('chickenpox', data[21]);
       setRadioChecked('xray', data[22]);
 
+      // ดึงค่าชนิดโควิดมาใส่ (ถ้ามี)
       if (data[18] && data[18].startsWith('อื่น ๆ')) { setRadioChecked('covidType', 'อื่น ๆ'); document.getElementById('covidTypeOther').value = data[18].replace('อื่น ๆ (', '').replace(')', ''); } 
-      else { setRadioChecked('covidType', data[18]); }
+      else if (data[18]) { setRadioChecked('covidType', data[18]); }
 
       if (data[19] && data[19].startsWith('มี')) { setRadioChecked('otherVac', 'มี'); document.getElementById('otherVacDetail').value = data[19].replace('มี (', '').replace(')', ''); } 
       else { setRadioChecked('otherVac', 'ไม่มี'); }
@@ -455,6 +502,13 @@
       if (data[20] && data[20].startsWith('มี')) { setRadioChecked('allergy', 'มี'); document.getElementById('allergyDetail').value = data[20].replace('มี (', '').replace(')', ''); } 
       else { setRadioChecked('allergy', 'ไม่มี'); }
       
+      window.scrollTo(0, 0);
+    }
+
+    // ฟังก์ชันยกเลิกการแก้ไข
+    function cancelEdit() {
+      document.getElementById('surveySection').classList.add('hidden');
+      document.getElementById('historySection').classList.remove('hidden');
       window.scrollTo(0, 0);
     }
   </script>
