@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>บัตรสะสมแต้ม</title>
+  <title>ลงทะเบียนร่วมกิจกรรม</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -21,7 +21,7 @@
 
   <div id="loading" class="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
     <div class="animate-spin inline-block w-12 h-12 border-[4px] border-green-600 border-t-transparent rounded-full"></div>
-    <p class="mt-4 text-gray-700 font-semibold">กำลังเชื่อมต่อฐานข้อมูล...</p>
+    <p class="mt-4 text-gray-700 font-semibold">กำลังเชื่อมต่อ...</p>
   </div>
 
   <div id="notLinkedSection" class="hidden text-center mt-20 p-6">
@@ -33,34 +33,31 @@
 
   <div id="stampSection" class="hidden max-w-md mx-auto bg-white min-h-screen shadow-md">
     
-    <!-- ส่วนหัวบัตร (Header Card) โทนสีเขียว LINE -->
     <div class="bg-gradient-to-b from-[#4caf50] to-[#22c55e] px-6 pt-8 pb-10 rounded-b-[35px] shadow-sm relative text-center text-white">
       <div class="w-16 h-16 mx-auto bg-white rounded-full shadow-md mb-3 flex items-center justify-center text-3xl">🏃‍♂️</div>
-      <h2 class="text-xl font-bold">กลุ่มงานอาชีวเวชกรรม</h2>
+      <h2 id="userNameDisplay" class="text-xl font-bold">กำลังโหลดชื่อ...</h2>
       <p class="text-sm opacity-90 mb-4">Aerobic Dance @ KLANG</p>
       
-      <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-left border border-white/30 flex justify-between items-center">
-        <div>
-          <span class="bg-[#166534] text-white text-[10px] px-2 py-1 rounded-md font-bold mb-1 inline-block">ของรางวัล</span>
-          <div class="text-sm mt-1">แสตมป์สะสม <span id="stampCountText" class="text-2xl font-bold text-yellow-300 mx-1">0</span> ดวง</div>
-        </div>
+      <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-left border border-white/30 flex items-center gap-4">
         
-        <!-- QR Code สำหรับสแกน -->
-        <div class="bg-white p-2 rounded-xl shadow-sm" onclick="Swal.fire('แสกนรับสิทธิ์', 'ยื่น QR นี้ให้เจ้าหน้าที่สแกน', 'info')">
-          <div id="qrcodeDisplay"></div>
-          <div class="text-[9px] text-center text-gray-800 mt-1 font-bold" id="timerDisplay">รีเฟรช 60s</div>
+        <div class="bg-white p-2.5 rounded-xl shadow-sm flex-shrink-0 cursor-pointer hover:scale-105 transition-transform" onclick="showBigQR()">
+          <div id="qrcodeDisplay" class="flex justify-center"></div>
+          <div class="text-[10px] text-center text-gray-800 mt-1.5 font-bold" id="timerDisplay">รีเฟรช 60s</div>
+        </div>
+
+        <div class="flex-1">
+          <span class="bg-[#166534] text-white text-[11px] px-2 py-1 rounded-md font-bold mb-1 shadow-sm inline-block">🎁 สะสมแสตมป์</span>
+          <div class="text-sm mt-1 leading-snug">มีแสตมป์แล้ว<br><span id="stampCountText" class="text-4xl font-bold text-yellow-300 mr-1 drop-shadow-md">0</span><span class="text-sm font-semibold">ดวง</span></div>
         </div>
       </div>
     </div>
 
-    <!-- ส่วนแลกรางวัล (Gacha) -->
     <div id="gachaSection" class="hidden -mt-5 mx-6 relative z-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl shadow-lg p-4 text-center text-white">
       <div class="absolute -right-2 -top-2 text-5xl opacity-30">🎁</div>
       <h3 class="font-bold text-md">คุณมีสิทธิ์ลุ้นรางวัล! <span id="ticketCount" class="bg-red-500 text-white rounded-full px-2 text-xs">0</span></h3>
       <button onclick="playGacha()" class="mt-2 bg-white text-orange-600 text-sm font-bold px-6 py-2 rounded-full shadow-md hover:scale-105 transition-transform">กดเปิดกล่องเลย!</button>
     </div>
 
-    <!-- ตารางแสตมป์ 14 สัปดาห์ -->
     <div class="p-6">
       <div class="flex justify-between items-center mb-4 border-b pb-2">
         <h3 class="font-bold text-gray-800">บัตรสะสมแต้ม (14 สัปดาห์)</h3>
@@ -102,7 +99,7 @@
         globalUserId = (await liff.getProfile()).userId;
 
         loadStampData(true); 
-        fetchInterval = setInterval(() => loadStampData(false), 3000); // ดึงข้อมูลทุก 3 วินาทีเพื่ออัปเดตหน้าจอทันทีที่เจ้าหน้าที่สแกน
+        fetchInterval = setInterval(() => loadStampData(false), 3000); 
       } catch (err) { Swal.fire("ข้อผิดพลาด", err.message, "error"); }
     }
 
@@ -114,6 +111,7 @@
         if (!res.isLinked) { document.getElementById('notLinkedSection').classList.remove('hidden'); clearInterval(fetchInterval); return; }
 
         document.getElementById('stampSection').classList.remove('hidden');
+        document.getElementById('userNameDisplay').innerText = res.name;
         
         if (res.stamps > currentStamps && !showLoading) {
           if (res.stamps % 5 === 0) Swal.fire('ยอดเยี่ยม! 🏆', `สะสมครบ ${res.stamps} ดวง ได้รับ 1 สิทธิ์เปิดกล่อง!`, 'success');
@@ -177,16 +175,43 @@
       });
     }
 
+    // สร้าง QR Code ขนาด 96x96 พิกเซล
     function generateSecureQR() {
       const expireTime = Date.now() + (60 * 1000); 
       document.getElementById('qrcodeDisplay').innerHTML = ''; 
-      new QRCode(document.getElementById('qrcodeDisplay'), { text: `${globalUserId}|${expireTime}`, width: 64, height: 64, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
+      new QRCode(document.getElementById('qrcodeDisplay'), { 
+        text: `${globalUserId}|${expireTime}`, 
+        width: 96, 
+        height: 96, 
+        colorDark : "#166534", 
+        colorLight : "#ffffff", 
+        correctLevel : QRCode.CorrectLevel.M 
+      });
       secondsLeft = 60;
       clearInterval(refreshInterval);
       refreshInterval = setInterval(() => {
         secondsLeft--; document.getElementById('timerDisplay').innerText = `รีเฟรช ${secondsLeft}s`;
         if (secondsLeft <= 0) generateSecureQR(); 
       }, 1000);
+    }
+
+    // ป๊อปอัพโชว์ QR Code ขนาดใหญ่ เมื่อคลิกที่ QR
+    function showBigQR() {
+      const expireTime = Date.now() + (60 * 1000); 
+      const qrData = `${globalUserId}|${expireTime}`;
+      
+      Swal.fire({
+        title: 'ยื่นให้เจ้าหน้าที่สแกน',
+        html: '<div id="bigQrCode" class="flex justify-center mt-4 mb-2"></div><p class="text-xs text-gray-500">QR Code จะเปลี่ยนใหม่ทุก 60 วินาที เพื่อความปลอดภัย</p>',
+        showConfirmButton: true,
+        confirmButtonText: 'ปิดหน้าต่าง',
+        confirmButtonColor: '#16a34a',
+        didOpen: () => {
+          new QRCode(document.getElementById('bigQrCode'), {
+            text: qrData, width: 200, height: 200, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M
+          });
+        }
+      });
     }
 
     main();
