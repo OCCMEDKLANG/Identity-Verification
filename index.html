@@ -44,7 +44,6 @@
     </div>
 
     <div class="p-4">
-      <!-- Tab 1: Profile -->
       <div id="content-profileTab" class="tab-content block">
         <h2 id="formTitle" class="text-lg font-bold mb-4 text-gray-800">📝 ลงทะเบียนข้อมูลผู้ใช้งาน</h2>
         <div class="space-y-4">
@@ -67,22 +66,17 @@
           <div><label class="block text-sm text-gray-600 mb-1">หน่วยงานที่ปฏิบัติงานจริง <span class="text-red-500">*</span></label><input list="dept_list" id="f_dept" class="w-full border p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="พิมพ์ค้นหา หรือเลือกหน่วยงาน" oninput="removeError(this)"><datalist id="dept_list"><option value="สำนักการแพทย์"><option value="สำนักอนามัย"><option value="โรงพยาบาลกลาง"><option value="โรงพยาบาลตากสิน"><option value="สำนักงานเขต กทม."></datalist></div>
         </div>
         
-        <!-- กลุ่มปุ่มจัดการ Profile -->
         <button id="btnLinkAccount" onclick="saveData()" class="w-full bg-green-600 text-white font-bold p-3 rounded-lg mt-6 hover:bg-green-700 shadow-md">ผูกบัญชีและบันทึกข้อมูล</button>
-        
         <button id="btnEditProfile" onclick="enableProfileEdit()" class="hidden w-full bg-blue-600 text-white font-bold p-3 rounded-lg mt-6 hover:bg-blue-700 shadow-md transition">✏️ แก้ไขข้อมูล</button>
         
         <div id="profileEditActions" class="hidden mt-6 space-y-3">
           <button onclick="saveData()" class="w-full bg-green-600 text-white font-bold p-3 rounded-lg hover:bg-green-700 shadow-md">💾 บันทึกการอัปเดต</button>
           <button onclick="cancelProfileEdit()" class="w-full bg-gray-200 text-gray-700 font-bold p-3 rounded-lg hover:bg-gray-300">❌ ยกเลิกการแก้ไข</button>
         </div>
-
         <button id="btnUnlink" onclick="unlinkAccount()" class="w-full bg-red-100 text-red-600 font-bold p-3 rounded-lg mt-3 hover:bg-red-200 hidden">ยกเลิกการผูกบัญชี</button>
       </div>
 
-      <!-- Tab 2: Vaccine -->
       <div id="content-vaccineTab" class="tab-content hidden">
-        <!-- กรณีไม่ได้ผูกบัญชี (แสดงกล่องปุ่มไปหน้าเว็บตรง) -->
         <div id="vac-unlinked" class="hidden text-center py-10 px-2">
           <div class="text-5xl mb-4">📄</div>
           <h3 class="text-lg font-bold text-gray-800 mb-2">ท่านยังไม่มีประวัติการรับวัคซีน</h3>
@@ -243,9 +237,7 @@
         </div>
       </div>
 
-      <!-- Tab 3: Mental Health -->
       <div id="content-mentalTab" class="tab-content hidden">
-        <!-- กรณีไม่ได้ผูกบัญชี (แสดงกล่องปุ่มไปหน้าเว็บตรง) -->
         <div id="m-unlinked" class="hidden text-center py-10 px-2">
           <div class="text-5xl mb-4 text-pink-500">🧠</div>
           <h3 class="text-lg font-bold text-gray-800 mb-2">ระบบประเมินสุขภาพจิต</h3>
@@ -355,12 +347,12 @@
   </div>
 
   <script>
+    // ⚠️ ตรวจสอบ URL ทั้ง 4 ให้ถูกต้องด้วยนะครับ (API ต้องจบด้วย /exec)
     const LIFF_ID = "2010419960-jJFrolbW";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwqpHVKFKzCP_ICyDtdltZ4Nk-foKmytN92nT5YFPzH0wJoxfWlZ1Y0i6MiAFVdBZosdw/exec";
     const VACCINE_API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; 
     const MENTAL_API_URL = "https://script.google.com/macros/s/AKfycbwSiR2e9yAGLbHUG90TIToUt13JwUJWIY0l8yQys-eIn32L7EzXYxVsz3TG3Qx6mI3sMQ/exec"; 
 
-    // 🌟 ใส่ URL หน้าเว็บ Standalone ของวัคซีนและสุขภาพจิตตรงนี้ 🌟
     const VACCINE_STANDALONE_URL = "https://occmedklang.github.io/vaccine.html";
     const MENTAL_STANDALONE_URL = "https://occmedklang.github.io/mental.html";
 
@@ -396,9 +388,6 @@
       return null;
     }
 
-    // ==========================================
-    // ระบบ Lock/Unlock ฟอร์มประวัติส่วนตัว
-    // ==========================================
     function lockProfileForm() {
       document.querySelectorAll('#content-profileTab input, #content-profileTab select').forEach(el => {
         el.disabled = true;
@@ -446,11 +435,9 @@
       document.getElementById('f_dob').value = mainUserProfile.dob; document.getElementById('f_phone').value = mainUserProfile.phone;
     }
 
-    // 🌟 ฟังก์ชันสลับแท็บพร้อมปรับสี 🌟
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
       
-      // ล้างสีสถานะ active ของทุกปุ่ม
       document.querySelectorAll('[id^="btn-"]').forEach(btn => {
         btn.classList.remove('border-green-600', 'text-green-600', 'bg-green-50', 'border-blue-600', 'text-blue-600', 'bg-blue-50', 'border-pink-600', 'text-pink-600', 'bg-pink-50');
         btn.classList.add('border-transparent', 'text-gray-500');
@@ -460,7 +447,6 @@
       const activeBtn = document.getElementById('btn-' + tabId);
       activeBtn.classList.remove('border-transparent', 'text-gray-500');
 
-      // กำหนดสีตามแท็บที่กด
       if (tabId === 'profileTab') {
         activeBtn.classList.add('border-green-600', 'text-green-600', 'bg-green-50');
       } else if (tabId === 'vaccineTab') {
@@ -535,7 +521,6 @@
               if (fullName.startsWith(p)) { prefix = p; let rest = fullName.substring(p.length).trim(); let parts = rest.split(' '); fname = parts[0]||''; lname = parts.slice(1).join(' ')||''; break; }
             }
             
-            // เก็บข้อมูลไว้ในตัวแปรเผื่อกดยกเลิก
             mainUserProfile = { 
               prefix: prefix, fname: fname, lname: lname, 
               idCard: res.data.idCard, dob: res.data.dob, 
@@ -546,7 +531,7 @@
             document.getElementById('m_intro_name').innerText = (mainUserProfile.prefix === "อื่นๆ" ? "" : mainUserProfile.prefix) + mainUserProfile.fname + " " + mainUserProfile.lname;
 
             resetProfileFormToOriginal();
-            lockProfileForm(); // สั่งล็อกหน้าจอประวัติส่วนตัว
+            lockProfileForm(); 
             
           } else { Swal.fire('ล้มเหลว', res.message, 'error'); }
         }).catch(err => { Swal.fire('Error', err.message, 'error'); });
@@ -621,10 +606,14 @@
       vaccineDataFetched = true;
       document.getElementById('vac-unlinked').classList.add('hidden');
       document.getElementById('vac-loading').classList.remove('hidden');
-      document.getElementById('vac-nodata').classList.add('hidden'); document.getElementById('vac-history').classList.add('hidden'); document.getElementById('vac-form').classList.add('hidden');
+      document.getElementById('vac-nodata').classList.add('hidden'); 
+      document.getElementById('vac-history').classList.add('hidden'); 
+      document.getElementById('vac-form').classList.add('hidden');
       
-      // 🌟 ส่งค่า dob แบบเต็มๆ เป๊ะๆ (มีเครื่องหมาย /) ไปค้นหา เพื่อให้ตรงกับฐานข้อมูล
-      callAPI(VACCINE_API_URL, 'checkLogin', { id: mainUserProfile.idCard, dob: mainUserProfile.dob }).then(res => {
+      // 🌟 แก้ไขจุดนี้: นำระบบลบ / ออก เพื่อส่งค่า "14042540" แบบเดิมที่เคยทำงานได้ 100%
+      const cleanDob = mainUserProfile.dob.replace(/\D/g, ''); 
+      
+      callAPI(VACCINE_API_URL, 'checkLogin', { id: mainUserProfile.idCard, dob: cleanDob }).then(res => {
         document.getElementById('vac-loading').classList.add('hidden');
         if(res.status === 'found') {
           globalVaccineData = res.data;
@@ -632,7 +621,13 @@
         } else {
           document.getElementById('vac-nodata').classList.remove('hidden');
         }
-      }).catch(err => { document.getElementById('vac-loading').classList.add('hidden'); document.getElementById('vac-nodata').classList.remove('hidden'); });
+      }).catch(err => { 
+        document.getElementById('vac-loading').classList.add('hidden'); 
+        document.getElementById('vac-nodata').classList.remove('hidden');
+        
+        // 🌟 เพิ่มป๊อปอัพแจ้งเตือน Error ทันที! (เผื่อใส่ URL ผิด มันจะไม่เนียนไปขึ้นหน้า 'ไม่พบประวัติ' อีกต่อไป)
+        Swal.fire('ข้อผิดพลาดการเชื่อมต่อ', 'ไม่สามารถดึงข้อมูลประวัติวัคซีนได้ โปรดตรวจสอบลิงก์ VACCINE_API_URL อีกครั้งครับ', 'error');
+      });
     }
 
     function openVacForm() {
