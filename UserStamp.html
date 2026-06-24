@@ -76,11 +76,10 @@
 
   <script>
     // ⚠️ ใส่ LIFF ID แสตมป์ และ URL ของ API แสตมป์ (Web app ตัวล่าสุด)
-    const LIFF_ID_STAMP = "2010469434-OPy0wuua"; 
+    const LIFF_ID_STAMP = "2010469434-OPy0wuua";
     const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbwe0c85_shFvZ8UnH1Rqk1GLDc33xsWqNlUXuRi2ezkaIb9IBXKyn2HXXXP8Z70IpWo/exec"; 
 
     const dateLabels = ['1 ก.ค.', '8 ก.ค.', '13 ก.ค.', '20 ก.ค.', '27 ก.ค.', '3 ส.ค.', '13 ส.ค.', '19 ส.ค.', '26 ส.ค.', '2 ก.ย.', '9 ก.ย.', '16 ก.ย.', '23 ก.ย.', '30 ก.ย.'];
-
     let globalUserId = "";
     let currentStamps = 0;
     let secondsLeft = 60;
@@ -99,14 +98,15 @@
         if (!liff.isLoggedIn()) { liff.login(); return; }
         globalUserId = (await liff.getProfile()).userId;
 
-        loadStampData(true); 
-        fetchInterval = setInterval(() => loadStampData(false), 3000); 
-      } catch (err) { Swal.fire("ข้อผิดพลาด", err.message, "error"); }
+        loadStampData(true);
+        // 🌟 ยืดเวลารีเฟรชเป็น 15 วินาที เพื่อลดภาระการประมวลผลบนมือถือ Android
+        fetchInterval = setInterval(() => loadStampData(false), 15000); 
+      } catch (err) { Swal.fire("ข้อผิดพลาด", err.message, "error");
+      }
     }
 
     function loadStampData(showLoading = false) {
       if (showLoading) document.getElementById('loading').classList.remove('hidden');
-      
       callBackend('getUserStamp', { userId: globalUserId }).then(res => {
         document.getElementById('loading').classList.add('hidden');
         if (!res.isLinked) { document.getElementById('notLinkedSection').classList.remove('hidden'); clearInterval(fetchInterval); return; }
@@ -123,9 +123,10 @@
         
         // ส่ง tickets เข้าไปเพื่อคำนวณว่าแลกไปแล้วกี่ดวง
         renderStamps(res.history, currentStamps, res.tickets);
-
+        
         if (res.tickets > 0) { document.getElementById('gachaSection').classList.remove('hidden'); document.getElementById('ticketCount').innerText = res.tickets; } 
-        else { document.getElementById('gachaSection').classList.add('hidden'); }
+        else { document.getElementById('gachaSection').classList.add('hidden');
+        }
 
         if (showLoading) generateSecureQR();
 
@@ -143,7 +144,6 @@
       let redeemedStampsCount = usedTickets * 5; 
       
       let stampedCounter = 0;
-
       historyArray.forEach((status, index) => {
         const div = document.createElement('div');
         div.className = 'flex flex-col items-center stamp-circle relative';
@@ -185,21 +185,26 @@
     }
 
     function playGacha() {
-      Swal.fire({ title: 'ลุ้นของรางวัล...', html: '<div class="gacha-box text-7xl mt-4 drop-shadow-xl">🎁</div><p class="mt-4 text-sm text-gray-500">กรุณารอสักครู่...</p>', showConfirmButton: false, allowOutsideClick: false });
-
-      callBackend('drawGacha', { userId: globalUserId }).then(res => {
-        if (!res.success) { Swal.fire('เกิดข้อผิดพลาด', res.message, 'error'); return; }
-        setTimeout(() => {
-          if (res.isWin) Swal.fire({ title: '🎉 ยินดีด้วย!', text: `คุณได้รับรางวัล: ${res.prize}`, icon: 'success' });
-          else Swal.fire({ title: 'เสียใจด้วย 😭', text: 'คุณไม่ได้รับรางวัล โอกาสหน้าลองใหม่นะ!', icon: 'error' });
-          loadStampData(true); // รีเฟรชข้อมูลเพื่อเปลี่ยนสีแสตมป์เป็น "ใช้แล้ว" ทันที
-        }, 1500); 
+      // 🌟 ยกเลิกระบบสุ่มหลังบ้าน และเปลี่ยนมาโชว์ Popup แจ้งเตือนสิทธิ์ลุ้นรางวัลแทน
+      Swal.fire({
+        title: '🎉 ท่านได้สิทธิ์ลุ้นรางวัลแล้ว!',
+        html: `
+          <div class="gacha-box text-6xl mt-2 mb-4 drop-shadow-lg">🎁</div>
+          <p class="text-sm text-gray-700 font-semibold leading-relaxed">
+            สามารถติดตามประกาศผลรางวัลได้วันที่<br>
+            <span class="text-green-600 font-bold text-base bg-green-50 px-2 py-1 rounded">30 กันยายน 2569</span><br><br>
+            หรือ ติดตามการจับรางวัลได้ที่<br>
+            <span class="text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded">ห้องประชุมเทเวศรวงวิวัฒน์</span>
+          </p>
+        `,
+        confirmButtonText: 'รับทราบ',
+        confirmButtonColor: '#16a34a'
       });
     }
 
     // สร้าง QR Code ขนาดใหญ่ 140x140 พิกเซล
     function generateSecureQR() {
-      const expireTime = Date.now() + (60 * 1000); 
+      const expireTime = Date.now() + (60 * 1000);
       document.getElementById('qrcodeDisplay').innerHTML = ''; 
       new QRCode(document.getElementById('qrcodeDisplay'), { 
         text: `${globalUserId}|${expireTime}`, 
@@ -218,7 +223,7 @@
     }
 
     function showBigQR() {
-      const expireTime = Date.now() + (60 * 1000); 
+      const expireTime = Date.now() + (60 * 1000);
       const qrData = `${globalUserId}|${expireTime}`;
       
       Swal.fire({
