@@ -876,9 +876,9 @@
       document.getElementById('vh_allergy').innerText = data[17] || '-';
       document.getElementById('vh_chickenpox').innerText = data[18] || '-'; 
       document.getElementById('vh_xray').innerText = data[19] || '-';
-      
-      const covidVal = data[14] || '-'; 
-      const covidTypeVal = data[15] || '-'; 
+
+      const covidVal = String(data[14] || '-'); 
+      const covidTypeVal = String(data[15] || '-');
       document.getElementById('vh_covid').innerText = covidVal;
       
       if (covidVal.includes('ได้รับวัคซีน') && covidTypeVal !== '-' && covidTypeVal !== '') { 
