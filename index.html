@@ -45,6 +45,24 @@
 
     <div class="p-4">
       <div id="content-profileTab" class="tab-content block">
+        <div id="step-consent" class="block mt-2">
+          <div class="bg-green-50 p-6 rounded-xl border border-green-200 text-center shadow-sm">
+            <div class="text-5xl mb-4">📄</div>
+            <h3 class="font-bold text-green-800 text-lg mb-2">ข้อตกลงและยินยอม</h3>
+            <p class="text-sm text-gray-700 mb-6 text-left leading-relaxed">
+              ข้อมูลที่ท่านกรอกจะถูกนำไปใช้เพื่อเป็นฐานข้อมูล การประมวลผลสถิติ และการให้บริการด้านสุขภาพของกลุ่มงานอาชีวเวชกรรม โดยจะถูกเก็บรักษาเป็นความลับขั้นสูงสุด
+            </p>
+            <label class="radio-card bg-white hover:bg-green-50 border-gray-300 mb-6 text-left cursor-pointer">
+              <input type="checkbox" id="f_consentCheck" class="w-5 h-5 mr-3 accent-green-600">
+              <span class="text-sm font-semibold text-gray-800">ข้าพเจ้ายินยอมให้ใช้ข้อมูลส่วนบุคคล</span>
+            </label>
+            <button type="button" onclick="proceedToForm()" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 shadow-md transition">
+              ดำเนินการต่อ
+            </button>
+          </div>
+        </div>
+
+        <div id="step-form" class="hidden">
         <h2 id="formTitle" class="text-lg font-bold mb-4 text-gray-800">📝 ลงทะเบียนข้อมูลผู้ใช้งาน</h2>
         <div class="space-y-4">
           <div>
@@ -189,15 +207,6 @@
               </datalist>
           </div>
         </div>
-
-        <div id="consentSection" class="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
-          <h3 class="font-bold text-green-800 mb-2">📌 ข้อตกลงและยินยอม</h3>
-          <p class="text-sm text-gray-700 mb-3 leading-relaxed">ข้อมูลที่ท่านกรอกจะถูกนำไปใช้เพื่อเป็นฐานข้อมูล การประมวลผลสถิติ และการให้บริการด้านสุขภาพของกลุ่มงานอาชีวเวชกรรม โดยจะถูกเก็บรักษาเป็นความลับขั้นสูงสุด</p>
-          <label class="radio-card bg-white hover:bg-green-50 border-gray-300">
-            <input type="checkbox" id="f_consentCheck" class="w-5 h-5 mr-3 accent-green-600">
-            <span class="text-sm font-semibold text-gray-800">ข้าพเจ้ายินยอมให้ใช้ข้อมูลส่วนบุคคล</span>
-          </label>
-        </div>
         
         <button id="btnLinkAccount" onclick="saveData()" class="w-full bg-green-600 text-white font-bold p-3 rounded-lg mt-6 hover:bg-green-700 shadow-md">ผูกบัญชีและบันทึกข้อมูล</button>
         <button id="btnEditProfile" onclick="enableProfileEdit()" class="hidden w-full bg-blue-600 text-white font-bold p-3 rounded-lg mt-6 hover:bg-blue-700 shadow-md transition">✏️ แก้ไขข้อมูล</button>
@@ -207,7 +216,7 @@
           <button onclick="cancelProfileEdit()" class="w-full bg-gray-200 text-gray-700 font-bold p-3 rounded-lg hover:bg-gray-300">❌ ยกเลิกการแก้ไข</button>
         </div>
         <button id="btnUnlink" onclick="unlinkAccount()" class="w-full bg-red-100 text-red-600 font-bold p-3 rounded-lg mt-3 hover:bg-red-200 hidden">ยกเลิกการผูกบัญชี</button>
-      </div>
+      </div></div>
 
       <div id="content-vaccineTab" class="tab-content hidden">
         <div id="vac-unlinked" class="hidden text-center py-10 px-2">
