@@ -16,7 +16,7 @@
 </head>
 <body class="p-4 pb-20">
 
-  <div id="loading" class="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
+  <div id="loading" class="hidden fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
     <div class="animate-spin inline-block w-10 h-10 border-[4px] border-blue-600 border-t-transparent rounded-full"></div>
     <p class="mt-4 text-gray-600">กำลังเชื่อมต่อข้อมูล...</p>
   </div>
@@ -205,7 +205,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; // ⚠️ อย่าลืมใส่ URL GAS 
+    const API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; // ⚠️ ใส่ URL ของ Apps Script ตัววัคซีนของคุณ
     let globalData = null;
 
     function formatDate(input) {
@@ -240,7 +240,7 @@
       if(idCard.length !== 13 || !dob) { Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง', 'warning'); return; }
 
       document.getElementById('loading').classList.remove('hidden');
-      let cleanDob = dob.replace(/\D/g, '');
+      let cleanDob = dob.replace(/\D/g, ''); // ส่งไปเฉพาะตัวเลข
       callAPI('checkLogin', { id: idCard, dob: cleanDob }).then(res => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('loginSection').classList.add('hidden');
@@ -292,14 +292,18 @@
         document.getElementById('historySection').classList.add('hidden');
         document.getElementById('formSection').classList.remove('hidden');
         document.getElementById('btnCancel').classList.remove('hidden');
-        
+
+        // 🌟 ดึงข้อมูลส่วนตัวเก่ามาหยอดใส่ฟอร์มกันการบันทึกแล้วหาย
         let prefEl = document.getElementById('prefix');
         let prefVal = d[0] ? String(d[0]).trim() : '';
         let found = Array.from(prefEl.options).some(opt => opt.value === prefVal);
         if(found) { prefEl.value = prefVal; } else { prefEl.value = 'อื่นๆ'; document.getElementById('prefixOther').classList.remove('hidden'); document.getElementById('prefixOther').value = prefVal; }
         
-        document.getElementById('name').value = d[1] || ''; document.getElementById('idCard').value = d[2] || '';
-        document.getElementById('dob').value = d[3] || ''; document.getElementById('position').value = d[4] || ''; document.getElementById('dept').value = d[5] || '';
+        document.getElementById('name').value = d[1] || '';
+        document.getElementById('idCard').value = d[2] || '';
+        document.getElementById('dob').value = d[3] || '';
+        document.getElementById('position').value = d[4] || '';
+        document.getElementById('dept').value = d[5] || '';
 
         setRadio('v_hepA', d[9]); setRadio('v_hepB', d[10]); setRadio('v_flu', d[11]); setRadio('v_mmr', d[12]);
         setRadio('v_varicella', d[13]); setRadio('v_pertussis', d[14]); setRadio('v_diphtheria', d[15]); setRadio('v_tetanus', d[16]);
@@ -307,8 +311,8 @@
 
         document.querySelectorAll('input[name="v_covidType"]').forEach(cb => cb.checked = false);
         document.getElementById('v_covidTypeSection').classList.add('hidden');
-        
-        // 🌟 แก้ไข: ครอบด้วย String() ป้องกัน TypeError หากช่องนี้เป็น null หรือ undefined
+
+        // 🌟 แก้ไข: ดักจับ TypeError เพื่อป้องกันหน้าจอขาว
         if (d[18] && String(d[18]).trim() !== "") {
           document.getElementById('v_covidTypeSection').classList.remove('hidden');
           let types = String(d[18]).split(',').map(t => t.trim());
@@ -330,11 +334,15 @@
         
         window.scrollTo(0, 0);
       } catch (err) {
-        console.error(err); Swal.fire('ข้อผิดพลาด', 'เกิดปัญหาขณะโหลดข้อมูลแก้ไข: ' + err.message, 'error');
+        console.error(err);
+        Swal.fire('ข้อผิดพลาด', 'เกิดปัญหาขณะโหลดข้อมูลแก้ไข: ' + err.message, 'error');
       }
     }
 
-    function cancelEdit() { document.getElementById('formSection').classList.add('hidden'); document.getElementById('historySection').classList.remove('hidden'); }
+    function cancelEdit() {
+      document.getElementById('formSection').classList.add('hidden');
+      document.getElementById('historySection').classList.remove('hidden');
+    }
 
     document.querySelectorAll('#vForm input[type="radio"], #vForm input[type="checkbox"]').forEach(r => {
       r.addEventListener('change', function() {
