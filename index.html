@@ -553,6 +553,11 @@
       document.getElementById('btnEditProfile').classList.remove('hidden');
       document.getElementById('btnUnlink').classList.remove('hidden');
       document.getElementById('consentSection').classList.add('hidden'); // <-- เพิ่มบรรทัดนี้เข้าไป
+      
+      // 🌟 เพิ่ม 2 บรรทัดนี้ เพื่อซ่อนข้อตกลง และโชว์หน้าประวัติเลย
+      if(document.getElementById('step-consent')) document.getElementById('step-consent').classList.add('hidden');
+      if(document.getElementById('step-form')) document.getElementById('step-form').classList.remove('hidden');
+    }
     }
 
     function enableProfileEdit() {
@@ -690,13 +695,6 @@
     }
 
     function saveData() {
-      // 🌟 วางโค้ดดักจับข้อตกลงตรงนี้ครับ 🌟
-      const consentSec = document.getElementById('consentSection');
-      if (consentSec && !consentSec.classList.contains('hidden') && !document.getElementById('f_consentCheck').checked) {
-        Swal.fire('แจ้งเตือน', 'กรุณาทำเครื่องหมายถูก เพื่อยินยอมข้อตกลงก่อนทำรายการครับ', 'warning');
-        return;
-      }
-      
       document.querySelectorAll('input, select').forEach(el => removeError(el));
       let firstErrorEl = null;
       let errEl;
