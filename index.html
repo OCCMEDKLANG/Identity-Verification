@@ -672,6 +672,13 @@
     }
 
     function saveData() {
+      // 🌟 วางโค้ดดักจับข้อตกลงตรงนี้ครับ 🌟
+      const consentSec = document.getElementById('consentSection');
+      if (consentSec && !consentSec.classList.contains('hidden') && !document.getElementById('f_consentCheck').checked) {
+        Swal.fire('แจ้งเตือน', 'กรุณาทำเครื่องหมายถูก เพื่อยินยอมข้อตกลงก่อนทำรายการครับ', 'warning');
+        return;
+      }
+      
       document.querySelectorAll('input, select').forEach(el => removeError(el));
       let firstErrorEl = null;
       let errEl;
