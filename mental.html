@@ -12,335 +12,237 @@
     .required::after { content: " *"; color: #ef4444; }
     .radio-card { display: flex; align-items: center; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s; background: white;}
     .radio-card:hover { background-color: #f9fafb; border-color: #3b82f6; }
-    input[type="radio"] { accent-color: #3b82f6; width: 1.2rem; height: 1.2rem; margin-right: 0.75rem; cursor: pointer;}
+    input[type="radio"] { accent-color: #3b82f6; width: 1.2rem; height: 1.2rem; margin-right: 0.75rem; }
     .form-section { display: none; }
-    .form-section.active { display: block; animation: fadeIn 0.4s; }
+    .form-section.active { display: block; animation: fadeIn 0.5s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body class="p-4 pb-12">
+<body class="p-4 pb-20">
 
-  <div id="loading" class="hidden fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
-    <div class="animate-spin inline-block w-12 h-12 border-[4px] border-blue-600 border-t-transparent rounded-full"></div>
-    <p class="mt-4 text-gray-700 font-semibold" id="loadingText">กำลังประมวลผล...</p>
+  <div id="loading" class="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center hidden">
+    <div class="animate-spin inline-block w-12 h-12 border-[4px] border-green-600 border-t-transparent rounded-full"></div>
+    <p class="mt-4 text-green-700 font-semibold" id="loadingText">กำลังโหลดข้อมูล...</p>
   </div>
 
-  <div class="max-w-xl mx-auto mt-6">
-    <div class="bg-white p-6 rounded-3xl shadow-lg border-t-4 border-blue-500" id="mainCard">
+  <div class="max-w-md mx-auto">
+    <div id="mainCard" class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
       
-      <div class="text-center mb-6 border-b pb-4">
-        <div class="text-5xl mb-2">🧠</div>
-        <h2 class="text-2xl font-bold text-blue-700">แบบประเมินสุขภาพจิต</h2>
-        <p class="text-sm text-gray-500 mt-1">คัดกรองภาวะซึมเศร้าและความเครียด</p>
+      <div id="section-login" class="form-section active text-center">
+        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">ประเมินสุขภาพจิต</h2>
+        <p class="text-sm text-gray-500 mb-6">คัดกรองภาวะซึมเศร้าและความเครียด</p>
+        
+        <form id="loginForm" class="space-y-4 text-left" onsubmit="handleLogin(event)">
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1 required">เลขประจำตัวประชาชน</label>
+          <input type="text" id="l_idCard" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-green-500 focus:ring-0 transition" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="13 หลัก" required></div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1 required">ชื่อ-นามสกุล (ไม่ต้องมีคำนำหน้า)</label>
+          <input type="text" id="l_name" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-green-500 focus:ring-0 transition" placeholder="เช่น สมชาย ใจดี" required></div>
+          <button type="submit" class="w-full bg-green-600 text-white font-bold py-3.5 rounded-xl hover:bg-green-700 shadow-md transition mt-6 text-lg">เข้าสู่ระบบ / เริ่มประเมิน</button>
+        </form>
       </div>
 
-      <form id="screeningForm" onsubmit="event.preventDefault();">
+      <div id="section-intro" class="form-section text-center">
+        <div class="text-5xl mb-4">🧠</div>
+        <h2 class="text-xl font-bold text-gray-800 mb-2">ยินดีต้อนรับ</h2>
+        <p class="text-green-600 font-semibold mb-6 text-lg" id="welcomeName"></p>
         
-        <div id="section1" class="form-section active">
-          <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6">
-            <h3 class="font-bold text-blue-800 mb-2">📌 วัตถุประสงค์และข้อตกลง</h3>
-            <p class="text-sm text-gray-700 mb-3">แบบประเมินนี้จัดทำขึ้นเพื่อคัดกรองสภาวะสุขภาพจิตเบื้องต้น เพื่อให้ท่านได้รับคำแนะนำและการดูแลที่เหมาะสมอย่างทันท่วงที</p>
-            <p class="text-sm text-gray-700">ข้อมูลทั้งหมดของท่านจะถูกเก็บรักษาไว้เป็นความลับขั้นสูงสุด และใช้เพื่อสนับสนุนส่งเสริมสุขภาพจิตเท่านั้น</p>
+        <div class="bg-blue-50 p-4 rounded-xl text-left border border-blue-100 mb-6">
+          <h3 class="font-bold text-blue-800 mb-2 text-sm">📌 วัตถุประสงค์</h3>
+          <p class="text-sm text-gray-700 leading-relaxed">แบบประเมินนี้ใช้เพื่อคัดกรองภาวะซึมเศร้าและความเครียดเบื้องต้น เพื่อให้ท่านได้รับคำแนะนำและการดูแลที่เหมาะสม ข้อมูลทั้งหมดจะถูกเก็บเป็นความลับสูงสุด</p>
+        </div>
+        <button type="button" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-md transition text-lg" onclick="startAssessment()">เริ่มทำแบบประเมิน</button>
+      </div>
+
+      <div id="section-3" class="form-section">
+        <div class="mb-6 border-b pb-4">
+          <h2 class="text-xl font-bold text-gray-800">แบบประเมินด่านแรก (2Q Plus)</h2>
+          <p class="text-sm text-gray-500 mt-1">ในช่วง <span class="font-bold text-blue-600">2 สัปดาห์</span> ที่ผ่านมา รวมวันนี้ ท่านมีอาการเหล่านี้หรือไม่?</p>
+        </div>
+        <form id="form3" class="space-y-5">
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <label class="block text-sm font-semibold text-gray-800 mb-3 required">1. รู้สึกหดหู่ เศร้า หรือท้อแท้สิ้นหวัง</label>
+            <label class="radio-card"><input type="radio" name="q2_1" value="มี" required> <span>มี</span></label>
+            <label class="radio-card"><input type="radio" name="q2_1" value="ไม่มี"> <span>ไม่มี</span></label>
           </div>
-          
-          <label class="radio-card bg-gray-50 hover:bg-gray-100 border-gray-300">
-            <input type="checkbox" id="consentCheck" required class="w-5 h-5 mr-3 accent-blue-600">
-            <span class="text-sm font-semibold text-gray-800">ข้าพเจ้ารับทราบและยินยอมให้ประมวลผลข้อมูล</span>
-          </label>
-          
-          <button type="button" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-6 hover:bg-blue-700 shadow-md transition" onclick="nextSection('section1', 'section2')">เริ่มทำแบบประเมิน</button>
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <label class="block text-sm font-semibold text-gray-800 mb-3 required">2. รู้สึกเบื่อ ทำอะไรก็ไม่เพลิดเพลิน</label>
+            <label class="radio-card"><input type="radio" name="q2_2" value="มี" required> <span>มี</span></label>
+            <label class="radio-card"><input type="radio" name="q2_2" value="ไม่มี"> <span>ไม่มี</span></label>
+          </div>
+          <div class="bg-red-50 p-4 rounded-xl border border-red-200">
+            <label class="block text-sm font-semibold text-red-700 mb-3 required">3. (ข้อ Plus) ใน <span class="underline">1 เดือน</span> ที่ผ่านมา มีความคิดอยากตาย หรือคิดทำร้ายตัวเองหรือไม่?</label>
+            <label class="radio-card border-red-200"><input type="radio" name="qPlus" value="มี" required style="accent-color: #ef4444;"> <span>มี</span></label>
+            <label class="radio-card border-red-200"><input type="radio" name="qPlus" value="ไม่มี" style="accent-color: #ef4444;"> <span>ไม่มี</span></label>
+          </div>
+        </form>
+        <div class="flex gap-3 mt-8">
+          <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="switchSection('section-intro')">ย้อนกลับ</button>
+          <button type="button" class="w-2/3 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="evaluate2QPlus()">คำนวณผล</button>
+        </div>
+      </div>
+
+      <div id="section-9q" class="form-section">
+        <div class="mb-6 border-b pb-4">
+          <h2 class="text-xl font-bold text-gray-800">แบบประเมินโรคซึมเศร้า (9Q)</h2>
+          <p class="text-sm text-gray-500 mt-1">ในช่วง <span class="font-bold text-blue-600">2 สัปดาห์</span> ที่ผ่านมา ท่านมีอาการเหล่านี้บ่อยแค่ไหน?</p>
+        </div>
+        <form id="form9q" class="space-y-4 text-sm"></form>
+        <div class="flex gap-3 mt-8">
+          <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="switchSection('section-3')">ย้อนกลับ</button>
+          <button type="button" class="w-2/3 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="handle9QNext()">ถัดไป</button>
+        </div>
+      </div>
+
+      <div id="section-8q" class="form-section">
+        <div class="mb-6 border-b pb-4">
+          <h2 class="text-xl font-bold text-red-600">ประเมินความเสี่ยงต่อการฆ่าตัวตาย (8Q)</h2>
+        </div>
+        <form id="form8q" class="space-y-3 text-sm"></form>
+        <div class="flex gap-3 mt-8">
+          <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="goBackFrom8Q()">ย้อนกลับ</button>
+          <button type="button" class="w-2/3 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 shadow-md transition" onclick="handle8QNext()">ส่งแบบประเมิน</button>
+        </div>
+      </div>
+
+      <div id="section-result" class="form-section text-center">
+        <div id="resultEmoji" class="text-7xl mb-4 animate-bounce"></div>
+        <h2 id="resultTitle" class="text-2xl font-bold mb-2"></h2>
+        
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-left mb-6 text-sm">
+          <h3 class="font-bold text-gray-800 border-b pb-2 mb-2">📊 สรุปผลคะแนน</h3>
+          <p class="mb-1"><span class="font-semibold text-gray-600">ด่านแรก (2Q Plus):</span> <span id="r_2q" class="font-bold text-gray-800"></span></p>
+          <div id="m_r_9q_box" class="hidden"><p class="mb-1"><span class="font-semibold text-gray-600">โรคซึมเศร้า (9Q):</span> <span id="m_r_9q" class="font-bold text-gray-800"></span></p></div>
+          <div id="m_r_8q_box" class="hidden"><p class="mb-1"><span class="font-semibold text-gray-600">ความเสี่ยง (8Q):</span> <span id="m_r_8q" class="font-bold text-gray-800"></span></p></div>
         </div>
 
-        <div id="section2" class="form-section">
-          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6">
-            <h3 class="font-bold text-gray-800 mb-4 text-blue-700 border-b pb-2">ข้อมูลทั่วไป</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1 required">เลขประจำตัวประชาชน 13 หลัก</label>
-                <input type="text" id="idCard" required pattern="[0-9]{13}" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="กรอกตัวเลข 13 หลัก">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1 required">คำนำหน้าชื่อ</label>
-                <select id="prefix" class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" onchange="togglePrefixOther()" required>
-                  <option value="">-- เลือกคำนำหน้า --</option><option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option><option value="อื่นๆ">อื่นๆ</option>
-                </select>
-                <input type="text" id="prefixOther" class="w-full border p-3 rounded-xl mt-2 hidden focus:ring-2 focus:ring-blue-500 outline-none" placeholder="โปรดระบุคำนำหน้า">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1 required">ชื่อ - นามสกุล</label>
-                <input type="text" id="fullName" required class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ไม่ต้องระบุคำนำหน้าซ้ำ">
-              </div>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="nextSection('section2', 'section1')">ย้อนกลับ</button>
-            <button type="button" class="w-2/3 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="nextSection('section2', 'section3')">ถัดไป</button>
-          </div>
-        </div>
+        <div id="resultAdvice" class="p-4 rounded-xl text-sm text-left mb-8 font-medium leading-relaxed shadow-sm"></div>
 
-        <div id="section3" class="form-section">
-          <div class="mb-4">
-            <h3 class="font-bold text-lg text-blue-700">แบบประเมินด่านแรก (2Q Plus)</h3>
-            <p class="text-sm text-gray-500">โปรดตอบให้ครบถ้วนตามความรู้สึกจริงของท่าน</p>
-          </div>
-          <div class="space-y-4">
-            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-              <label class="block text-sm font-semibold text-gray-800 mb-3">1. ใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้ ท่านรู้สึกหดหู่ เศร้า หรือท้อแท้สิ้นหวัง หรือไม่?</label>
-              <div class="flex flex-col">
-                <label class="radio-card"><input type="radio" name="q2_1" value="มี" required> <span>มี</span></label>
-                <label class="radio-card"><input type="radio" name="q2_1" value="ไม่มี"> <span>ไม่มี</span></label>
-              </div>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-              <label class="block text-sm font-semibold text-gray-800 mb-3">2. ใน 2 สัปดาห์ที่ผ่านมา รวมวันนี้ ท่านรู้สึกเบื่อ ทำอะไรก็ไม่เพลิดเพลิน หรือไม่?</label>
-              <div class="flex flex-col">
-                <label class="radio-card"><input type="radio" name="q2_2" value="มี" required> <span>มี</span></label>
-                <label class="radio-card"><input type="radio" name="q2_2" value="ไม่มี"> <span>ไม่มี</span></label>
-              </div>
-            </div>
-            <div class="bg-red-50 p-4 rounded-xl border border-red-200">
-              <label class="block text-sm font-semibold text-red-700 mb-3">3. (ข้อ Plus) ใน 1 เดือนที่ผ่านมา ท่านมีความคิดอยากตาย หรือคิดทำร้ายตัวเอง หรือไม่?</label>
-              <div class="flex flex-col">
-                <label class="radio-card border-red-200 hover:border-red-400"><input type="radio" name="qPlus" value="มี" required style="accent-color: #ef4444;"> <span>มี</span></label>
-                <label class="radio-card border-red-200 hover:border-red-400"><input type="radio" name="qPlus" value="ไม่มี" style="accent-color: #ef4444;"> <span>ไม่มี</span></label>
-              </div>
-            </div>
-          </div>
-          <div class="flex gap-2 mt-6">
-            <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="nextSection('section3', 'section2')">ย้อนกลับ</button>
-            <button type="button" class="w-2/3 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="evaluate2QPlusLogic()">คำนวณผลประเมิน</button>
-          </div>
-        </div>
+        <button type="button" class="w-full bg-gray-800 text-white font-bold py-3.5 rounded-xl hover:bg-gray-900 shadow-md transition text-lg" onclick="resetAssessment()">🔄 ประเมินอีกครั้ง</button>
+      </div>
 
-        <div id="section9Q" class="form-section">
-          <div class="mb-4">
-            <h3 class="font-bold text-lg text-blue-700">แบบประเมินโรคซึมเศร้า (9Q)</h3>
-          </div>
-          <div id="questions9QContainer" class="space-y-4"></div>
-          <div class="flex gap-2 mt-6">
-            <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="nextSection('section9Q', 'section3')">ย้อนกลับ</button>
-            <button type="button" class="w-2/3 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="handle9QFlowNext()">ถัดไป</button>
-          </div>
-        </div>
-
-        <div id="section8Q" class="form-section">
-          <div class="mb-4">
-            <h3 class="font-bold text-lg text-red-600">ประเมินความเสี่ยงต่อการฆ่าตัวตาย (8Q)</h3>
-          </div>
-          <div id="questions8QContainer" class="space-y-3"></div>
-          <div class="flex gap-2 mt-6">
-            <button type="button" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition" onclick="goBackFrom8Q()">ย้อนกลับ</button>
-            <button type="button" class="w-2/3 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 shadow-md transition" onclick="handle8QFlowNext()">ส่งข้อมูล</button>
-          </div>
-        </div>
-
-        <div id="sectionResult" class="form-section text-center">
-          <div id="resultEmoji" class="text-7xl mb-4 animate-bounce"></div>
-          <h3 id="resultTitle" class="text-xl font-bold mb-2"></h3>
-          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-left mb-6 text-sm">
-            <p class="mb-1"><span class="font-semibold text-gray-700">ชื่อ-สกุล:</span> <span id="r_name"></span></p>
-            <p class="mb-1"><span class="font-semibold text-gray-700">เลขบัตรประชาชน:</span> <span id="r_idcard"></span></p>
-            <hr class="my-2 border-gray-300">
-            <p class="mb-1"><span class="font-semibold text-gray-700">ด่านแรก (2Q Plus):</span> <span id="r_2q"></span></p>
-            <div id="r_9q_box" class="hidden"><p class="mb-1"><span class="font-semibold text-gray-700">ซึมเศร้า (9Q):</span> <span id="r_9q"></span></p></div>
-            <div id="r_8q_box" class="hidden"><p class="mb-1"><span class="font-semibold text-gray-700">ความเสี่ยง (8Q):</span> <span id="r_8q"></span></p></div>
-          </div>
-          <div id="resultAdvice" class="p-4 rounded-xl text-sm text-left mb-6 font-medium"></div>
-          <button type="button" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-md transition" onclick="resetAssessment()">🔄 ประเมินอีกครั้ง</button>
-        </div>
-
-      </form>
     </div>
   </div>
 
   <script>
-    // ⚠️ อย่าลืมนำลิงก์ Web App ของระบบสุขภาพจิต (หลังอัปเดตใหม่) มาใส่ตรงนี้นะครับ
-    const MENTAL_API_URL = "https://script.google.com/macros/s/AKfycbwSiR2e9yAGLbHUG90TIToUt13JwUJWIY0l8yQys-eIn32L7EzXYxVsz3TG3Qx6mI3sMQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwSiR2e9yAGLbHUG90TIToUt13JwUJWIY0l8yQys-eIn32L7EzXYxVsz3TG3Qx6mI3sMQ/exec"; // ⚠️ อย่าลืมใส่ URL GAS คุณที่นี่
+    
+    let userData = { idCard: '', name: '' };
+    let need9Q = false;
+    let need8Q = false;
 
-    const questions9Q = [
-      "เบื่อ ไม่สนใจอยากทำอะไร", "ไม่สบายใจ ซึมเศร้า ท้อแท้", "หลับยาก หรือหลับๆ ตื่นๆ หรือหลับมากไป",
-      "เหนื่อยง่าย หรือไม่ค่อยมีแรง", "เบื่ออาหาร หรือกินมากเกินไป", "รู้สึกไม่ดีกับตัวเอง คิดว่าตัวเองล้มเหลว",
-      "สมาธิไม่ดีเวลาทำอะไร เช่น ดูโทรทัศน์ หรือทำงาน", "พูดหรือทำอะไรช้า หรือกระสับกระส่ายผิดปกติ", "คิดทำร้ายตัวเอง หรือคิดว่าถ้าตายๆ ไปเสียคงจะดี"
-    ];
+    const questions9Q = [ "เบื่อ ไม่สนใจอยากทำอะไร", "ไม่สบายใจ ซึมเศร้า ท้อแท้", "หลับยาก หรือหลับๆ ตื่นๆ หรือหลับมากไป", "เหนื่อยง่าย หรือไม่ค่อยมีแรง", "เบื่ออาหาร หรือกินมากเกินไป", "รู้สึกไม่ดีกับตัวเอง คิดว่าตัวเองล้มเหลว", "สมาธิไม่ดีเวลาทำอะไร เช่น ดูโทรทัศน์ หรือทำงาน", "พูดหรือทำอะไรช้า หรือกระสับกระส่ายผิดปกติ", "คิดทำร้ายตัวเอง หรือคิดว่าถ้าตายๆ ไปเสียคงจะดี" ];
+    const questions8Q = [ { text: "1. คิดอยากตาย หรือคิดว่าตายไปซะก็ดี", score: 1 }, { text: "2. อยากทำร้ายตัวเอง หรือทำให้ตัวเองบาดเจ็บ", score: 2 }, { text: "3. คิดเกี่ยวกับการฆ่าตัวตาย", score: 4 }, { text: "4. มีแผนการที่จะฆ่าตัวตาย", score: 8 }, { text: "5. ได้ลงมือทำร้ายตัวเอง ใน 1 เดือนที่ผ่านมา", score: 8 }, { text: "6. เคยพยายามฆ่าตัวตายในอดีต", score: 4 }, { text: "7. มีโอกาสที่จะทำตามที่คิดในปัจจุบัน", score: 2 }, { text: "8. ไม่สามารถยับยั้งชั่งใจ ที่จะไม่ทำร้ายตัวเอง", score: 2 } ];
 
-    const questions8Q = [
-      { text: "1. คิดอยากตาย หรือคิดว่าตายไปซะก็ดี", score: 1 }, { text: "2. อยากทำร้ายตัวเอง หรือทำให้ตัวเองบาดเจ็บ", score: 2 },
-      { text: "3. คิดเกี่ยวกับการฆ่าตัวตาย", score: 4 }, { text: "4. มีแผนการที่จะฆ่าตัวตาย", score: 8 },
-      { text: "5. ได้ลงมือทำร้ายตัวเอง ใน 1 เดือนที่ผ่านมา", score: 8 }, { text: "6. เคยพยายามฆ่าตัวตายในอดีต", score: 4 },
-      { text: "7. มีโอกาสที่จะทำตามที่คิดในปัจจุบัน", score: 2 }, { text: "8. ไม่สามารถยับยั้งชั่งใจ ที่จะไม่ทำร้ายตัวเอง", score: 2 }
-    ];
-
-    let need9Q = false; let need8Q = false;
-
-    function nextSection(currentId, nextId) {
-      const currentForm = document.getElementById(currentId);
-      const inputs = currentForm.querySelectorAll('input[required], select[required]');
-      let isValid = true;
-      inputs.forEach(input => { 
-        if (!input.checkValidity()) { isValid = false; input.classList.add('border-red-500'); } else { input.classList.remove('border-red-500'); } 
-      });
-      if (!isValid) { Swal.fire('ข้อมูลไม่ครบถ้วน', 'โปรดกรอก/เลือกข้อมูลให้ครบในช่องที่บังคับครับ', 'warning'); return; }
-      
+    function switchSection(sectionId) {
       document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
-      document.getElementById(nextId).classList.add('active');
-      window.scrollTo(0, 0);
+      document.getElementById(sectionId).classList.add('active'); window.scrollTo(0, 0);
     }
 
-    function togglePrefixOther() {
-      const prefix = document.getElementById('prefix').value;
-      const otherDiv = document.getElementById('prefixOther');
-      if (prefix === 'อื่นๆ') { otherDiv.classList.remove('hidden'); otherDiv.required = true; } else { otherDiv.classList.add('hidden'); otherDiv.required = false; }
+    function handleLogin(e) {
+      e.preventDefault();
+      userData.idCard = document.getElementById('l_idCard').value.trim();
+      userData.name = document.getElementById('l_name').value.trim();
+      document.getElementById('welcomeName').innerText = userData.name;
+      switchSection('section-intro');
     }
+
+    function startAssessment() { render9Q(); render8Q(); switchSection('section-3'); }
 
     function render9Q() {
       let html = '';
       questions9Q.forEach((q, i) => {
-        html += `
-          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-            <label class="block text-sm font-semibold text-gray-800 mb-3">${i+1}. ${q}</label>
-            <div class="flex flex-col text-sm">
-              <label class="radio-card"><input type="radio" name="9q_${i}" value="0" required> <span>ไม่มีเลย</span></label>
-              <label class="radio-card"><input type="radio" name="9q_${i}" value="1"> <span>มีบางวัน</span></label>
-              <label class="radio-card"><input type="radio" name="9q_${i}" value="2"> <span>บ่อย</span></label>
-              <label class="radio-card"><input type="radio" name="9q_${i}" value="3"> <span>ทุกวัน</span></label>
-            </div>
-          </div>`;
+        html += `<div class="bg-gray-50 p-4 rounded-xl border border-gray-200"><label class="block font-semibold text-gray-800 mb-3 required">${i+1}. ${q}</label><div class="flex flex-col gap-1"><label class="radio-card"><input type="radio" name="q9_${i}" value="0" required> <span>ไม่มีเลย</span></label><label class="radio-card"><input type="radio" name="q9_${i}" value="1"> <span>เป็นบางวัน (1-7 วัน)</span></label><label class="radio-card"><input type="radio" name="q9_${i}" value="2"> <span>เป็นบ่อย (มากกว่า 7 วัน)</span></label><label class="radio-card"><input type="radio" name="q9_${i}" value="3"> <span>เป็นทุกวัน</span></label></div></div>`;
       });
-      document.getElementById('questions9QContainer').innerHTML = html;
+      document.getElementById('form9q').innerHTML = html;
     }
 
     function render8Q() {
       let html = '';
       questions8Q.forEach((q, i) => {
-        html += `
-          <div class="bg-red-50 p-3 rounded-xl border border-red-200">
-            <label class="block text-sm font-semibold text-red-800 mb-2">${q.text}</label>
-            <div class="flex flex-col text-sm">
-              <label class="radio-card border-red-200 hover:border-red-400"><input type="radio" name="8q_${i}" value="${q.score}" required style="accent-color:#ef4444"> <span>ใช่</span></label>
-              <label class="radio-card border-red-200 hover:border-red-400"><input type="radio" name="8q_${i}" value="0" style="accent-color:#ef4444"> <span>ไม่ใช่</span></label>
-            </div>
-          </div>`;
+        html += `<div class="bg-red-50 p-3 rounded-xl border border-red-100"><label class="block font-semibold text-red-900 mb-2 required">${q.text}</label><div class="flex flex-col gap-1"><label class="radio-card border-red-200 hover:border-red-400"><input type="radio" name="q8_${i}" value="${q.score}" required style="accent-color:#ef4444"> <span>ใช่</span></label><label class="radio-card border-red-200 hover:border-red-400"><input type="radio" name="q8_${i}" value="0" style="accent-color:#ef4444"> <span>ไม่ใช่</span></label></div></div>`;
       });
-      document.getElementById('questions8QContainer').innerHTML = html;
+      document.getElementById('form8q').innerHTML = html;
     }
 
-    function evaluate2QPlusLogic() {
-      const q2_1 = document.querySelector('input[name="q2_1"]:checked');
-      const q2_2 = document.querySelector('input[name="q2_2"]:checked');
-      const qPlus = document.querySelector('input[name="qPlus"]:checked');
+    function evaluate2QPlus() {
+      const q2_1 = document.querySelector('input[name="q2_1"]:checked'); const q2_2 = document.querySelector('input[name="q2_2"]:checked'); const qPlus = document.querySelector('input[name="qPlus"]:checked');
+      if (!q2_1 || !q2_2 || !qPlus) { Swal.fire('แจ้งเตือน', 'กรุณาตอบคำถามให้ครบทั้ง 3 ข้อครับ', 'warning'); return; }
 
-      if (!q2_1 || !q2_2 || !qPlus) { Swal.fire('แจ้งเตือน', 'โปรดทำแบบประเมินให้ครบถ้วนทั้ง 3 ข้อครับ', 'warning'); return; }
-
-      const is2QPositive = (q2_1.value === 'มี' || q2_2.value === 'มี');
-      const isPlusPositive = (qPlus.value === 'มี');
-
-      if (!is2QPositive && isPlusPositive) { need9Q = false; need8Q = true; render8Q(); nextSection('section3', 'section8Q'); } 
+      const is2QPositive = (q2_1.value === 'มี' || q2_2.value === 'มี'); const isPlusPositive = (qPlus.value === 'มี');
+      if (!is2QPositive && isPlusPositive) { need9Q = false; need8Q = true; switchSection('section-8q'); } 
       else if (!is2QPositive && !isPlusPositive) { need9Q = false; need8Q = false; calculateAndSubmit(); } 
-      else if (is2QPositive && isPlusPositive) { need9Q = true; need8Q = true; render9Q(); nextSection('section3', 'section9Q'); } 
-      else if (is2QPositive && !isPlusPositive) { need9Q = true; need8Q = false; render9Q(); nextSection('section3', 'section9Q'); }
+      else if (is2QPositive && isPlusPositive) { need9Q = true; need8Q = true; switchSection('section-9q'); } 
+      else if (is2QPositive && !isPlusPositive) { need9Q = true; need8Q = false; switchSection('section-9q'); }
     }
 
-    function goBackFrom8Q() {
-      if (need9Q) nextSection('section8Q', 'section9Q'); else nextSection('section8Q', 'section3');
+    function goBackFrom8Q() { if (need9Q) switchSection('section-9q'); else switchSection('section-3'); }
+
+    function handle9QNext() {
+      let isValid = true; for(let i=0; i<9; i++) { if(!document.querySelector(`input[name="q9_${i}"]:checked`)) isValid = false; }
+      if (!isValid) { Swal.fire('แจ้งเตือน', 'กรุณาตอบแบบประเมิน 9Q ให้ครบทุกข้อครับ', 'warning'); return; }
+      if (need8Q) { switchSection('section-8q'); } else { calculateAndSubmit(); }
     }
 
-    function handle9QFlowNext() {
-      let isValid = true;
-      for(let i=0; i<9; i++) { if(!document.querySelector(`input[name="9q_${i}"]:checked`)) isValid = false; }
-      if (!isValid) { Swal.fire('แจ้งเตือน', 'โปรดตอบแบบประเมิน 9Q ให้ครบทุกข้อครับ', 'warning'); return; }
-      if (need8Q) { render8Q(); nextSection('section9Q', 'section8Q'); } else { calculateAndSubmit(); }
-    }
-
-    function handle8QFlowNext() {
-      let isValid = true;
-      for(let i=0; i<8; i++) { if(!document.querySelector(`input[name="8q_${i}"]:checked`)) isValid = false; }
-      if (!isValid) { Swal.fire('แจ้งเตือน', 'โปรดตอบแบบประเมิน 8Q ให้ครบทุกข้อครับ', 'warning'); return; }
+    function handle8QNext() {
+      let isValid = true; for(let i=0; i<8; i++) { if(!document.querySelector(`input[name="q8_${i}"]:checked`)) isValid = false; }
+      if (!isValid) { Swal.fire('แจ้งเตือน', 'กรุณาตอบแบบประเมิน 8Q ให้ครบทุกข้อครับ', 'warning'); return; }
       calculateAndSubmit();
     }
 
     function calculateAndSubmit() {
       let score9Q = 0; let result9Q = 'ไม่ได้ประเมิน';
       if (need9Q) {
-        for (let i = 0; i < 9; i++) score9Q += parseInt(document.querySelector(`input[name="9q_${i}"]:checked`).value);
+        for (let i = 0; i < 9; i++) score9Q += parseInt(document.querySelector(`input[name="q9_${i}"]:checked`).value);
         if (score9Q < 7) result9Q = 'ไม่มีอาการซึมเศร้า'; else if (score9Q <= 12) result9Q = 'ซึมเศร้าระดับน้อย';
         else if (score9Q <= 18) result9Q = 'ซึมเศร้าระดับปานกลาง'; else result9Q = 'ซึมเศร้าระดับรุนแรง';
       }
 
       let score8Q = 0; let result8Q = 'ไม่ได้ประเมิน';
       if (need8Q) {
-        for (let i = 0; i < 8; i++) score8Q += parseInt(document.querySelector(`input[name="8q_${i}"]:checked`).value);
+        for (let i = 0; i < 8; i++) score8Q += parseInt(document.querySelector(`input[name="q8_${i}"]:checked`).value);
         if (score8Q === 0) result8Q = 'ไม่มีความเสี่ยงฆ่าตัวตาย'; else if (score8Q <= 8) result8Q = 'เสี่ยงฆ่าตัวตายระดับน้อย';
         else if (score8Q <= 16) result8Q = 'เสี่ยงฆ่าตัวตายระดับปานกลาง'; else result8Q = 'เสี่ยงฆ่าตัวตายระดับรุนแรง';
       }
 
-      let finalSummary = 'ปกติ'; let adviceHtml = '';
-      let title = ''; let themeColor = 'green'; let emoji = '😊';
+      let finalSummary = 'ปกติ'; let adviceHtml = ''; let title = ''; let emoji = '😊'; let themeColor = 'green';
 
-      if (!need9Q && !need8Q) {
-        emoji = '🟢 😊'; title = 'สุขภาพจิตดี / ปกติ'; themeColor = 'green';
-        adviceHtml = 'ขอให้ท่านรักษาสุขภาพจิตที่ดีนี้ไว้ รักษาสมดุลการทำงานและการพักผ่อนอย่างสม่ำเสมอครับ';
-      } else {
+      if (!need9Q && !need8Q) { emoji = '🟢 😊'; title = 'สุขภาพจิตดี / ปกติ'; themeColor = 'green'; adviceHtml = 'ขอให้ท่านรักษาสุขภาพจิตที่ดีนี้ไว้ รักษาสมดุลการทำงานและการพักผ่อนอย่างสม่ำเสมอครับ'; } 
+      else {
         finalSummary = 'กลุ่มเสี่ยง/เฝ้าระวัง';
-        if (need8Q && score8Q > 0) {
-          emoji = '🔴 🚨'; title = 'ควรเฝ้าระวัง (เสี่ยงทำร้ายตนเอง)'; themeColor = 'red';
-          adviceHtml = `⚠️ ท่านมีความเสี่ยงในระดับ <span class="font-bold">${result8Q}</span><br><br>เราอยากให้คุณรู้ว่าคุณไม่ได้อยู่คนเดียวนะครับ โปรดติดต่อหน่วยปรึกษาสุขภาพและจิตวิทยา ทันที ข้อมูลของท่านจะถูกเก็บเป็นความลับครับ`;
-        } else if (need9Q) {
-          if (score9Q >= 19) { emoji = '🔴 😭'; title = 'ควรได้รับคำปรึกษา (ซึมเศร้ารุนแรง)'; themeColor = 'red'; }
-          else if (score9Q >= 13) { emoji = '🟠 😥'; title = 'ควรพักผ่อนและดูแลจิตใจ (ซึมเศร้าปานกลาง)'; themeColor = 'orange'; }
-          else if (score9Q >= 7) { emoji = '🟡 😔'; title = 'อาจมีภาวะความเครียด (ซึมเศร้าน้อย)'; themeColor = 'yellow'; }
-          else { emoji = '🟢 😌'; title = 'อยู่ในเกณฑ์ปกติ (ไม่มีภาวะซึมเศร้า)'; themeColor = 'green'; }
-          
-          if (score9Q >= 7) adviceHtml = `ท่านมีระดับคะแนนอยู่ในเกณฑ์ <span class="font-bold">${result9Q}</span> ควรหาเวลาพักผ่อน พัฒนาทักษะการเผชิญความเครียด หรือพูดคุยระบายปัญหากับนักจิตวิทยาครับ`;
-          else adviceHtml = 'แม้ท่านจะรู้สึกท้อแท้ในด่านแรก แต่คะแนนรวมยังอยู่ในเกณฑ์ที่รับมือได้ ขอให้พักผ่อนให้เพียงพอนะครับ';
+        if (need8Q && score8Q > 0) { emoji = '🔴 🚨'; title = 'ควรเฝ้าระวัง (เสี่ยงทำร้ายตนเอง)'; themeColor = 'red'; adviceHtml = `⚠️ ท่านมีความเสี่ยงในระดับ <span class="font-bold">${result8Q}</span><br><br>เราอยากให้คุณรู้ว่าคุณไม่ได้อยู่คนเดียวนะครับ โปรดติดต่อหน่วยปรึกษาสุขภาพและจิตวิทยา ทันที ข้อมูลของท่านจะถูกเก็บเป็นความลับครับ`; } 
+        else if (need9Q) {
+          if (score9Q >= 19) { emoji = '🔴 😭'; title = 'ควรได้รับคำปรึกษา (ซึมเศร้ารุนแรง)'; themeColor = 'red'; } else if (score9Q >= 13) { emoji = '🟠 😥'; title = 'ควรพักผ่อนและดูแลจิตใจ (ซึมเศร้าปานกลาง)'; themeColor = 'orange'; } else if (score9Q >= 7) { emoji = '🟡 😔'; title = 'อาจมีภาวะความเครียด (ซึมเศร้าน้อย)'; themeColor = 'yellow'; } else { emoji = '🟢 😌'; title = 'อยู่ในเกณฑ์ปกติ (ไม่มีภาวะซึมเศร้า)'; themeColor = 'green'; }
+          if (score9Q >= 7) adviceHtml = `ท่านมีระดับคะแนนอยู่ในเกณฑ์ <span class="font-bold">${result9Q}</span> ควรหาเวลาพักผ่อน พัฒนาทักษะการเผชิญความเครียด หรือพูดคุยระบายปัญหากับนักจิตวิทยาครับ`; else adviceHtml = 'แม้ท่านจะรู้สึกท้อแท้ในด่านแรก แต่คะแนนรวมยังอยู่ในเกณฑ์ที่รับมือได้ ขอให้พักผ่อนให้เพียงพอนะครับ';
         }
       }
 
-      const pref = document.getElementById('prefix').value;
-      const combinedName = (pref === 'อื่นๆ' ? document.getElementById('prefixOther').value : pref) + document.getElementById('fullName').value;
-
       const payload = {
-        idCard: document.getElementById('idCard').value,
-        combinedName: combinedName,
-        q2_1: document.querySelector('input[name="q2_1"]:checked').value,
-        q2_2: document.querySelector('input[name="q2_2"]:checked').value,
+        idCard: userData.idCard, combinedName: userData.name,
+        q2_1: document.querySelector('input[name="q2_1"]:checked').value, q2_2: document.querySelector('input[name="q2_2"]:checked').value,
         qPlus: document.querySelector('input[name="qPlus"]:checked').value,
         score9Q: score9Q, result9Q: result9Q, score8Q: score8Q, result8Q: result8Q, finalSummary: finalSummary
       };
 
       document.getElementById('loadingText').innerText = "กำลังบันทึกข้อมูล..."; document.getElementById('loading').classList.remove('hidden');
 
-      // เปลี่ยนมาใช้ fetch API
-      fetch(MENTAL_API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'saveMentalData', formData: payload })
-      }).then(r => r.json()).then(response => {
+      fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveMentalData', formData: payload }) }).then(r => r.json()).then(response => {
         document.getElementById('loading').classList.add('hidden');
         if(response.success) {
-          document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
-          document.getElementById('sectionResult').classList.add('active');
-          document.getElementById('mainCard').className = `bg-white p-6 rounded-3xl shadow-lg border-t-4 border-${themeColor}-500`;
-
-          document.getElementById('resultEmoji').innerText = emoji;
-          document.getElementById('resultTitle').innerText = title;
-          document.getElementById('resultTitle').className = `text-xl font-bold mb-2 text-${themeColor}-700`;
-          
-          document.getElementById('r_name').innerText = payload.combinedName;
-          document.getElementById('r_idcard').innerText = payload.idCard;
+          switchSection('section-result');
+          document.getElementById('mainCard').className = `bg-white p-6 rounded-2xl shadow-xl border-t-8 border-${themeColor}-500`;
+          document.getElementById('resultEmoji').innerText = emoji; document.getElementById('resultTitle').innerText = title; document.getElementById('resultTitle').className = `text-2xl font-bold mb-2 text-${themeColor}-700`;
           document.getElementById('r_2q').innerText = `2Q=${payload.q2_1==='มี'||payload.q2_2==='มี'?'เสี่ยง':'ปกติ'}, Plus=${payload.qPlus}`;
           
-          if(need9Q) { document.getElementById('r_9q_box').classList.remove('hidden'); document.getElementById('r_9q').innerText = `${score9Q} คะแนน (${result9Q})`; }
-          if(need8Q) { document.getElementById('r_8q_box').classList.remove('hidden'); document.getElementById('r_8q').innerText = `${score8Q} คะแนน (${result8Q})`; }
+          // 🌟 แก้ไข: เรียกหา ID กล่อง 9Q และ 8Q ให้ตรงกับ HTML
+          if(need9Q) { document.getElementById('m_r_9q_box').classList.remove('hidden'); document.getElementById('m_r_9q').innerText = `${score9Q} คะแนน (${result9Q})`; }
+          if(need8Q) { document.getElementById('m_r_8q_box').classList.remove('hidden'); document.getElementById('m_r_8q').innerText = `${score8Q} คะแนน (${result8Q})`; }
           
-          document.getElementById('resultAdvice').innerHTML = adviceHtml;
-          document.getElementById('resultAdvice').className = `p-4 rounded-xl text-sm text-left mb-6 font-medium bg-${themeColor}-50 text-${themeColor}-800 border border-${themeColor}-200`;
-          window.scrollTo(0, 0);
-        } else {
-          Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการบันทึก: ' + response.error, 'error');
-        }
-      }).catch(err => {
-        document.getElementById('loading').classList.add('hidden');
-        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
-      });
+          document.getElementById('resultAdvice').innerHTML = adviceHtml; document.getElementById('resultAdvice').className = `p-4 rounded-xl text-sm text-left mb-6 font-medium bg-${themeColor}-50 text-${themeColor}-800 border border-${themeColor}-200`; window.scrollTo(0, 0);
+        } else { Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการบันทึก: ' + response.error, 'error'); }
+      }).catch(err => { document.getElementById('loading').classList.add('hidden'); Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error'); });
     }
 
     function resetAssessment() {
@@ -349,13 +251,14 @@
       }).then((result) => {
         if (result.isConfirmed) {
           document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-          document.getElementById('r_9q_box').classList.add('hidden');
-          document.getElementById('r_8q_box').classList.add('hidden');
+          
+          // 🌟 แก้ไข: เรียกหา ID กล่อง 9Q และ 8Q ให้ตรงกับ HTML
+          document.getElementById('m_r_9q_box').classList.add('hidden');
+          document.getElementById('m_r_8q_box').classList.add('hidden');
           
           document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
-          document.getElementById('mainCard').className = `bg-white p-6 rounded-3xl shadow-lg border-t-4 border-blue-500`;
-          document.getElementById('section3').classList.add('active');
-          window.scrollTo(0, 0);
+          document.getElementById('mainCard').className = `bg-white p-6 rounded-2xl shadow-lg border border-gray-100`;
+          document.getElementById('section-3').classList.add('active'); window.scrollTo(0, 0);
         }
       });
     }
