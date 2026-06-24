@@ -238,8 +238,7 @@
       if(idCard.length !== 13 || !dob) { Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง', 'warning'); return; }
 
       document.getElementById('loading').classList.remove('hidden');
-      let cleanDob = dob.replace(/\D/g, ''); // ส่งไปเฉพาะตัวเลข
-      callAPI('checkLogin', { id: idCard, dob: cleanDob }).then(res => {
+      callAPI('checkLogin', { id: idCard, dob: dob }).then(res => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('mainContent').classList.remove('hidden');
