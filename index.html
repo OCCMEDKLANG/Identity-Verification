@@ -1014,10 +1014,10 @@
         finalPos = mainUserProfile.position; 
         finalDept = mainUserProfile.dept;
       } else {
-        finalPrefix = globalVaccineData[0] || ""; 
-        finalName = globalVaccineData[1] || ""; 
-        finalPos = globalVaccineData[4] || "-"; 
-        finalDept = globalVaccineData[5] || "-";
+        finalPrefix = ""; 
+        finalName = globalVaccineData[0] || ""; // Col A
+        finalPos = globalVaccineData[1] || "-"; // Col B (ตำแหน่ง)
+        finalDept = globalVaccineData[2] || "-"; // Col C (หน่วยงาน)
       }
 
       const vData = {
