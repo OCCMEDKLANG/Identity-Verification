@@ -223,7 +223,7 @@
           <div class="text-5xl mb-4">📄</div>
           <h3 class="text-lg font-bold text-gray-800 mb-2">ท่านยังไม่มีประวัติการรับวัคซีน</h3>
           <p class="text-sm text-gray-500 mb-6">กรุณาคลิกปุ่มด้านล่างเพื่อบันทึกข้อมูลเข้าระบบ</p>
-          <button onclick="window.location.href=VACCINE_STANDALONE_URL" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-700 flex items-center justify-center gap-2">
+          <button onclick="liff.openWindow({ url: VACCINE_STANDALONE_URL, external: true })" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-700 flex items-center justify-center gap-2">
             📝 บันทึกข้อมูลประวัติการได้รับวัคซีน
           </button>
         </div>
@@ -382,7 +382,7 @@
           <div class="text-5xl mb-4 text-pink-500">🧠</div>
           <h3 class="text-lg font-bold text-gray-800 mb-2">ระบบประเมินสุขภาพจิต</h3>
           <p class="text-sm text-gray-500 mb-6">คัดกรองภาวะซึมเศร้าและความเครียด กรุณาคลิกปุ่มด้านล่างเพื่อเริ่มทำแบบประเมิน</p>
-          <button onclick="window.location.href=MENTAL_STANDALONE_URL" class="w-full bg-pink-500 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-pink-600 flex items-center justify-center gap-2">
+          <button onclick="liff.openWindow({ url: MENTAL_STANDALONE_URL, external: true })" class="w-full bg-pink-500 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-pink-600 flex items-center justify-center gap-2">
             🧠 ทำแบบประเมินสุขภาพจิต
           </button>
         </div>
