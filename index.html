@@ -863,22 +863,25 @@
       document.getElementById('vac-form').classList.add('hidden'); 
       document.getElementById('vac-history').classList.remove('hidden');
       
-      document.getElementById('vh_name').innerText = data[1] && data[1] !== "" ? data[1] : `${data[0]} ${data[1]}`;
-      document.getElementById('vh_hepA').innerText = data[9] || '-'; 
-      document.getElementById('vh_hepB').innerText = data[10] || '-';
-      document.getElementById('vh_flu').innerText = data[11] || '-'; 
-      document.getElementById('vh_mmr').innerText = data[12] || '-';
-      document.getElementById('vh_varicella').innerText = data[13] || '-'; 
-      document.getElementById('vh_pertussis').innerText = data[14] || '-';
-      document.getElementById('vh_diphtheria').innerText = data[15] || '-'; 
-      document.getElementById('vh_tetanus').innerText = data[16] || '-';
-      document.getElementById('vh_otherVac').innerText = data[19] || '-'; 
-      document.getElementById('vh_allergy').innerText = data[20] || '-';
-      document.getElementById('vh_chickenpox').innerText = data[21] || '-'; 
-      document.getElementById('vh_xray').innerText = data[22] || '-';
+      // Col A (0) = ชื่อ-สกุล
+      document.getElementById('vh_name').innerText = data[0] || '-';
       
-      const covidVal = data[17] || '-'; 
-      const covidTypeVal = data[18] || '-'; 
+      // ปรับ Index ให้ตรงกับ Col G(6) ถึง T(19)
+      document.getElementById('vh_hepA').innerText = data[6] || '-'; 
+      document.getElementById('vh_hepB').innerText = data[7] || '-';
+      document.getElementById('vh_flu').innerText = data[8] || '-'; 
+      document.getElementById('vh_mmr').innerText = data[9] || '-';
+      document.getElementById('vh_varicella').innerText = data[10] || '-'; 
+      document.getElementById('vh_pertussis').innerText = data[11] || '-';
+      document.getElementById('vh_diphtheria').innerText = data[12] || '-'; 
+      document.getElementById('vh_tetanus').innerText = data[13] || '-';
+      document.getElementById('vh_otherVac').innerText = data[16] || '-'; 
+      document.getElementById('vh_allergy').innerText = data[17] || '-';
+      document.getElementById('vh_chickenpox').innerText = data[18] || '-'; 
+      document.getElementById('vh_xray').innerText = data[19] || '-';
+      
+      const covidVal = data[14] || '-'; 
+      const covidTypeVal = data[15] || '-'; 
       document.getElementById('vh_covid').innerText = covidVal;
       
       if (covidVal.includes('ได้รับวัคซีน') && covidTypeVal !== '-' && covidTypeVal !== '') { 
