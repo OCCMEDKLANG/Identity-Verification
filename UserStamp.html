@@ -21,7 +21,7 @@
 
   <div id="loading" class="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
     <div class="animate-spin inline-block w-12 h-12 border-[4px] border-green-600 border-t-transparent rounded-full"></div>
-    <p class="mt-4 text-gray-700 font-semibold">กำลังเชื่อมต่อ...</p>
+    <p class="mt-4 text-gray-700 font-semibold">กำลังซิงค์ข้อมูล...</p>
   </div>
 
   <div id="notLinkedSection" class="hidden text-center mt-20 p-6">
@@ -35,7 +35,7 @@
     
     <div class="bg-gradient-to-b from-[#4caf50] to-[#22c55e] px-6 pt-8 pb-10 rounded-b-[35px] shadow-sm relative text-center text-white">
       <div class="w-16 h-16 mx-auto bg-white rounded-full shadow-md mb-3 flex items-center justify-center text-3xl">🏃‍♂️</div>
-      <h2 id="userNameDisplay" class="text-xl font-bold">กำลังโหลดชื่อ...</h2>
+      <h2 id="userNameDisplay" class="text-xl font-bold">...</h2>
       <p class="text-sm opacity-90 mb-4">Aerobic Dance @ KLANG</p>
       
       <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center border border-white/30">
@@ -46,8 +46,10 @@
         </div>
 
         <div class="flex justify-center items-center gap-2">
-          <span class="bg-[#166534] text-white text-[12px] px-3 py-1 rounded-md font-bold shadow-sm">🎁 สะสมแสตมป์</span>
-          <div class="text-sm font-semibold">มีแล้ว <span id="stampCountText" class="text-3xl font-bold text-yellow-300 mx-1 drop-shadow-md">0</span> ดวง</div>
+          <button onclick="loadStampData(true, true)" class="bg-[#166534] text-white text-[12px] px-3 py-1.5 rounded-md font-bold shadow-md hover:bg-green-800 active:scale-95 transition-transform flex items-center gap-1">
+            🔄 อัปเดตแสตมป์
+          </button>
+          <div class="text-sm font-semibold ml-2">มีแล้ว <span id="stampCountText" class="text-3xl font-bold text-yellow-300 mx-1 drop-shadow-md">0</span> ดวง</div>
         </div>
 
       </div>
@@ -75,7 +77,7 @@
   </div>
 
   <script>
-    // ⚠️ ใส่ LIFF ID แสตมป์ และ URL ของ API แสตมป์ (Web app ตัวล่าสุด)
+    // ⚠️ อย่าลืมใส่ LIFF ID และ URL กลับเข้าไปตรงนี้นะครับ
     const LIFF_ID_STAMP = "2010469434-OPy0wuua";
     const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbwe0c85_shFvZ8UnH1Rqk1GLDc33xsWqNlUXuRi2ezkaIb9IBXKyn2HXXXP8Z70IpWo/exec"; 
 
@@ -84,7 +86,6 @@
     let currentStamps = 0;
     let secondsLeft = 60;
     let refreshInterval = null;
-    let fetchInterval = null;
 
     async function callBackend(action, data = {}) {
       const payloadString = JSON.stringify({ action: action, ...data });
@@ -98,47 +99,81 @@
         if (!liff.isLoggedIn()) { liff.login(); return; }
         globalUserId = (await liff.getProfile()).userId;
 
-        loadStampData(true);
-        // 🌟 ยืดเวลารีเฟรชเป็น 15 วินาที เพื่อลดภาระการประมวลผลบนมือถือ Android
-        fetchInterval = setInterval(() => loadStampData(false), 15000); 
-      } catch (err) { Swal.fire("ข้อผิดพลาด", err.message, "error");
+        // เรียกโหลดแสตมป์ โดยให้ดึงจาก Cache มาโชว์ก่อนเลย (isInitialLoad = true)
+        loadStampData(true, false);
+      } catch (err) { Swal.fire("ข้อผิดพลาด", err.message, "error"); }
+    }
+
+    // ฟังก์ชันจัดการแสดงข้อมูล (Cache & Fetch)
+    function loadStampData(showLoading = false, forceAlert = false) {
+      const cacheKey = `stampCache_${globalUserId}`;
+      const cachedData = localStorage.getItem(cacheKey);
+
+      // ถ้ามี Cache ให้โชว์ข้อมูลทันที ไม่ต้องให้รอจานหมุน!
+      if (cachedData && !forceAlert) {
+        updateUI(JSON.parse(cachedData), false); 
+        showLoading = false; 
+      }
+
+      if (showLoading) document.getElementById('loading').classList.remove('hidden');
+
+      // วิ่งไปถามหลังบ้านเพื่ออัปเดตข้อมูลล่าสุด (Background Fetch)
+      callBackend('getUserStamp', { userId: globalUserId }).then(res => {
+        document.getElementById('loading').classList.add('hidden');
+        if (!res.isLinked) { 
+          document.getElementById('notLinkedSection').classList.remove('hidden'); 
+          return; 
+        }
+
+        // เซฟข้อมูลใหม่ลง Cache
+        localStorage.setItem(cacheKey, JSON.stringify(res));
+
+        // อัปเดต UI ด้วยข้อมูลใหม่ (ถ้าแสตมป์เพิ่มขึ้น จะเด้ง Alert อัตโนมัติ หรือถ้าบังคับกดปุ่มอัปเดตก็จะโชว์)
+        let hasNewStamp = res.stamps > currentStamps;
+        updateUI(res, hasNewStamp || forceAlert); 
+        
+        if (forceAlert && !hasNewStamp) {
+           Swal.fire({ title: 'อัปเดตแล้ว', text: 'ข้อมูลแสตมป์ของคุณเป็นปัจจุบันที่สุดแล้ว', icon: 'info', timer: 1500, showConfirmButton: false});
+        }
+
+      }).catch(err => {
+        document.getElementById('loading').classList.add('hidden');
+        console.log(err);
+      });
+    }
+
+    // ฟังก์ชันแยกส่วนการวาด UI 
+    function updateUI(res, showAlerts) {
+      document.getElementById('stampSection').classList.remove('hidden');
+      document.getElementById('userNameDisplay').innerText = res.name;
+      
+      if (showAlerts && res.stamps > currentStamps) {
+        if (res.stamps % 5 === 0 && res.stamps !== 0) Swal.fire('ยอดเยี่ยม! 🏆', `สะสมครบ ${res.stamps} ดวง ได้รับ 1 สิทธิ์เปิดกล่อง!`, 'success');
+        else Swal.fire('สำเร็จ! ✅', `ได้รับแสตมป์ดวงที่ ${res.stamps} แล้ว`, 'success');
+      }
+
+      currentStamps = res.stamps;
+      document.getElementById('stampCountText').innerText = currentStamps;
+      
+      renderStamps(res.history, currentStamps, res.tickets);
+      
+      if (res.tickets > 0) { 
+        document.getElementById('gachaSection').classList.remove('hidden'); 
+        document.getElementById('ticketCount').innerText = res.tickets; 
+      } else { 
+        document.getElementById('gachaSection').classList.add('hidden');
+      }
+
+      if (document.getElementById('qrcodeDisplay').innerHTML === '') {
+        generateSecureQR();
       }
     }
 
-    function loadStampData(showLoading = false) {
-      if (showLoading) document.getElementById('loading').classList.remove('hidden');
-      callBackend('getUserStamp', { userId: globalUserId }).then(res => {
-        document.getElementById('loading').classList.add('hidden');
-        if (!res.isLinked) { document.getElementById('notLinkedSection').classList.remove('hidden'); clearInterval(fetchInterval); return; }
-
-        document.getElementById('stampSection').classList.remove('hidden');
-        document.getElementById('userNameDisplay').innerText = res.name; // นำชื่อมาแสดงที่นี่
-        
-        if (res.stamps > currentStamps && !showLoading) {
-          if (res.stamps % 5 === 0) Swal.fire('ยอดเยี่ยม! 🏆', `สะสมครบ ${res.stamps} ดวง ได้รับ 1 สิทธิ์เปิดกล่อง!`, 'success');
-          else Swal.fire('สำเร็จ! ✅', `ได้รับแสตมป์ดวงที่ ${res.stamps} แล้ว`, 'success');
-        }
-        currentStamps = res.stamps;
-        document.getElementById('stampCountText').innerText = currentStamps;
-        
-        // ส่ง tickets เข้าไปเพื่อคำนวณว่าแลกไปแล้วกี่ดวง
-        renderStamps(res.history, currentStamps, res.tickets);
-        
-        if (res.tickets > 0) { document.getElementById('gachaSection').classList.remove('hidden'); document.getElementById('ticketCount').innerText = res.tickets; } 
-        else { document.getElementById('gachaSection').classList.add('hidden');
-        }
-
-        if (showLoading) generateSecureQR();
-
-      }).catch(err => console.log(err));
-    }
-
-    // วาดดวงแสตมป์ พร้อมเช็คสถานะ "ใช้แล้ว"
+    // วาดดวงแสตมป์
     function renderStamps(historyArray, totalStamps, availableTickets) {
       const grid = document.getElementById('stampGrid');
       grid.innerHTML = ''; 
 
-      // คำนวณจำนวนแสตมป์ที่ถูกแปลงเป็นตั๋วและกดใช้ไปแล้ว (1 สิทธิ์ = 5 ดวง)
       let earnedTickets = Math.floor(totalStamps / 5);
       let usedTickets = earnedTickets - availableTickets;
       let redeemedStampsCount = usedTickets * 5; 
@@ -152,14 +187,11 @@
 
         if (status === 'stamped') {
           stampedCounter++;
-          
           if (stampedCounter <= redeemedStampsCount) {
-            // แสตมป์ที่ถูกใช้สิทธิ์เปิดกล่องไปแล้ว (สีเขียวเข้ม + กล่องของขวัญ + ป้ายกำกับ)
             circleClass = 'bg-[#166534] text-white border-2 border-[#14532d] shadow-sm opacity-90';
             icon = '<span class="text-xl">🎁</span>';
             badgeHtml = '<div class="absolute -top-2 -right-2 bg-yellow-500 text-white text-[8px] px-1.5 py-0.5 rounded border border-white font-bold shadow-sm transform rotate-12">ใช้แล้ว</div>';
           } else {
-            // แสตมป์ปกติที่เพิ่งได้รับ
             circleClass = 'bg-green-500 text-white border-2 border-green-600 shadow-sm';
             icon = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>';
           }
@@ -185,7 +217,6 @@
     }
 
     function playGacha() {
-      // 🌟 ยกเลิกระบบสุ่มหลังบ้าน และเปลี่ยนมาโชว์ Popup แจ้งเตือนสิทธิ์ลุ้นรางวัลแทน
       Swal.fire({
         title: '🎉 ท่านได้สิทธิ์ลุ้นรางวัลแล้ว!',
         html: `
@@ -202,17 +233,12 @@
       });
     }
 
-    // สร้าง QR Code ขนาดใหญ่ 140x140 พิกเซล
     function generateSecureQR() {
       const expireTime = Date.now() + (60 * 1000);
       document.getElementById('qrcodeDisplay').innerHTML = ''; 
       new QRCode(document.getElementById('qrcodeDisplay'), { 
         text: `${globalUserId}|${expireTime}`, 
-        width: 140, 
-        height: 140, 
-        colorDark : "#166534", 
-        colorLight : "#ffffff", 
-        correctLevel : QRCode.CorrectLevel.M 
+        width: 140, height: 140, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M 
       });
       secondsLeft = 60;
       clearInterval(refreshInterval);
@@ -225,13 +251,10 @@
     function showBigQR() {
       const expireTime = Date.now() + (60 * 1000);
       const qrData = `${globalUserId}|${expireTime}`;
-      
       Swal.fire({
         title: 'ยื่นให้เจ้าหน้าที่สแกน',
         html: '<div id="bigQrCode" class="flex justify-center mt-4 mb-2"></div><p class="text-xs text-gray-500">QR Code จะเปลี่ยนใหม่ทุก 60 วินาที เพื่อความปลอดภัย</p>',
-        showConfirmButton: true,
-        confirmButtonText: 'ปิดหน้าต่าง',
-        confirmButtonColor: '#16a34a',
+        showConfirmButton: true, confirmButtonText: 'ปิดหน้าต่าง', confirmButtonColor: '#16a34a',
         didOpen: () => {
           new QRCode(document.getElementById('bigQrCode'), {
             text: qrData, width: 220, height: 220, colorDark : "#166534", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M
