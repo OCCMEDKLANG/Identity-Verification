@@ -833,8 +833,10 @@
       document.getElementById('vac-history').classList.add('hidden'); 
       document.getElementById('vac-form').classList.add('hidden');
       
-      // 🌟 แก้ไข: ส่งวันเกิดแบบมีสแลชไปเลยครับ (01/01/2542) เพื่อให้ค้นหาเจอ
-      callAPI(VACCINE_API_URL, 'checkLogin', { id: mainUserProfile.idCard, dob: mainUserProfile.dob })
+      // 🌟 แก้ไข: ตัดเครื่องหมาย / ออกให้เหลือแต่ตัวเลข (เช่น 01012542) เพื่อให้ตรงกับหลังบ้านของวัคซีน
+      const cleanDob = mainUserProfile.dob.replace(/\D/g, '');
+      
+      callAPI(VACCINE_API_URL, 'checkLogin', { id: mainUserProfile.idCard, dob: cleanDob })
         .then(res => {
           document.getElementById('vac-loading').classList.add('hidden');
           if(res.status === 'found') {
