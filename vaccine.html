@@ -262,20 +262,30 @@
       document.getElementById('formSection').classList.add('hidden');
       document.getElementById('historySection').classList.remove('hidden');
 
-      document.getElementById('h_name').innerText = data[1] && data[1] !== "" ? data[1] : `${data[0]} ${data[1]}`;
-      
-      document.getElementById('h_hepA').innerText = data[9] || '-'; document.getElementById('h_hepB').innerText = data[10] || '-';
-      document.getElementById('h_flu').innerText = data[11] || '-'; document.getElementById('h_mmr').innerText = data[12] || '-';
-      document.getElementById('h_varicella').innerText = data[13] || '-'; document.getElementById('h_pertussis').innerText = data[14] || '-';
-      document.getElementById('h_diphtheria').innerText = data[15] || '-'; document.getElementById('h_tetanus').innerText = data[16] || '-';
-      document.getElementById('h_otherVac').innerText = data[19] || '-'; document.getElementById('h_allergy').innerText = data[20] || '-';
-      document.getElementById('h_chickenpox').innerText = data[21] || '-'; document.getElementById('h_xray').innerText = data[22] || '-';
+      document.getElementById('h_name').innerText = data[0] || '-';
+      document.getElementById('h_hepA').innerText = data[6] || '-'; 
+      document.getElementById('h_hepB').innerText = data[7] || '-';
+      document.getElementById('h_flu').innerText = data[8] || '-'; 
+      document.getElementById('h_mmr').innerText = data[9] || '-';
+      document.getElementById('h_varicella').innerText = data[10] || '-'; 
+      document.getElementById('h_pertussis').innerText = data[11] || '-';
+      document.getElementById('h_diphtheria').innerText = data[12] || '-'; 
+      document.getElementById('h_tetanus').innerText = data[13] || '-';
+      document.getElementById('h_otherVac').innerText = data[16] || '-'; 
+      document.getElementById('h_allergy').innerText = data[17] || '-';
+      document.getElementById('h_chickenpox').innerText = data[18] || '-'; 
+      document.getElementById('h_xray').innerText = data[19] || '-';
 
-      const covidVal = data[17] || '-'; const covidTypeVal = data[18] || '-';
+      const covidVal = data[14] || '-'; 
+      const covidTypeVal = data[15] || '-'; 
       document.getElementById('h_covid').innerText = covidVal;
+      
       if (covidVal.includes('ได้รับวัคซีน') && covidTypeVal !== '-' && covidTypeVal !== '') {
-        document.getElementById('h_covidType_container').classList.remove('hidden'); document.getElementById('h_covidType').innerText = covidTypeVal;
-      } else { document.getElementById('h_covidType_container').classList.add('hidden'); }
+        document.getElementById('h_covidType_container').classList.remove('hidden'); 
+        document.getElementById('h_covidType').innerText = covidTypeVal;
+      } else { 
+        document.getElementById('h_covidType_container').classList.add('hidden'); 
+      }
     }
 
     function setRadio(name, value) {
@@ -291,29 +301,51 @@
         document.getElementById('formSection').classList.remove('hidden');
         document.getElementById('btnCancel').classList.remove('hidden');
 
-        // 🌟 ดึงข้อมูลส่วนตัวเก่ามาหยอดใส่ฟอร์มกันการบันทึกแล้วหาย
-        let prefEl = document.getElementById('prefix');
-        let prefVal = d[0] ? String(d[0]).trim() : '';
-        let found = Array.from(prefEl.options).some(opt => opt.value === prefVal);
-        if(found) { prefEl.value = prefVal; } else { prefEl.value = 'อื่นๆ'; document.getElementById('prefixOther').classList.remove('hidden'); document.getElementById('prefixOther').value = prefVal; }
+        // แยกคำนำหน้าและชื่อจากคอลัมน์ A
+        let fullName = d[0] ? String(d[0]).trim() : '';
+        let prefVal = "อื่นๆ";
+        const prefixes = ["นาย", "นางสาว", "นาง"];
+        for (let p of prefixes) {
+          if (fullName.startsWith(p)) { 
+            prefVal = p; 
+            fullName = fullName.substring(p.length).trim(); 
+            break; 
+          }
+        }
         
-        document.getElementById('name').value = d[1] || '';
-        document.getElementById('idCard').value = d[2] || '';
-        document.getElementById('dob').value = d[3] || '';
-        document.getElementById('position').value = d[4] || '';
-        document.getElementById('dept').value = d[5] || '';
+        let prefEl = document.getElementById('prefix');
+        prefEl.value = prefVal;
+        if(prefVal === "อื่นๆ") { 
+          document.getElementById('prefixOther').classList.remove('hidden'); 
+          document.getElementById('prefixOther').value = ""; 
+        } else { 
+          document.getElementById('prefixOther').classList.add('hidden'); 
+        }
+        
+        document.getElementById('name').value = fullName || '';
+        document.getElementById('position').value = d[1] || ''; // Col B: ตำแหน่ง
+        document.getElementById('dept').value = d[2] || '';     // Col C: หน่วยงาน
+        document.getElementById('dob').value = d[3] || '';      // Col D: วันเกิด
+        document.getElementById('idCard').value = d[4] || '';   // Col E: เลขบัตร
 
-        setRadio('v_hepA', d[9]); setRadio('v_hepB', d[10]); setRadio('v_flu', d[11]); setRadio('v_mmr', d[12]);
-        setRadio('v_varicella', d[13]); setRadio('v_pertussis', d[14]); setRadio('v_diphtheria', d[15]); setRadio('v_tetanus', d[16]);
-        setRadio('v_covid', d[17]); setRadio('v_chickenpox', d[21]); setRadio('v_xray', d[22]);
+        setRadio('v_hepA', d[6]); 
+        setRadio('v_hepB', d[7]); 
+        setRadio('v_flu', d[8]); 
+        setRadio('v_mmr', d[9]);
+        setRadio('v_varicella', d[10]); 
+        setRadio('v_pertussis', d[11]); 
+        setRadio('v_diphtheria', d[12]); 
+        setRadio('v_tetanus', d[13]);
+        setRadio('v_covid', d[14]); 
+        setRadio('v_chickenpox', d[18]); 
+        setRadio('v_xray', d[19]);
 
         document.querySelectorAll('input[name="v_covidType"]').forEach(cb => cb.checked = false);
         document.getElementById('v_covidTypeSection').classList.add('hidden');
-
-        // 🌟 แก้ไข: ดักจับ TypeError เพื่อป้องกันหน้าจอขาว
-        if (d[18] && String(d[18]).trim() !== "") {
+        
+        if (d[15] && String(d[15]).trim() !== "") {
           document.getElementById('v_covidTypeSection').classList.remove('hidden');
-          let types = String(d[18]).split(',').map(t => t.trim());
+          let types = String(d[15]).split(',').map(t => t.trim());
           types.forEach(t => {
             if(t.startsWith('อื่น ๆ')) {
               let otherCb = document.querySelector('input.v-covid-other-cb');
@@ -327,13 +359,12 @@
           });
         }
 
-        if (d[19] && String(d[19]).startsWith('มี')) { setRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').classList.remove('hidden'); document.getElementById('v_otherVacDetail').value = String(d[19]).replace('มี (', '').replace(')', ''); } else { setRadio('v_otherVac', 'ไม่มี'); }
-        if (d[20] && String(d[20]).startsWith('มี')) { setRadio('v_allergy', 'มี'); document.getElementById('v_allergyDetail').classList.remove('hidden'); document.getElementById('v_allergyDetail').value = String(d[20]).replace('มี (', '').replace(')', ''); } else { setRadio('v_allergy', 'ไม่มี'); }
+        if (d[16] && String(d[16]).startsWith('มี')) { setRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').classList.remove('hidden'); document.getElementById('v_otherVacDetail').value = String(d[16]).replace('มี (', '').replace(')', ''); } else { setRadio('v_otherVac', 'ไม่มี'); }
+        if (d[17] && String(d[17]).startsWith('มี')) { setRadio('v_allergy', 'มี'); document.getElementById('v_allergyDetail').classList.remove('hidden'); document.getElementById('v_allergyDetail').value = String(d[17]).replace('มี (', '').replace(')', ''); } else { setRadio('v_allergy', 'ไม่มี'); }
         
         window.scrollTo(0, 0);
       } catch (err) {
-        console.error(err);
-        Swal.fire('ข้อผิดพลาด', 'เกิดปัญหาขณะโหลดข้อมูลแก้ไข: ' + err.message, 'error');
+        console.error(err); Swal.fire('ข้อผิดพลาด', 'เกิดปัญหาขณะโหลดข้อมูลแก้ไข: ' + err.message, 'error');
       }
     }
 
