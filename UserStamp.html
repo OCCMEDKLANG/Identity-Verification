@@ -120,8 +120,12 @@
       // วิ่งไปถามหลังบ้านเพื่ออัปเดตข้อมูลล่าสุด (Background Fetch)
       callBackend('getUserStamp', { userId: globalUserId }).then(res => {
         document.getElementById('loading').classList.add('hidden');
+        
+        // 🌟 แก้ไขบล็อกนี้: ถ้ายังไม่ได้ผูกบัญชี ให้ซ่อนหน้าแสตมป์และล้างความจำ
         if (!res.isLinked) { 
           document.getElementById('notLinkedSection').classList.remove('hidden'); 
+          document.getElementById('stampSection').classList.add('hidden'); // สั่งซ่อนหน้าแสตมป์
+          localStorage.removeItem(cacheKey); // สั่งล้างความจำในเครื่อง
           return; 
         }
 
