@@ -90,7 +90,7 @@
             </div>
             
             <div>
-              <label class="block text-sm text-gray-600 mb-1">วันเกิด (วว/ดด/ปปปป พ.ศ.) <span class="text-red-500">*</span></label>
+              <label class="block text-sm text-gray-600 mb-1">วันเดือนปีเกิด (วว/ดด/ปปปป พ.ศ.) <span class="text-red-500">*</span></label>
               <div class="relative">
                 <input type="text" id="f_dob" placeholder="เช่น 01/01/2542" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                 <input type="date" id="f_dob_picker" class="absolute top-0 right-0 w-10 h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'f_dob'); removeError(document.getElementById('f_dob'))">
@@ -121,13 +121,10 @@
                 <option value="ลูกจ้างห้วงเวลา">ลูกจ้างห้วงเวลา</option>
               </select>
             </div>
-            
+
             <div>
               <label class="block text-sm text-gray-600 mb-1">หน่วยงานที่ปฏิบัติงานจริง <span class="text-red-500">*</span></label>
-              <input list="dept_list" id="f_dept" class="w-full border p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="พิมพ์ค้นหา หรือเลือกหน่วยงาน" oninput="removeError(this)">
-              <datalist id="dept_list">
-                <option value="โรงพยาบาลกลาง"><option value="กลุ่มงานเวชศาสตร์ฉุกเฉินและนิติเวชวิทยา"><option value="หน่วยงานอุบัติเหตุและฉุกเฉิน"><option value="กลุ่มงานบริการการแพทย์ฉุกเฉินและรับส่งต่อ"><option value="กลุ่มงานรังสีวิทยา"><option value="หน่วยเอกซเรย์ (x-ray) และห้องตรวจพิเศษโรคหัวใจ (EKG)"><option value="หน่วยเอกซเรย์ x-ray (การพยาบาล)"><option value="ศูนย์ส่องกล้อง"><option value="หน่วยแพทย์กู้ชีวิต"><option value="ห้องตรวจศัลยกรรมกระดูก"><option value="คลินิกโรคติดเชื้อทางเดินหายใจ(ARI)"><option value="หน่วยปรึกษาสุขภาพและจิตวิทยา"><option value="หน่วย TB DOTS"><option value="ห้องตรวจประกันสังคม"><option value="ห้องตรวจประกันสุขภาพ"><option value="ห้องตรวจศัลยกรรมทั่วไป"><option value="ห้องตรวจอายุรกรรมทั่วไป"><option value="ห้องผ่าตัดเล็ก"><option value="Premium Clinic"><option value="กลุ่มงานทันตกรรม"><option value="หน่วยตรวจโรค ตา หู คอ จมูก (EENT)"><option value="ห้องตรวจโรค หู คอ จมูก"><option value="ห้องตรวจโรคตา"><option value="ห้องตรวจกุมารเวชกรรมทั่วไป"><option value="ห้องตรวจสูตินรีเวชกรรม (ANC)"><option value="ห้องตรวจสูตินรีเวชกรรมและกุมารเวชกรรม (ANC)"><option value="เวชภัณฑ์กลาง (CSSD)"><option value="หน่วยงานวิสัญญีวิทยา (AN)"><option value="ห้องผ่าตัด (OR)"><option value="กลุ่มงานเภสัชกรรม"><option value="ศูนย์เครื่องช่วยหายใจ"><option value="ศูนย์เครื่องมือแพทย์"><option value="ห้องตรวจพิเศษโรคหัวใจ (EKG)"><option value="หอผู้ป่วยหนักโรคหัวใจ (CCU)"><option value="หอผู้ป่วยหนักระบบทางเดินหายใจ (RCU)"><option value="หอผู้ป่วยหนักศัลยกรรม (SICU)"><option value="หอผู้ป่วยหนักอายุรกรรม (MICU)"><option value="หน่วยไตเทียม"><option value="ห้องคลอด (LR)"><option value="หออภิบาลทารกแรกเกิด (NICU)"><option value="กลุ่มงานเวชศาสตร์ชุมชน"><option value="กลุ่มงานจิตเวช"><option value="กลุ่มงานประกันสุขภาพ"><option value="กลุ่มงานอาชีวเวชกรรม"><option value="หอผู้ป่วยศัลยกรรมชายสามัญ 20/8"><option value="หอผู้ป่วยศัลยกรรมชายสามัญ 20/9"><option value="หอผู้ป่วยศัลยกรรมพิเศษ 20/9"><option value="หอผู้ป่วยศัลยกรรมหญิงสามัญ 20/9"><option value="หอผู้ป่วยศัลยกรรมกระดูกชายสามัญ 20/10"><option value="หอผู้ป่วยศัลยกรรมกระดูกพิเศษ 20/10"><option value="หอผู้ป่วยศัลยกรรมกระดูกหญิงสามัญ 20/10"><option value="หน่วยโรคมะเร็งและโรคเลือด"><option value="หอผู้ป่วยศัลยกรรมพิเศษ 20/11"><option value="หอผู้ป่วยอายุรกรรมชายสามัญ 20/11"><option value="IC"><option value="กลุ่มงานเทคนิคการแพทย์"><option value="กลุ่มงานเวชกรรมฟื้นฟู"><option value="หน่วยเวชกรรมฟื้นฟู (กายภาพบำบัด)"><option value="กลุ่มงานเวชศาสตร์ผู้สูงอายุ"><option value="กลุ่มงานโสต ศอ นาสิก"><option value="กลุ่มงานกุมารเวชกรรม"><option value="กลุ่มงานจักษุวิทยา"><option value="กลุ่มงานธนาคารเลือด"><option value="กลุ่มงานพยาธิวิทยา"><option value="กลุ่มงานวิสัญญีวิทยา"><option value="กลุ่มงานศัลยกรรม"><option value="กลุ่มงานสูติ-นรีเวชกรรม"><option value="กลุ่มงานออร์โธปิดิกส์"><option value="กลุ่มงานอายุรกรรม"><option value="งานเวชระเบียน"><option value="งานศึกษาอบรม"><option value="งานสวนและต้นไม้"><option value="งานสวัสดิการ"><option value="ห้องสมุด"><option value="ฝ่ายวิชาการและแผนงาน"><option value="ศูนย์เด็กเล็กน่าอยู่คู่นมแม่ (Day Care)"><option value="หอผู้ป่วยสูติกรรมพิเศษ 20/13"><option value="หอผู้ป่วยสูติกรรมหลังคลอด 20/13 และศูนย์เด็กเล็กน่าอยู่คู่นมแม่ กทม.และคลินิกนมแม่ (Day Care)"><option value="หอผู้ป่วยสูติกรรมหลังคลอด 20/13"><option value="หอผู้ป่วยอายุรกรรมชายสามัญ 20/14"><option value="หอผู้ป่วยอายุรกรรมพิเศษ 20/14"><option value="หอผู้ป่วยอายุรกรรมหญิงสามัญ 20/14"><option value="กลุ่มงานส่งเสริมการวิจัย"><option value="หอผู้ป่วยกุมารเวชกรรมทั่วไป 20/15"><option value="หอผู้ป่วยอายุรกรรมพิเศษ 20/15"><option value="หอผู้ป่วยอายุรกรรมหญิงสามัญ 20/15"><option value="กลุ่มงานการแพทย์แผนไทยและการแพทย์ทางเลือก"><option value="กลุ่มงานพัฒนาคุณภาพ"><option value="ฝ่ายพัสดุ"><option value="ศูนย์ตรวจและรักษาสายตา (Lasik Center)"><option value="หอผู้ป่วยศัลยกรรมพิเศษ 20/16"><option value="ศูนย์พร้อมใจ"><option value="หอผู้ป่วยสูติ-นรีเวชกรรม 20/17"><option value="ศูนย์สารสนเทศและสถิติ"><option value="ฝ่ายการพยาบาล"><option value="ฝ่ายงบประมาณการเงินและบัญชี"><option value="งานเย็บผ้า"><option value="งานการเจ้าหน้าที่"><option value="งานซักฟอก"><option value="งานธุรการ"><option value="งานประชาสัมพันธ์"><option value="งานยานพาหนะ"><option value="งานรักษาความปลอดภัย"><option value="งานรักษาความสะอาด"><option value="ฝ่ายบริหารงานทั่วไป"><option value="ศูนย์โทรศัพท์กลาง"><option value="สำนักงานผู้บริหาร"><option value="งานเวชนิทัศน์"><option value="ศูนย์ UMSC"><option value="กลุ่มงานแพทยศาสตร์ศึกษา"><option value="จุดคัดกรอง"><option value="ฝ่ายโภชนาการ"><option value="ฝ่ายซ่อมบำรุงและกำจัดของเสีย"><option value="ศูนย์เปล"><option value="ห้องสีฟ้า">
-              </datalist>
+              <input type="text" id="f_dept" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="โปรดระบุหน่วยงาน" oninput="removeError(this)">
             </div>
           </div>
 
@@ -178,17 +175,17 @@
           <div class="p-2 pt-4">
             <h3 class="font-bold text-gray-800 mb-3 text-sm border-b pb-2">รายการวัคซีน</h3>
             <div class="space-y-2 text-xs">
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Hepatitis A</span><span id="vh_hepA" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Hepatitis B</span><span id="vh_hepB" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Influenza</span><span id="vh_flu" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">MMR / MR</span><span id="vh_mmr" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Varicella</span><span id="vh_varicella" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Pertussis</span><span id="vh_pertussis" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Diphtheria</span><span id="vh_diphtheria" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Tetanus</span><span id="vh_tetanus" class="text-right text-gray-600 max-w-[50%]"></span></div>
-              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">COVID-19</span><span id="vh_covid" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Hepatitis A (ไวรัสตับอักเสบ A)</span><span id="vh_hepA" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Hepatitis B (ไวรัสตับอักเสบ B)</span><span id="vh_hepB" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Influenza (ไข้หวัดใหญ่)</span><span id="vh_flu" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">MMR (หัด-คางทูม-หัดเยอรมัน) / MR (หัด-หัดเยอรมัน)</span><span id="vh_mmr" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Varicella (อีสุกอีใส)</span><span id="vh_Varicella" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Pertussis (ไอกรน)</span><span id="vh_Pertussis" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Diphtheria (คอตีบ)</span><span id="vh_diphtheria" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">Tetanus (บาดทะยัก)</span><span id="vh_tetanus" class="text-right text-gray-600 max-w-[50%]"></span></div>
+              <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">COVID-19 (โควิด 19)</span><span id="vh_covid" class="text-right text-gray-600 max-w-[50%]"></span></div>
               <div id="vh_covidType_container" class="hidden flex justify-between items-center bg-gray-50/50 p-2 rounded ml-4 border-l-2 border-blue-500">
-                <span class="text-[10px] text-gray-500">↳ ชนิดวัคซีนที่ได้รับ</span><span id="vh_covidType" class="text-[10px] text-right text-gray-500 max-w-[50%]"></span>
+                <span class="text-[10px] text-gray-500">↳ ชนิดวัคซีนที่ได้รับ (COVID-19)</span><span id="vh_covidType" class="text-[10px] text-right text-gray-500 max-w-[50%]"></span>
               </div>
               <div class="flex justify-between items-center bg-gray-50 p-2 rounded"><span class="font-semibold text-gray-700">วัคซีนอื่นๆ</span><span id="vh_otherVac" class="text-right text-gray-600 max-w-[50%]"></span></div>
             </div>
@@ -217,7 +214,7 @@
             <div class="space-y-4">
               
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">1. Hepatitis A</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">1. Hepatitis A (ไวรัสตับอักเสบ A)</label>
                 <label class="radio-card"><input type="radio" name="v_hepA" value="ได้รับวัคซีนครบ 3 เข็ม หรือมีภูมิคุ้มกัน" required> <span class="text-sm">ครบ 3 เข็ม/มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_hepA" value="ได้รับวัคซีนไม่ครบ หรือยังไม่มีภูมิคุ้มกัน"> <span class="text-sm">ไม่ครบ/ยังไม่มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_hepA" value="อยู่ระหว่างการรับวัคซีน"> <span class="text-sm">อยู่ระหว่างการรับวัคซีน</span></label>
@@ -226,7 +223,7 @@
               </div>
               
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">2. Hepatitis B</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">2. Hepatitis B (ไวรัสตับอักเสบ B)</label>
                 <label class="radio-card"><input type="radio" name="v_hepB" value="ได้รับวัคซีนครบ 2 เข็ม หรือมีภูมิคุ้มกัน" required> <span class="text-sm">ครบ 2 เข็ม/มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_hepB" value="ได้รับวัคซีนไม่ครบ หรือยังไม่มีภูมิคุ้มกัน"> <span class="text-sm">ไม่ครบ/ยังไม่มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_hepB" value="อยู่ระหว่างการรับวัคซีน"> <span class="text-sm">อยู่ระหว่างการรับวัคซีน</span></label>
@@ -235,7 +232,7 @@
               </div>
               
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">3. Influenza</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">3. Influenza (ไข้หวัดใหญ่)</label>
                 <label class="radio-card"><input type="radio" name="v_flu" value="ได้รับวัคซีนครั้งล่าสุด ไม่เกิน 1 ปี" required> <span class="text-sm">ล่าสุด ไม่เกิน 1 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_flu" value="ได้รับวัคซีนล่าสุด เกิน 1 ปี"> <span class="text-sm">ล่าสุด เกิน 1 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_flu" value="ไม่เคยได้รับวัคซีน"> <span class="text-sm">ไม่เคยได้รับวัคซีน</span></label>
@@ -243,7 +240,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">4. MMR / MR</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">4. MMR (หัด-คางทูม-หัดเยอรมัน) / MR (หัด-หัดเยอรมัน)</label>
                 <label class="radio-card"><input type="radio" name="v_mmr" value="ได้รับวัคซีนครบ 2 เข็ม หรือมีภูมิคุ้มกัน" required> <span class="text-sm">ครบ 2 เข็ม/มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_mmr" value="ได้รับวัคซีนไม่ครบ หรือยังไม่มีภูมิคุ้มกัน"> <span class="text-sm">ไม่ครบ/ยังไม่มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_mmr" value="อยู่ระหว่างการรับวัคซีน"> <span class="text-sm">อยู่ระหว่างการรับวัคซีน</span></label>
@@ -252,7 +249,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">5. Varicella</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">5. Varicella (อีสุกอีใส)</label>
                 <label class="radio-card"><input type="radio" name="v_varicella" value="ได้รับวัคซีนครบ 2 เข็ม หรือมีภูมิคุ้มกัน" required> <span class="text-sm">ครบ 2 เข็ม/มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_varicella" value="ได้รับวัคซีนไม่ครบ หรือยังไม่มีภูมิคุ้มกัน"> <span class="text-sm">ไม่ครบ/ยังไม่มีภูมิคุ้มกัน</span></label>
                 <label class="radio-card"><input type="radio" name="v_varicella" value="อยู่ระหว่างการรับวัคซีน"> <span class="text-sm">อยู่ระหว่างการรับวัคซีน</span></label>
@@ -261,7 +258,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">6. Pertussis</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">6. Pertussis (ไอกรน)</label>
                 <label class="radio-card"><input type="radio" name="v_pertussis" value="ได้รับวัคซีนล่าสุด ไม่เกิน 10 ปี" required> <span class="text-sm">ล่าสุด ไม่เกิน 10 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_pertussis" value="ได้รับวัคซีนล่าสุด เกิน 10 ปี"> <span class="text-sm">ล่าสุด เกิน 10 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_pertussis" value="ยังไม่เคยได้รับวัคซีน"> <span class="text-sm">ยังไม่เคยได้รับ</span></label>
@@ -269,7 +266,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">7. Diphtheria</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">7. Diphtheria (คอตีบ)</label>
                 <label class="radio-card"><input type="radio" name="v_diphtheria" value="ได้รับวัคซีนล่าสุด ไม่เกิน 10 ปี" required> <span class="text-sm">ล่าสุด ไม่เกิน 10 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_diphtheria" value="ได้รับวัคซีนล่าสุด เกิน 10 ปี"> <span class="text-sm">ล่าสุด เกิน 10 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_diphtheria" value="ยังไม่เคยได้รับวัคซีน"> <span class="text-sm">ยังไม่เคยได้รับ</span></label>
@@ -277,7 +274,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">8. Tetanus</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">8. Tetanus (บาดทะยัก)</label>
                 <label class="radio-card"><input type="radio" name="v_tetanus" value="ได้รับวัคซีนล่าสุด ไม่เกิน 10 ปี" required> <span class="text-sm">ล่าสุด ไม่เกิน 10 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_tetanus" value="ได้รับวัคซีนล่าสุด เกิน 10 ปี"> <span class="text-sm">ล่าสุด เกิน 10 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_tetanus" value="ยังไม่เคยได้รับวัคซีน"> <span class="text-sm">ยังไม่เคยได้รับ</span></label>
@@ -285,7 +282,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">9. COVID-19</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">9. COVID-19 (โควิด 19)</label>
                 <label class="radio-card"><input type="radio" name="v_covid" value="ได้รับวัคซีนล่าสุด ไม่เกิน 1 ปี" required> <span class="text-sm">ล่าสุด ไม่เกิน 1 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_covid" value="ได้รับวัคซีนล่าสุด เกิน 1 ปี"> <span class="text-sm">ล่าสุด เกิน 1 ปี</span></label>
                 <label class="radio-card"><input type="radio" name="v_covid" value="ไม่เคยฉีด"> <span class="text-sm">ไม่เคยฉีด</span></label>
@@ -293,7 +290,7 @@
               </div>
 
               <div id="v_covidTypeSection" class="hidden ml-4 pl-4 border-l-2 border-blue-400">
-                <label class="block text-sm font-semibold text-gray-800 mb-2">9.1 ชนิดวัคซีนที่ได้รับ</label>
+                <label class="block text-sm font-semibold text-gray-800 mb-2">9.1 ชนิดวัคซีนที่ได้รับ (COVID-19)</label>
                 <label class="radio-card"><input type="checkbox" name="v_covidType" value="Pfizer (ไฟเซอร์)"> <span class="text-sm">Pfizer (ไฟเซอร์)</span></label>
                 <label class="radio-card"><input type="checkbox" name="v_covidType" value="Moderna (โมเดอร์นา)"> <span class="text-sm">Moderna (โมเดอร์นา)</span></label>
                 <label class="radio-card"><input type="checkbox" name="v_covidType" value="AstraZeneca (แอสตร้าเซนเนก้า)"> <span class="text-sm">AstraZeneca (แอสตร้าเซนเนก้า)</span></label>
@@ -649,7 +646,7 @@
       const dob = dobInput.value.trim();
       if (!dob) { 
         checkError(dobInput, false); 
-        Swal.fire('แจ้งเตือน', 'กรุณากรอกวันเกิดเพื่อตรวจสอบ', 'warning'); 
+        Swal.fire('แจ้งเตือน', 'กรุณากรอกวันเดือนปีเกิดเพื่อตรวจสอบ', 'warning'); 
         return; 
       }
       
@@ -762,11 +759,10 @@
       let type = typeEl.value; 
       errEl = checkError(typeEl, type !== ""); 
       if (errEl && !firstErrorEl) firstErrorEl = errEl;
-      
+
       let deptEl = document.getElementById('f_dept'); 
       let dept = deptEl.value.trim(); 
-      let validDepts = Array.from(document.getElementById('dept_list').options).map(opt => opt.value);
-      errEl = checkError(deptEl, dept !== "" && validDepts.includes(dept)); 
+      errEl = checkError(deptEl, dept !== ""); 
       if (errEl && !firstErrorEl) firstErrorEl = errEl;
       
       if (firstErrorEl) { 
@@ -1004,7 +1000,7 @@
       e.preventDefault();
       const cTypes = Array.from(document.querySelectorAll('input[name="v_covidType"]:checked')).map(cb => cb.value);
       if(document.querySelector('input[name="v_covid"]:checked').value.includes('ได้รับวัคซีน') && cTypes.length === 0) { 
-        Swal.fire('แจ้งเตือน', 'กรุณาเลือกชนิดวัคซีน COVID-19 อย่างน้อย 1 ข้อ', 'warning'); 
+        Swal.fire('แจ้งเตือน', 'กรุณาเลือกชนิดวัคซีน COVID-19 (โควิด 19) อย่างน้อย 1 ข้อ', 'warning'); 
         return; 
       }
 
