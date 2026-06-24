@@ -16,7 +16,7 @@
 </head>
 <body class="p-4 pb-20">
 
-  <div id="loading" class="hidden fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
+  <div id="loading" class="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
     <div class="animate-spin inline-block w-10 h-10 border-[4px] border-blue-600 border-t-transparent rounded-full"></div>
     <p class="mt-4 text-gray-600">กำลังเชื่อมต่อข้อมูล...</p>
   </div>
@@ -94,8 +94,10 @@
           <div><label class="block text-xs font-semibold text-gray-700 mb-1">วันเกิด <span class="text-red-500">*</span></label><input type="text" id="dob" class="w-full border p-2 rounded-lg bg-gray-100 text-sm" readonly></div>
           <div><label class="block text-xs font-semibold text-gray-700 mb-1">ตำแหน่ง <span class="text-red-500">*</span></label><input type="text" id="position" class="w-full border p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required></div>
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงานที่ปฏิบัติงานจริง <span class="text-red-500">*</span></label>
-            <input type="text" id="dept" class="w-full border p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="โปรดระบุหน่วยงาน" required>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน <span class="text-red-500">*</span></label>
+            <select id="dept" class="w-full border p-2 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <option value="">-- เลือกหน่วยงาน --</option><option value="โรงพยาบาลกลาง">โรงพยาบาลกลาง</option><option value="กลุ่มงานเวชศาสตร์ฉุกเฉินและนิติเวชวิทยา">กลุ่มงานเวชศาสตร์ฉุกเฉินและนิติเวชวิทยา</option><option value="หน่วยงานอุบัติเหตุและฉุกเฉิน">หน่วยงานอุบัติเหตุและฉุกเฉิน</option><option value="กลุ่มงานบริการการแพทย์ฉุกเฉินและรับส่งต่อ">กลุ่มงานบริการการแพทย์ฉุกเฉินและรับส่งต่อ</option><option value="กลุ่มงานรังสีวิทยา">กลุ่มงานรังสีวิทยา</option><option value="หน่วยเอกซเรย์ (x-ray) และห้องตรวจพิเศษโรคหัวใจ (EKG)">หน่วยเอกซเรย์ (x-ray) และห้องตรวจพิเศษโรคหัวใจ (EKG)</option><option value="หน่วยเอกซเรย์ x-ray (การพยาบาล)">หน่วยเอกซเรย์ x-ray (การพยาบาล)</option><option value="ศูนย์ส่องกล้อง">ศูนย์ส่องกล้อง</option><option value="หน่วยแพทย์กู้ชีวิต">หน่วยแพทย์กู้ชีวิต</option><option value="ห้องตรวจศัลยกรรมกระดูก">ห้องตรวจศัลยกรรมกระดูก</option><option value="คลินิกโรคติดเชื้อทางเดินหายใจ(ARI)">คลินิกโรคติดเชื้อทางเดินหายใจ(ARI)</option><option value="หน่วยปรึกษาสุขภาพและจิตวิทยา">หน่วยปรึกษาสุขภาพและจิตวิทยา</option><option value="หน่วย TB DOTS">หน่วย TB DOTS</option><option value="ห้องตรวจประกันสังคม">ห้องตรวจประกันสังคม</option><option value="ห้องตรวจประกันสุขภาพ">ห้องตรวจประกันสุขภาพ</option><option value="ห้องตรวจศัลยกรรมทั่วไป">ห้องตรวจศัลยกรรมทั่วไป</option><option value="ห้องตรวจอายุรกรรมทั่วไป">ห้องตรวจอายุรกรรมทั่วไป</option><option value="ห้องผ่าตัดเล็ก">ห้องผ่าตัดเล็ก</option><option value="Premium Clinic">Premium Clinic</option><option value="กลุ่มงานทันตกรรม">กลุ่มงานทันตกรรม</option><option value="หน่วยตรวจโรค ตา หู คอ จมูก (EENT)">หน่วยตรวจโรค ตา หู คอ จมูก (EENT)</option><option value="ห้องตรวจโรค หู คอ จมูก">ห้องตรวจโรค หู คอ จมูก</option><option value="ห้องตรวจโรคตา">ห้องตรวจโรคตา</option><option value="ห้องตรวจกุมารเวชกรรมทั่วไป">ห้องตรวจกุมารเวชกรรมทั่วไป</option><option value="ห้องตรวจสูตินรีเวชกรรม (ANC)">ห้องตรวจสูตินรีเวชกรรม (ANC)</option><option value="ห้องตรวจสูตินรีเวชกรรมและกุมารเวชกรรม (ANC)">ห้องตรวจสูตินรีเวชกรรมและกุมารเวชกรรม (ANC)</option><option value="เวชภัณฑ์กลาง (CSSD)">เวชภัณฑ์กลาง (CSSD)</option><option value="หน่วยงานวิสัญญีวิทยา (AN)">หน่วยงานวิสัญญีวิทยา (AN)</option><option value="ห้องผ่าตัด (OR)">ห้องผ่าตัด (OR)</option><option value="กลุ่มงานเภสัชกรรม">กลุ่มงานเภสัชกรรม</option><option value="ศูนย์เครื่องช่วยหายใจ">ศูนย์เครื่องช่วยหายใจ</option><option value="ศูนย์เครื่องมือแพทย์">ศูนย์เครื่องมือแพทย์</option><option value="ห้องตรวจพิเศษโรคหัวใจ (EKG)">ห้องตรวจพิเศษโรคหัวใจ (EKG)</option><option value="หอผู้ป่วยหนักโรคหัวใจ (CCU)">หอผู้ป่วยหนักโรคหัวใจ (CCU)</option><option value="หอผู้ป่วยหนักระบบทางเดินหายใจ (RCU)">หอผู้ป่วยหนักระบบทางเดินหายใจ (RCU)</option><option value="หอผู้ป่วยหนักศัลยกรรม (SICU)">หอผู้ป่วยหนักศัลยกรรม (SICU)</option><option value="หอผู้ป่วยหนักอายุรกรรม (MICU)">หอผู้ป่วยหนักอายุรกรรม (MICU)</option><option value="หน่วยไตเทียม">หน่วยไตเทียม</option><option value="ห้องคลอด (LR)">ห้องคลอด (LR)</option><option value="หออภิบาลทารกแรกเกิด (NICU)">หออภิบาลทารกแรกเกิด (NICU)</option><option value="กลุ่มงานเวชศาสตร์ชุมชน">กลุ่มงานเวชศาสตร์ชุมชน</option><option value="กลุ่มงานจิตเวช">กลุ่มงานจิตเวช</option><option value="กลุ่มงานประกันสุขภาพ">กลุ่มงานประกันสุขภาพ</option><option value="กลุ่มงานอาชีวเวชกรรม">กลุ่มงานอาชีวเวชกรรม</option><option value="หอผู้ป่วยศัลยกรรมชายสามัญ 20/8">หอผู้ป่วยศัลยกรรมชายสามัญ 20/8</option><option value="หอผู้ป่วยศัลยกรรมชายสามัญ 20/9">หอผู้ป่วยศัลยกรรมชายสามัญ 20/9</option><option value="หอผู้ป่วยศัลยกรรมพิเศษ 20/9">หอผู้ป่วยศัลยกรรมพิเศษ 20/9</option><option value="หอผู้ป่วยศัลยกรรมหญิงสามัญ 20/9">หอผู้ป่วยศัลยกรรมหญิงสามัญ 20/9</option><option value="หอผู้ป่วยศัลยกรรมกระดูกชายสามัญ 20/10">หอผู้ป่วยศัลยกรรมกระดูกชายสามัญ 20/10</option><option value="หอผู้ป่วยศัลยกรรมกระดูกพิเศษ 20/10">หอผู้ป่วยศัลยกรรมกระดูกพิเศษ 20/10</option><option value="หอผู้ป่วยศัลยกรรมกระดูกหญิงสามัญ 20/10">หอผู้ป่วยศัลยกรรมกระดูกหญิงสามัญ 20/10</option><option value="หน่วยโรคมะเร็งและโรคเลือด">หน่วยโรคมะเร็งและโรคเลือด</option><option value="หอผู้ป่วยศัลยกรรมพิเศษ 20/11">หอผู้ป่วยศัลยกรรมพิเศษ 20/11</option><option value="หอผู้ป่วยอายุรกรรมชายสามัญ 20/11">หอผู้ป่วยอายุรกรรมชายสามัญ 20/11</option><option value="IC">IC</option><option value="กลุ่มงานเทคนิคการแพทย์">กลุ่มงานเทคนิคการแพทย์</option><option value="กลุ่มงานเวชกรรมฟื้นฟู">กลุ่มงานเวชกรรมฟื้นฟู</option><option value="หน่วยเวชกรรมฟื้นฟู (กายภาพบำบัด)">หน่วยเวชกรรมฟื้นฟู (กายภาพบำบัด)</option><option value="กลุ่มงานเวชศาสตร์ผู้สูงอายุ">กลุ่มงานเวชศาสตร์ผู้สูงอายุ</option><option value="กลุ่มงานโสต ศอ นาสิก">กลุ่มงานโสต ศอ นาสิก</option><option value="กลุ่มงานกุมารเวชกรรม">กลุ่มงานกุมารเวชกรรม</option><option value="กลุ่มงานจักษุวิทยา">กลุ่มงานจักษุวิทยา</option><option value="กลุ่มงานธนาคารเลือด">กลุ่มงานธนาคารเลือด</option><option value="กลุ่มงานพยาธิวิทยา">กลุ่มงานพยาธิวิทยา</option><option value="กลุ่มงานวิสัญญีวิทยา">กลุ่มงานวิสัญญีวิทยา</option><option value="กลุ่มงานศัลยกรรม">กลุ่มงานศัลยกรรม</option><option value="กลุ่มงานสูติ-นรีเวชกรรม">กลุ่มงานสูติ-นรีเวชกรรม</option><option value="กลุ่มงานออร์โธปิดิกส์">กลุ่มงานออร์โธปิดิกส์</option><option value="กลุ่มงานอายุรกรรม">กลุ่มงานอายุรกรรม</option><option value="งานเวชระเบียน">งานเวชระเบียน</option><option value="งานศึกษาอบรม">งานศึกษาอบรม</option><option value="งานสวนและต้นไม้">งานสวนและต้นไม้</option><option value="งานสวัสดิการ">งานสวัสดิการ</option><option value="ห้องสมุด">ห้องสมุด</option><option value="ฝ่ายวิชาการและแผนงาน">ฝ่ายวิชาการและแผนงาน</option><option value="ศูนย์เด็กเล็กน่าอยู่คู่นมแม่ (Day Care)">ศูนย์เด็กเล็กน่าอยู่คู่นมแม่ (Day Care)</option><option value="หอผู้ป่วยสูติกรรมพิเศษ 20/13">หอผู้ป่วยสูติกรรมพิเศษ 20/13</option><option value="หอผู้ป่วยสูติกรรมหลังคลอด 20/13 และศูนย์เด็กเล็กน่าอยู่คู่นมแม่ กทม.และคลินิกนมแม่ (Day Care)">หอผู้ป่วยสูติกรรมหลังคลอด 20/13 และศูนย์เด็กเล็กน่าอยู่คู่นมแม่ กทม.และคลินิกนมแม่ (Day Care)</option><option value="หอผู้ป่วยสูติกรรมหลังคลอด 20/13">หอผู้ป่วยสูติกรรมหลังคลอด 20/13</option><option value="หอผู้ป่วยอายุรกรรมชายสามัญ 20/14">หอผู้ป่วยอายุรกรรมชายสามัญ 20/14</option><option value="หอผู้ป่วยอายุรกรรมพิเศษ 20/14">หอผู้ป่วยอายุรกรรมพิเศษ 20/14</option><option value="หอผู้ป่วยอายุรกรรมหญิงสามัญ 20/14">หอผู้ป่วยอายุรกรรมหญิงสามัญ 20/14</option><option value="กลุ่มงานส่งเสริมการวิจัย">กลุ่มงานส่งเสริมการวิจัย</option><option value="หอผู้ป่วยกุมารเวชกรรมทั่วไป 20/15">หอผู้ป่วยกุมารเวชกรรมทั่วไป 20/15</option><option value="หอผู้ป่วยอายุรกรรมพิเศษ 20/15">หอผู้ป่วยอายุรกรรมพิเศษ 20/15</option><option value="หอผู้ป่วยอายุรกรรมหญิงสามัญ 20/15">หอผู้ป่วยอายุรกรรมหญิงสามัญ 20/15</option><option value="กลุ่มงานการแพทย์แผนไทยและการแพทย์ทางเลือก">กลุ่มงานการแพทย์แผนไทยและการแพทย์ทางเลือก</option><option value="กลุ่มงานพัฒนาคุณภาพ">กลุ่มงานพัฒนาคุณภาพ</option><option value="ฝ่ายพัสดุ">ฝ่ายพัสดุ</option><option value="ศูนย์ตรวจและรักษาสายตา (Lasik Center)">ศูนย์ตรวจและรักษาสายตา (Lasik Center)</option><option value="หอผู้ป่วยศัลยกรรมพิเศษ 20/16">หอผู้ป่วยศัลยกรรมพิเศษ 20/16</option><option value="ศูนย์พร้อมใจ">ศูนย์พร้อมใจ</option><option value="หอผู้ป่วยสูติ-นรีเวชกรรม 20/17">หอผู้ป่วยสูติ-นรีเวชกรรม 20/17</option><option value="ศูนย์สารสนเทศและสถิติ">ศูนย์สารสนเทศและสถิติ</option><option value="ฝ่ายการพยาบาล">ฝ่ายการพยาบาล</option><option value="ฝ่ายงบประมาณการเงินและบัญชี">ฝ่ายงบประมาณการเงินและบัญชี</option><option value="งานเย็บผ้า">งานเย็บผ้า</option><option value="งานการเจ้าหน้าที่">งานการเจ้าหน้าที่</option><option value="งานซักฟอก">งานซักฟอก</option><option value="งานธุรการ">งานธุรการ</option><option value="งานประชาสัมพันธ์">งานประชาสัมพันธ์</option><option value="งานยานพาหนะ">งานยานพาหนะ</option><option value="งานรักษาความปลอดภัย">งานรักษาความปลอดภัย</option><option value="งานรักษาความสะอาด">งานรักษาความสะอาด</option><option value="ฝ่ายบริหารงานทั่วไป">ฝ่ายบริหารงานทั่วไป</option><option value="ศูนย์โทรศัพท์กลาง">ศูนย์โทรศัพท์กลาง</option><option value="สำนักงานผู้บริหาร">สำนักงานผู้บริหาร</option><option value="งานเวชนิทัศน์">งานเวชนิทัศน์</option><option value="ศูนย์ UMSC">ศูนย์ UMSC</option><option value="กลุ่มงานแพทยศาสตร์ศึกษา">กลุ่มงานแพทยศาสตร์ศึกษา</option><option value="จุดคัดกรอง">จุดคัดกรอง</option><option value="ฝ่ายโภชนาการ">ฝ่ายโภชนาการ</option><option value="ฝ่ายซ่อมบำรุงและกำจัดของเสีย">ฝ่ายซ่อมบำรุงและกำจัดของเสีย</option><option value="ศูนย์เปล">ศูนย์เปล</option><option value="ห้องสีฟ้า">ห้องสีฟ้า</option>
+            </select>
           </div>
         </div>
 
@@ -203,7 +205,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; // ⚠️ ใส่ URL ของ Apps Script ตัววัคซีนของคุณ
+    const API_URL = "https://script.google.com/macros/s/AKfycbxniX6yNKyLB2tUW5TPqAf6lnLHQoZYNtsEq7vknaQJm51OqhKXdgTpriWWYLFYmr6k/exec"; // ⚠️ อย่าลืมใส่ URL GAS 
     let globalData = null;
 
     function formatDate(input) {
@@ -238,7 +240,8 @@
       if(idCard.length !== 13 || !dob) { Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง', 'warning'); return; }
 
       document.getElementById('loading').classList.remove('hidden');
-      callAPI('checkLogin', { id: idCard, dob: dob }).then(res => {
+      let cleanDob = dob.replace(/\D/g, '');
+      callAPI('checkLogin', { id: idCard, dob: cleanDob }).then(res => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('mainContent').classList.remove('hidden');
@@ -261,30 +264,20 @@
       document.getElementById('formSection').classList.add('hidden');
       document.getElementById('historySection').classList.remove('hidden');
 
-      document.getElementById('h_name').innerText = data[0] || '-';
-      document.getElementById('h_hepA').innerText = data[6] || '-'; 
-      document.getElementById('h_hepB').innerText = data[7] || '-';
-      document.getElementById('h_flu').innerText = data[8] || '-'; 
-      document.getElementById('h_mmr').innerText = data[9] || '-';
-      document.getElementById('h_varicella').innerText = data[10] || '-'; 
-      document.getElementById('h_pertussis').innerText = data[11] || '-';
-      document.getElementById('h_diphtheria').innerText = data[12] || '-'; 
-      document.getElementById('h_tetanus').innerText = data[13] || '-';
-      document.getElementById('h_otherVac').innerText = data[16] || '-'; 
-      document.getElementById('h_allergy').innerText = data[17] || '-';
-      document.getElementById('h_chickenpox').innerText = data[18] || '-'; 
-      document.getElementById('h_xray').innerText = data[19] || '-';
-
-      const covidVal = String(data[14] || '-'); 
-      const covidTypeVal = String(data[15] || '-');
-      document.getElementById('h_covid').innerText = covidVal;
+      document.getElementById('h_name').innerText = data[1] && data[1] !== "" ? data[1] : `${data[0]} ${data[1]}`;
       
+      document.getElementById('h_hepA').innerText = data[9] || '-'; document.getElementById('h_hepB').innerText = data[10] || '-';
+      document.getElementById('h_flu').innerText = data[11] || '-'; document.getElementById('h_mmr').innerText = data[12] || '-';
+      document.getElementById('h_varicella').innerText = data[13] || '-'; document.getElementById('h_pertussis').innerText = data[14] || '-';
+      document.getElementById('h_diphtheria').innerText = data[15] || '-'; document.getElementById('h_tetanus').innerText = data[16] || '-';
+      document.getElementById('h_otherVac').innerText = data[19] || '-'; document.getElementById('h_allergy').innerText = data[20] || '-';
+      document.getElementById('h_chickenpox').innerText = data[21] || '-'; document.getElementById('h_xray').innerText = data[22] || '-';
+
+      const covidVal = data[17] || '-'; const covidTypeVal = data[18] || '-';
+      document.getElementById('h_covid').innerText = covidVal;
       if (covidVal.includes('ได้รับวัคซีน') && covidTypeVal !== '-' && covidTypeVal !== '') {
-        document.getElementById('h_covidType_container').classList.remove('hidden'); 
-        document.getElementById('h_covidType').innerText = covidTypeVal;
-      } else { 
-        document.getElementById('h_covidType_container').classList.add('hidden'); 
-      }
+        document.getElementById('h_covidType_container').classList.remove('hidden'); document.getElementById('h_covidType').innerText = covidTypeVal;
+      } else { document.getElementById('h_covidType_container').classList.add('hidden'); }
     }
 
     function setRadio(name, value) {
@@ -299,52 +292,26 @@
         document.getElementById('historySection').classList.add('hidden');
         document.getElementById('formSection').classList.remove('hidden');
         document.getElementById('btnCancel').classList.remove('hidden');
-
-        // แยกคำนำหน้าและชื่อจากคอลัมน์ A
-        let fullName = d[0] ? String(d[0]).trim() : '';
-        let prefVal = "อื่นๆ";
-        const prefixes = ["นาย", "นางสาว", "นาง"];
-        for (let p of prefixes) {
-          if (fullName.startsWith(p)) { 
-            prefVal = p; 
-            fullName = fullName.substring(p.length).trim(); 
-            break; 
-          }
-        }
         
         let prefEl = document.getElementById('prefix');
-        prefEl.value = prefVal;
-        if(prefVal === "อื่นๆ") { 
-          document.getElementById('prefixOther').classList.remove('hidden'); 
-          document.getElementById('prefixOther').value = ""; 
-        } else { 
-          document.getElementById('prefixOther').classList.add('hidden'); 
-        }
+        let prefVal = d[0] ? String(d[0]).trim() : '';
+        let found = Array.from(prefEl.options).some(opt => opt.value === prefVal);
+        if(found) { prefEl.value = prefVal; } else { prefEl.value = 'อื่นๆ'; document.getElementById('prefixOther').classList.remove('hidden'); document.getElementById('prefixOther').value = prefVal; }
         
-        document.getElementById('name').value = fullName || '';
-        document.getElementById('position').value = d[1] || ''; // Col B: ตำแหน่ง
-        document.getElementById('dept').value = d[2] || '';     // Col C: หน่วยงาน
-        document.getElementById('dob').value = d[3] || '';      // Col D: วันเกิด
-        document.getElementById('idCard').value = d[4] || '';   // Col E: เลขบัตร
+        document.getElementById('name').value = d[1] || ''; document.getElementById('idCard').value = d[2] || '';
+        document.getElementById('dob').value = d[3] || ''; document.getElementById('position').value = d[4] || ''; document.getElementById('dept').value = d[5] || '';
 
-        setRadio('v_hepA', d[6]); 
-        setRadio('v_hepB', d[7]); 
-        setRadio('v_flu', d[8]); 
-        setRadio('v_mmr', d[9]);
-        setRadio('v_varicella', d[10]); 
-        setRadio('v_pertussis', d[11]); 
-        setRadio('v_diphtheria', d[12]); 
-        setRadio('v_tetanus', d[13]);
-        setRadio('v_covid', d[14]); 
-        setRadio('v_chickenpox', d[18]); 
-        setRadio('v_xray', d[19]);
+        setRadio('v_hepA', d[9]); setRadio('v_hepB', d[10]); setRadio('v_flu', d[11]); setRadio('v_mmr', d[12]);
+        setRadio('v_varicella', d[13]); setRadio('v_pertussis', d[14]); setRadio('v_diphtheria', d[15]); setRadio('v_tetanus', d[16]);
+        setRadio('v_covid', d[17]); setRadio('v_chickenpox', d[21]); setRadio('v_xray', d[22]);
 
         document.querySelectorAll('input[name="v_covidType"]').forEach(cb => cb.checked = false);
         document.getElementById('v_covidTypeSection').classList.add('hidden');
         
-        if (d[15] && String(d[15]).trim() !== "") {
+        // 🌟 แก้ไข: ครอบด้วย String() ป้องกัน TypeError หากช่องนี้เป็น null หรือ undefined
+        if (d[18] && String(d[18]).trim() !== "") {
           document.getElementById('v_covidTypeSection').classList.remove('hidden');
-          let types = String(d[15]).split(',').map(t => t.trim());
+          let types = String(d[18]).split(',').map(t => t.trim());
           types.forEach(t => {
             if(t.startsWith('อื่น ๆ')) {
               let otherCb = document.querySelector('input.v-covid-other-cb');
@@ -358,8 +325,8 @@
           });
         }
 
-        if (d[16] && String(d[16]).startsWith('มี')) { setRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').classList.remove('hidden'); document.getElementById('v_otherVacDetail').value = String(d[16]).replace('มี (', '').replace(')', ''); } else { setRadio('v_otherVac', 'ไม่มี'); }
-        if (d[17] && String(d[17]).startsWith('มี')) { setRadio('v_allergy', 'มี'); document.getElementById('v_allergyDetail').classList.remove('hidden'); document.getElementById('v_allergyDetail').value = String(d[17]).replace('มี (', '').replace(')', ''); } else { setRadio('v_allergy', 'ไม่มี'); }
+        if (d[19] && String(d[19]).startsWith('มี')) { setRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').classList.remove('hidden'); document.getElementById('v_otherVacDetail').value = String(d[19]).replace('มี (', '').replace(')', ''); } else { setRadio('v_otherVac', 'ไม่มี'); }
+        if (d[20] && String(d[20]).startsWith('มี')) { setRadio('v_allergy', 'มี'); document.getElementById('v_allergyDetail').classList.remove('hidden'); document.getElementById('v_allergyDetail').value = String(d[20]).replace('มี (', '').replace(')', ''); } else { setRadio('v_allergy', 'ไม่มี'); }
         
         window.scrollTo(0, 0);
       } catch (err) {
@@ -367,10 +334,7 @@
       }
     }
 
-    function cancelEdit() {
-      document.getElementById('formSection').classList.add('hidden');
-      document.getElementById('historySection').classList.remove('hidden');
-    }
+    function cancelEdit() { document.getElementById('formSection').classList.add('hidden'); document.getElementById('historySection').classList.remove('hidden'); }
 
     document.querySelectorAll('#vForm input[type="radio"], #vForm input[type="checkbox"]').forEach(r => {
       r.addEventListener('change', function() {
