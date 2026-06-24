@@ -530,6 +530,15 @@
       return null;
     }
 
+    function proceedToForm() {
+      if(!document.getElementById('f_consentCheck').checked) {
+        Swal.fire('แจ้งเตือน', 'กรุณาทำเครื่องหมายถูก เพื่อยินยอมข้อตกลงก่อนทำรายการครับ', 'warning');
+        return;
+      }
+      document.getElementById('step-consent').classList.add('hidden');
+      document.getElementById('step-form').classList.remove('hidden');
+    }
+    
     function lockProfileForm() {
       document.querySelectorAll('#content-profileTab input, #content-profileTab select').forEach(el => {
         el.disabled = true;
