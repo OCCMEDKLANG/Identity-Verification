@@ -459,8 +459,13 @@
       document.getElementById('vac-form').classList.remove('hidden');
       document.getElementById('v_btnCancel').classList.remove('hidden');
       
-      // ซ่อนส่วนแก้ไขชื่อ/นามสกุล (ดึงจากฐานข้อมูลมาแล้ว)
+      // ซ่อนส่วนข้อมูลส่วนบุคคล และปลดล็อค required เพื่อไม่ให้เบราว์เซอร์บล็อกการบันทึก
       document.getElementById('personalInfoSection').classList.add('hidden');
+      document.getElementById('v_prefix').required = false;
+      document.getElementById('v_fname').required = false;
+      document.getElementById('v_lname').required = false;
+      document.getElementById('v_position').required = false;
+      document.getElementById('v_dept').required = false;
 
       const d = globalVaccineData;
       setVacRadio('v_hepA', d[9]); setVacRadio('v_hepB', d[10]); setVacRadio('v_flu', d[11]); setVacRadio('v_mmr', d[12]);
