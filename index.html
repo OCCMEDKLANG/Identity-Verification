@@ -786,14 +786,42 @@
         dob: dob, 
         phone: phone 
       };
-      
-      Swal.fire({ title: 'กำลังประมวลผล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-      
-      callAPI(GAS_URL, 'saveUserData', { userId: globalUserId, formData: data })
-        .then(res => {
-          if (res.success) {
-            Swal.fire({ title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อย', icon: 'success', confirmButtonText: 'ตกลง' }).then(() => { 
-              
+
+      Swal.fire({
+        title: 'ยืนยันข้อมูลของคุณ',
+        html: `<div class="text-left text-sm space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <p><b>ชื่อ-สกุล:</b> ${combinedName}</p>
+          <p><b>เลขบัตร ปชช:</b> ${idCard}</p>
+          <p><b>วันเกิด:</b> ${dob}</p>
+          <p><b>เบอร์โทร:</b> ${phone}</p>
+          <p><b>หน่วยงาน:</b> ${dept}</p>
+        </div><p class="text-sm mt-3 text-red-500 font-semibold">*กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนบันทึก</p>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ยืนยันบันทึกข้อมูล',
+        cancelButtonText: 'ย้อนกลับไปแก้ไข'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({ title: 'กำลังประมวลผล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+          callAPI(GAS_URL, 'saveUserData', { userId: globalUserId, formData: data })
+            .then(res => {
+              if (res.success) {
+                Swal.fire({ title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อย', icon: 'success', confirmButtonText: 'ตกลง' }).then(() => { 
+                  const urlParams = new URLSearchParams(window.location.search);
+                  if (urlParams.get('from') === 'stamp') {
+                    window.location.href = "UserStamp.html"; 
+                  } else {
+                    liff.closeWindow(); 
+                  }
+                }); 
+              } else { 
+                Swal.fire('ล้มเหลว', res.message, 'error'); 
+              }
+            }).catch(err => { Swal.fire('Error', err.message, 'error'); });
+        }
+      });
               // ตรวจสอบว่าถูกส่งมาจากหน้ากิจกรรมหรือไม่
               const urlParams = new URLSearchParams(window.location.search);
               if (urlParams.get('from') === 'stamp') {
