@@ -1001,7 +1001,8 @@
     function submitVacForm(e) {
       e.preventDefault();
       const cTypes = Array.from(document.querySelectorAll('input[name="v_covidType"]:checked')).map(cb => cb.value);
-      if(document.querySelector('input[name="v_covid"]:checked').value.includes('ได้รับวัคซีน') && cTypes.length === 0) { 
+      const covidCheck = document.querySelector('input[name="v_covid"]:checked');
+      if(covidCheck && covidCheck.value.includes('ได้รับวัคซีน') && cTypes.length === 0) { 
         Swal.fire('แจ้งเตือน', 'กรุณาเลือกชนิดวัคซีน COVID-19 อย่างน้อย 1 ข้อ', 'warning'); 
         return; 
       }
@@ -1042,7 +1043,7 @@
       };
       
       Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-      
+
       callAPI(VACCINE_API_URL, 'saveData', { formData: vData })
         .then(res => {
           if(res.status === 'success') {
@@ -1051,6 +1052,8 @@
               renderVacHistory(res.data); 
               window.scrollTo(0, 0); 
             });
+          } else {
+            Swal.fire('ข้อผิดพลาด', res.message || 'บันทึกไม่สำเร็จ', 'error');
           }
         }).catch(err => { 
           Swal.fire('Error', err.message, 'error'); 
