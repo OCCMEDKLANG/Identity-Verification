@@ -792,8 +792,21 @@
       callAPI(GAS_URL, 'saveUserData', { userId: globalUserId, formData: data })
         .then(res => {
           if (res.success) {
-            Swal.fire({ title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อย', icon: 'success', confirmButtonText: 'ปิดหน้าต่าง' }).then(() => { liff.closeWindow(); }); 
-          } else { 
+            Swal.fire({ title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อย', icon: 'success', confirmButtonText: 'ตกลง' }).then(() => { 
+              
+              // ตรวจสอบว่าถูกส่งมาจากหน้ากิจกรรมหรือไม่
+              const urlParams = new URLSearchParams(window.location.search);
+              if (urlParams.get('redirect') === 'userstamp') {
+                // 🌟 ให้ใส่ลิงก์ LIFF ของหน้า "UserStamp.html" ของคุณตรงนี้ครับ 🌟
+                window.location.href = "https://liff.line.me/ใส่_LIFF_ID_ของหน้ากิจกรรม"; 
+              } else {
+                // ถ้าเข้ามาหน้า Index ปกติ ก็ให้ปิดหน้าต่างตามเดิม
+                liff.closeWindow(); 
+              }
+              
+            }); 
+          } else {
+            
             Swal.fire('ล้มเหลว', res.message, 'error'); 
           }
         }).catch(err => { 
