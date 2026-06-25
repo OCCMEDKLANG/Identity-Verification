@@ -765,8 +765,9 @@
       
       let deptEl = document.getElementById('f_dept'); 
       let dept = deptEl.value.trim(); 
-      let validDepts = Array.from(document.getElementById('dept_list').options).map(opt => opt.value);
-      errEl = checkError(deptEl, dept !== "" && validDepts.includes(dept)); 
+      
+      // 🌟 นำตัวแปรเช็ค validDepts ที่ทำให้เกิด Error หน้าจอค้างออกแล้ว ปล่อยให้พิมพ์อิสระได้เลย 🌟
+      errEl = checkError(deptEl, dept !== ""); 
       if (errEl && !firstErrorEl) firstErrorEl = errEl;
       
       if (firstErrorEl) { 
@@ -786,7 +787,8 @@
         dob: dob, 
         phone: phone 
       };
-
+      
+      // 🌟 โค้ดยืนยันข้อมูลก่อนบันทึก (แก้ให้ทำงานได้ลื่นไหล ไม่ค้าง) 🌟
       Swal.fire({
         title: 'ยืนยันข้อมูลของคุณ',
         html: `<div class="text-left text-sm space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -801,54 +803,31 @@
         confirmButtonColor: '#16a34a',
         cancelButtonColor: '#d33',
         confirmButtonText: 'ยืนยันบันทึกข้อมูล',
-        cancelButtonText: 'ย้อนกลับไปแก้ไข'
+        cancelButtonText: 'ย้อนกลับ',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+          return callAPI(GAS_URL, 'saveUserData', { userId: globalUserId, formData: data })
+            .then(res => {
+              if (!res.success) throw new Error(res.message || 'บันทึกไม่สำเร็จ');
+              return res;
+            })
+            .catch(error => { Swal.showValidationMessage(`ล้มเหลว: ${error.message}`); });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
       }).then((result) => {
         if (result.isConfirmed) {
-          // 🌟 ใช้หน้าจอโหลดที่มีอยู่แล้วใน HTML แทน เพื่อป้องกัน Swal.fire ค้าง
-          document.getElementById('loadingText').innerText = "กำลังบันทึกข้อมูล..."; 
-          document.getElementById('loading').classList.remove('hidden');
-
-          callAPI(GAS_URL, 'saveUserData', { userId: globalUserId, formData: data })
-            .then(res => {
-              document.getElementById('loading').classList.add('hidden'); // ซ่อนหน้าโหลดเมื่อเสร็จ
-              if (res.success) {
-                Swal.fire({ title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อย', icon: 'success', confirmButtonText: 'ตกลง' }).then(() => { 
-                  const urlParams = new URLSearchParams(window.location.search);
-                  if (urlParams.get('from') === 'stamp') {
-                    window.location.href = "UserStamp.html"; 
-                  } else {
-                    liff.closeWindow(); 
-                  }
-                }); 
-              } else { 
-                Swal.fire('ล้มเหลว', res.message, 'error'); 
-              }
-            }).catch(err => { 
-              document.getElementById('loading').classList.add('hidden');
-              Swal.fire('Error', err.message, 'error'); 
-            });
+          Swal.fire({ title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อย', icon: 'success', confirmButtonText: 'ตกลง' }).then(() => { 
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('from') === 'stamp') { 
+              window.location.href = "UserStamp.html"; 
+            } else { 
+              liff.closeWindow(); 
+            }
+          }); 
         }
       });
-              // ตรวจสอบว่าถูกส่งมาจากหน้ากิจกรรมหรือไม่
-              const urlParams = new URLSearchParams(window.location.search);
-              if (urlParams.get('from') === 'stamp') {
-                // 🌟 ให้ใส่ลิงก์ LIFF ของหน้า "UserStamp.html" ของคุณตรงนี้ครับ 🌟
-                window.location.href = "UserStamp.html"; 
-              } else {
-                // ถ้าเข้ามาหน้า Index ปกติ ก็ให้ปิดหน้าต่างตามเดิม
-                liff.closeWindow(); 
-              }
-              
-            }); 
-          } else {
-            
-            Swal.fire('ล้มเหลว', res.message, 'error'); 
-          }
-        }).catch(err => { 
-          Swal.fire('Error', err.message, 'error'); 
-        });
     }
-
+    
     function unlinkAccount() {
       Swal.fire({ 
         title: 'ยืนยันการลบการผูกบัญชี', 
