@@ -474,16 +474,19 @@
       setVacRadio('v_covid', d[17]); setVacRadio('v_chickenpox', d[21]); setVacRadio('v_xray', d[22]);
 
       document.querySelectorAll('input[name="v_covidType"]').forEach(cb => cb.checked = false);
-      if (d[18]) {
-        let types = d[18].split(',').map(t => t.trim());
+      if (d[18] && String(d[18]).trim() !== "") {
+        let types = String(d[18]).split(',').map(t => t.trim());
         types.forEach(t => {
           if(t.startsWith('อื่น ๆ')) { document.querySelector('input.v-covid-other-cb').checked = true; document.querySelector('input.v-covid-other-cb').dispatchEvent(new Event('change')); document.getElementById('v_covidTypeOther').value = t.replace('อื่น ๆ (', '').replace(')', ''); }
           else { let cb = document.querySelector(`input[name="v_covidType"][value="${t}"]`); if(cb) cb.checked = true; }
         });
       }
 
-      if (d[19] && d[19].startsWith('มี')) { setVacRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').value = d[19].replace('มี (', '').replace(')', ''); } else { setVacRadio('v_otherVac', 'ไม่มี'); }
-      if (d[20] && d[20].startsWith('มี')) { setVacRadio('v_allergy', 'มี'); document.getElementById('v_allergyDetail').value = d[20].replace('มี (', '').replace(')', ''); } else { setVacRadio('v_allergy', 'ไม่มี'); }
+      if (d[19] && String(d[19]).startsWith('มี')) { setVacRadio('v_otherVac', 'มี'); document.getElementById('v_otherVacDetail').value = String(d[19]).replace('มี (', '').replace(')', '');
+      } else { setVacRadio('v_otherVac', 'ไม่มี'); }
+      if (d[20] && String(d[20]).startsWith('มี')) { setVacRadio('v_allergy', 'มี');
+      document.getElementById('v_allergyDetail').value = String(d[20]).replace('มี (', '').replace(')', ''); } else { setVacRadio('v_allergy', 'ไม่มี');
+      }
     }
 
     function cancelVacEdit() { document.getElementById('vac-form').classList.add('hidden'); document.getElementById('vac-history').classList.remove('hidden'); }
