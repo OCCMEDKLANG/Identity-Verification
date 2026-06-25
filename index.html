@@ -796,7 +796,7 @@
               
               // ตรวจสอบว่าถูกส่งมาจากหน้ากิจกรรมหรือไม่
               const urlParams = new URLSearchParams(window.location.search);
-              if (urlParams.get('redirect') === 'stamp') {
+              if (urlParams.get('from') === 'stamp') {
                 // 🌟 ให้ใส่ลิงก์ LIFF ของหน้า "UserStamp.html" ของคุณตรงนี้ครับ 🌟
                 window.location.href = "UserStamp.html"; 
               } else {
