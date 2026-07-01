@@ -578,10 +578,10 @@
       // ให้แสดงชื่อและนามสกุลในกล่องเสมอ (แม้จะเป็นอื่นๆ กล่องก็จะไม่ว่างเปล่าแล้ว)
       document.getElementById('f_firstname').value = mainUserProfile.fname; 
       document.getElementById('f_lastname').value = mainUserProfile.lname;
-      
-      // ล้างกล่องคำนำหน้าอื่นๆ ปล่อยว่างไว้ (เพราะเราไม่รู้ว่าคำไหนคือคำนำหน้าที่แท้จริง เนื่องจากมันถูกรวมร่างกับชื่อจริงไปแล้ว)
+
+      // ถ้าระบุคำนำหน้าอื่นๆ ให้นำค่าที่แยกได้ไปใส่คืนในกล่อง
       if (mainUserProfile.prefix === "อื่นๆ") {
-        document.getElementById('f_other_prefix').value = ""; 
+        document.getElementById('f_other_prefix').value = mainUserProfile.customPrefixValue || ""; 
       }
       
       // 2. จัดการข้อมูลพื้นฐานอื่นๆ
@@ -699,6 +699,7 @@
 
             let fullName = res.data.name || ""; 
             let prefix = "อื่นๆ"; 
+            let customPrefixValue = ""; // ตัวแปรใหม่สำหรับเก็บคำนำหน้าแปลกๆ
             let fname = fullName; 
             let lname = "";
             
@@ -717,20 +718,25 @@
               }
             }
 
-            // ถ้าเป็นคำนำหน้าอื่นๆ ระบบจะหาช่องว่างเพื่อแยกนามสกุลออกมา
+            // ถ้าระบบหาคำนำหน้าปกติไม่เจอ แสดงว่าเป็น "คำนำหน้าอื่นๆ" ที่ถูกเว้นวรรคมา (เช่น เทส ทด สอบ)
             if (!foundPrefix) {
-              let parts = fullName.split(' ');
-              if (parts.length > 1) {
-                lname = parts.pop(); // ดึงก้อนสุดท้ายมาเป็นนามสกุล
-                fname = parts.join(' '); // ก้อนหน้าทั้งหมด (คำนำหน้า+ชื่อ) ให้เป็นชื่อจริง
-              } else {
-                fname = fullName;
+              let parts = fullName.split(' '); // สับคำด้วยเว้นวรรค
+              if (parts.length >= 3) {
+                prefix = "อื่นๆ";
+                customPrefixValue = parts[0]; // ก้อนที่ 1 = คำนำหน้า (เทส)
+                fname = parts[1]; // ก้อนที่ 2 = ชื่อจริง (ทด)
+                lname = parts.slice(2).join(' '); // ก้อนที่ 3 เป็นต้นไป = นามสกุล (สอบ)
+              } else if (parts.length === 2) {
+                prefix = "อื่นๆ";
+                customPrefixValue = parts[0];
+                fname = parts[1];
                 lname = "";
               }
             }
             
             mainUserProfile = { 
               prefix: prefix, 
+              customPrefixValue: customPrefixValue, // บันทึกค่าลงโปรไฟล์
               fname: fname, 
               lname: lname, 
               idCard: res.data.idCard, 
@@ -741,8 +747,9 @@
               phone: res.data.phone
             };
             
-            document.getElementById('m_intro_name').innerText = (mainUserProfile.prefix === "อื่นๆ" ? "" : mainUserProfile.prefix) + mainUserProfile.fname + " " + mainUserProfile.lname;
-
+            // อัปเดตชื่อหัวข้อของหน้าประเมินสุขภาพจิตให้ถูกต้อง
+            document.getElementById('m_intro_name').innerText = (mainUserProfile.prefix === "อื่นๆ" ? mainUserProfile.customPrefixValue + " " : mainUserProfile.prefix) + mainUserProfile.fname + " " + mainUserProfile.lname;
+              
             resetProfileFormToOriginal();
             lockProfileForm();
           } else { 
@@ -833,8 +840,14 @@
         Swal.fire('ข้อมูลไม่สมบูรณ์', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning'); 
         return; 
       }
-
-      let combinedName = `${prefix}${fname} ${lname}`.trim();
+      // ตรวจสอบว่าเลือก "อื่นๆ" หรือไม่ ถ้าใช่ให้แทรกเว้นวรรค 1 เคาะระหว่างคำนำหน้ากับชื่อจริง
+      let prefixDropdownVal = document.getElementById('f_prefix').value;
+      let combinedName = "";
+      if (prefixDropdownVal === 'อื่นๆ') {
+        combinedName = `${prefix} ${fname} ${lname}`.trim(); // แบบมีเว้นวรรค (เทส ทด สอบ)
+      } else {
+        combinedName = `${prefix}${fname} ${lname}`.trim(); // แบบปกติ (นายทด สอบ)
+      }
       const data = { 
         name: combinedName, 
         idCard: idCard, 
@@ -1093,7 +1106,7 @@
 
       let finalPrefix = "", finalName = "", finalPos = "", finalDept = "";
       if (!globalVaccineData) {
-        finalPrefix = mainUserProfile.prefix === "อื่นๆ" ? "" : mainUserProfile.prefix;
+        finalPrefix = mainUserProfile.prefix === "อื่นๆ" ? mainUserProfile.customPrefixValue + " " : mainUserProfile.prefix;
         finalName = (finalPrefix + mainUserProfile.fname.trim() + " " + mainUserProfile.lname.trim()).trim();
         finalPos = mainUserProfile.position; 
         finalDept = mainUserProfile.dept;
@@ -1325,8 +1338,7 @@
           else adviceHtml = 'แม้ท่านจะรู้สึกท้อแท้ในด่านแรก แต่คะแนนรวมยังอยู่ในเกณฑ์ที่รับมือได้ ขอให้พักผ่อนให้เพียงพอนะครับ';
         }
       }
-
-      const combinedName = (mainUserProfile.prefix === 'อื่นๆ' ? '' : mainUserProfile.prefix) + mainUserProfile.fname + " " + mainUserProfile.lname;
+      const combinedName = (mainUserProfile.prefix === 'อื่นๆ' ? mainUserProfile.customPrefixValue + " " : mainUserProfile.prefix) + mainUserProfile.fname + " " + mainUserProfile.lname;
       const payload = { 
         idCard: mainUserProfile.idCard, 
         combinedName: combinedName, 
