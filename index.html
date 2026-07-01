@@ -570,23 +570,44 @@
 
     function resetProfileFormToOriginal() {
       if(!mainUserProfile) return;
+      
+      // 1. จัดการคำนำหน้า ชื่อ และนามสกุล
       document.getElementById('f_prefix').value = mainUserProfile.prefix;
       togglePrefix();
+      
+      // ให้แสดงชื่อและนามสกุลในกล่องเสมอ (แม้จะเป็นอื่นๆ กล่องก็จะไม่ว่างเปล่าแล้ว)
+      document.getElementById('f_firstname').value = mainUserProfile.fname; 
+      document.getElementById('f_lastname').value = mainUserProfile.lname;
+      
+      // ล้างกล่องคำนำหน้าอื่นๆ ปล่อยว่างไว้ (เพราะเราไม่รู้ว่าคำไหนคือคำนำหน้าที่แท้จริง เนื่องจากมันถูกรวมร่างกับชื่อจริงไปแล้ว)
       if (mainUserProfile.prefix === "อื่นๆ") {
-        document.getElementById('f_other_prefix').value = mainUserProfile.fname;
-      } else { 
-        document.getElementById('f_firstname').value = mainUserProfile.fname; 
-        document.getElementById('f_lastname').value = mainUserProfile.lname; 
+        document.getElementById('f_other_prefix').value = ""; 
       }
       
+      // 2. จัดการข้อมูลพื้นฐานอื่นๆ
       document.getElementById('f_idCard').value = mainUserProfile.idCard; 
       document.getElementById('f_position').value = mainUserProfile.position;
-      document.getElementById('f_type').value = mainUserProfile.type; 
       document.getElementById('f_dept').value = mainUserProfile.dept;
       document.getElementById('f_dob').value = mainUserProfile.dob; 
       document.getElementById('f_phone').value = mainUserProfile.phone;
-    }
 
+      // 3. จัดการประเภทบุคลากร (ดักจับกรณีผู้ใช้พิมพ์ข้อมูล 'อื่นๆ' เอง)
+      let typeSelect = document.getElementById('f_type');
+      let savedType = mainUserProfile.type;
+      
+      // เช็คว่าข้อมูลที่ดึงมา มีอยู่ในตัวเลือก (Option) หรือไม่
+      let typeExists = Array.from(typeSelect.options).some(opt => opt.value === savedType);
+      
+      if (typeExists) {
+        typeSelect.value = savedType; // ถ้ามี ให้เลือกตามปกติ
+        if(typeof toggleOtherType === 'function') toggleOtherType(typeSelect); // ซ่อนกล่องพิมพ์
+      } else {
+        typeSelect.value = 'อื่นๆ'; // ถ้าไม่มี ให้ติ๊กเลือก 'อื่นๆ'
+        if(typeof toggleOtherType === 'function') toggleOtherType(typeSelect); // โชว์กล่องพิมพ์
+        document.getElementById('f_other_type').value = savedType; // เอาคำที่ดึงมา (เช่น 'ออกกำลัง') ยัดลงในกล่อง
+      }
+    }
+    
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
       document.querySelectorAll('[id^="btn-"]').forEach(btn => {
@@ -675,13 +696,15 @@
             Swal.close();
             document.getElementById('verifySection').classList.add('hidden');
             document.getElementById('mainDashboard').classList.remove('hidden');
-            
-            let fullName = res.data.name; 
+
+            let fullName = res.data.name || ""; 
             let prefix = "อื่นๆ"; 
             let fname = fullName; 
             let lname = "";
             
             const prefixes = ["นาย", "นางสาว", "นาง"];
+            let foundPrefix = false;
+            
             for (let p of prefixes) {
               if (fullName.startsWith(p)) { 
                 prefix = p; 
@@ -689,7 +712,20 @@
                 let parts = rest.split(' '); 
                 fname = parts[0] || ''; 
                 lname = parts.slice(1).join(' ') || ''; 
+                foundPrefix = true;
                 break; 
+              }
+            }
+
+            // ถ้าเป็นคำนำหน้าอื่นๆ ระบบจะหาช่องว่างเพื่อแยกนามสกุลออกมา
+            if (!foundPrefix) {
+              let parts = fullName.split(' ');
+              if (parts.length > 1) {
+                lname = parts.pop(); // ดึงก้อนสุดท้ายมาเป็นนามสกุล
+                fname = parts.join(' '); // ก้อนหน้าทั้งหมด (คำนำหน้า+ชื่อ) ให้เป็นชื่อจริง
+              } else {
+                fname = fullName;
+                lname = "";
               }
             }
             
