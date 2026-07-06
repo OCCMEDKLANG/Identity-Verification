@@ -79,6 +79,9 @@
             <div class="flex justify-between items-center bg-blue-50 p-2 rounded"><span class="font-semibold text-blue-800">ประวัติแพ้วัคซีน</span><span id="vh_allergy" class="text-right text-blue-800 max-w-[50%]"></span></div>
             <div class="flex justify-between items-center bg-blue-50 p-2 rounded"><span class="font-semibold text-blue-800">โรคอีสุกอีใส</span><span id="vh_chickenpox" class="text-right text-blue-800 max-w-[50%]"></span></div>
             <div class="flex justify-between items-center bg-blue-50 p-2 rounded"><span class="font-semibold text-blue-800">ผลตรวจ X-ray</span><span id="vh_xray" class="text-right text-blue-800 max-w-[50%]"></span></div>
+            <div class="flex justify-between items-center bg-blue-50 p-2 rounded mt-2"><span class="font-semibold text-blue-800">การสัมผัสเลือด/สารคัดหลั่ง</span><span id="vh_blood_exposure" class="text-right text-blue-800 max-w-[50%]"></span></div>
+            <div class="flex justify-between items-center bg-blue-50 p-2 rounded"><span class="font-semibold text-blue-800">อุบัติเหตุเข็มตำ (12 เดือน)</span><span id="vh_needlestick" class="text-right text-blue-800 max-w-[50%]"></span></div>
+            <div class="flex justify-between items-center bg-blue-50 p-2 rounded"><span class="font-semibold text-blue-800">ประสงค์รับ Hep B</span><span id="vh_hepB_pref" class="text-right text-blue-800 max-w-[50%]"></span></div>
           </div>
           <button onclick="editVacData()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-6 hover:bg-blue-700 shadow-md">✏️ แก้ไขข้อมูล</button>
           <button onclick="logout()" class="w-full bg-red-100 text-red-600 font-bold p-3 rounded-xl mt-3 hover:bg-red-200">ออกจากระบบ</button>
@@ -331,6 +334,28 @@
             <label class="radio-card"><input type="radio" name="v_xray" value="ผลผิดปกติ"> <span class="text-sm">ผลผิดปกติ</span></label>
             <label class="radio-card"><input type="radio" name="v_xray" value="ยังไม่เคยได้รับการตรวจ"> <span class="text-sm">ยังไม่เคยตรวจ</span></label>
             <label class="radio-card"><input type="radio" name="v_xray" value="ไม่ทราบ"> <span class="text-sm">ไม่ทราบ</span></label></div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-2">4. ลักษณะงานของท่านมีโอกาสสัมผัส "เลือด สารคัดหลั่ง หรือเข็ม/ของมีคมทางการแพทย์" หรือไม่?</label>
+              <label class="radio-card"><input type="radio" name="v_blood_exposure" value="มีโอกาสสัมผัสโดยตรง" required> <span class="text-sm">มีโอกาสสัมผัสโดยตรง (เช่น ทำหัตถการ, เจาะเลือด, ฉีดวัคซีน, ทำแผล ฯลฯ)</span></label>
+              <label class="radio-card"><input type="radio" name="v_blood_exposure" value="มีโอกาสสัมผัสทางอ้อม"> <span class="text-sm">มีโอกาสสัมผัสทางอ้อม (เช่น ล้างเครื่องมือแพทย์, เก็บขยะติดเชื้อ ฯลฯ)</span></label>
+              <label class="radio-card"><input type="radio" name="v_blood_exposure" value="ไม่มีโอกาสสัมผัสเลย"> <span class="text-sm">ไม่มีโอกาสสัมผัสเลย (เช่น ทำงานสำนักงาน, เอกสาร ฯลฯ)</span></label>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-2">5. เคยเกิดอุบัติเหตุจากเข็มทิ่มตำ/ของมีคม (Needlestick injury) ในช่วง 12 เดือนที่ผ่านมาหรือไม่?</label>
+              <label class="radio-card"><input type="radio" name="v_needlestick" value="ไม่เคย" required> <span class="text-sm">ไม่เคย</span></label>
+              <label class="radio-card"><input type="radio" name="v_needlestick" value="เคย และรายงานแล้ว"> <span class="text-sm">เคย และรายงานแล้ว</span></label>
+              <label class="radio-card"><input type="radio" name="v_needlestick" value="เคย แต่ไม่ได้รายงาน"> <span class="text-sm">เคย แต่ไม่ได้รายงาน</span></label>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-1">6. ท่านมีความประสงค์จะรับวัคซีนป้องกันไวรัสตับอักเสบบี ในรูปแบบใด?</label>
+              <p class="text-xs text-red-500 mb-2 font-semibold">***การจัดสรรวัคซีนจะพิจารณาจากความเสี่ยงและความเหมาะสม***</p>
+              <label class="radio-card"><input type="radio" name="v_hepB_pref" value="ฉีดครบชุด 3 เข็ม" required> <span class="text-sm">ฉีดครบชุด 3 เข็ม</span></label>
+              <label class="radio-card"><input type="radio" name="v_hepB_pref" value="ฉีดกระตุ้น 1 เข็ม"> <span class="text-sm">ฉีดกระตุ้น 1 เข็ม</span></label>
+              <label class="radio-card"><input type="radio" name="v_hepB_pref" value="ไม่ประสงค์รับวัคซีน"> <span class="text-sm">ไม่ประสงค์รับวัคซีน</span></label>
+            </div>
           </div>
 
           <button type="submit" class="w-full bg-blue-600 text-white font-bold p-3 rounded-xl mt-6 hover:bg-blue-700 shadow-md">บันทึกข้อมูล</button>
@@ -442,6 +467,9 @@
       document.getElementById('vh_diphtheria').innerText = data[15] || '-'; document.getElementById('vh_tetanus').innerText = data[16] || '-';
       document.getElementById('vh_otherVac').innerText = data[19] || '-'; document.getElementById('vh_allergy').innerText = data[20] || '-';
       document.getElementById('vh_chickenpox').innerText = data[21] || '-'; document.getElementById('vh_xray').innerText = data[22] || '-';
+      document.getElementById('vh_blood_exposure').innerText = data[23] || '-';
+      document.getElementById('vh_needlestick').innerText = data[24] || '-';
+      document.getElementById('vh_hepB_pref').innerText = data[25] || '-';
       
       const covidVal = data[17] || '-'; const covidTypeVal = data[18] || '-';
       document.getElementById('vh_covid').innerText = covidVal;
@@ -471,6 +499,9 @@
       setVacRadio('v_hepA', d[9]); setVacRadio('v_hepB', d[10]); setVacRadio('v_flu', d[11]); setVacRadio('v_mmr', d[12]);
       setVacRadio('v_varicella', d[13]); setVacRadio('v_pertussis', d[14]); setVacRadio('v_diphtheria', d[15]); setVacRadio('v_tetanus', d[16]);
       setVacRadio('v_covid', d[17]); setVacRadio('v_chickenpox', d[21]); setVacRadio('v_xray', d[22]);
+      setVacRadio('v_blood_exposure', d[23]); 
+      setVacRadio('v_needlestick', d[24]); 
+      setVacRadio('v_hepB_pref', d[25]);
 
       document.querySelectorAll('input[name="v_covidType"]').forEach(cb => cb.checked = false);
       if (d[18] && String(d[18]).trim() !== "") {
@@ -543,7 +574,10 @@
         covidType: cTypes, covidTypeOther: document.getElementById('v_covidTypeOther').value,
         otherVac: document.querySelector('input[name="v_otherVac"]:checked').value, otherVacDetail: document.getElementById('v_otherVacDetail').value,
         allergy: document.querySelector('input[name="v_allergy"]:checked').value, allergyDetail: document.getElementById('v_allergyDetail').value,
-        chickenpox: document.querySelector('input[name="v_chickenpox"]:checked').value, xray: document.querySelector('input[name="v_xray"]:checked').value 
+        chickenpox: document.querySelector('input[name="v_chickenpox"]:checked').value, xray: document.querySelector('input[name="v_xray"]:checked').value,
+        blood_exposure: document.querySelector('input[name="v_blood_exposure"]:checked').value,
+        needlestick: document.querySelector('input[name="v_needlestick"]:checked').value,
+        hepB_pref: document.querySelector('input[name="v_hepB_pref"]:checked').value
       };
 
       Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
