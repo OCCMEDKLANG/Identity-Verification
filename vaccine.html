@@ -350,6 +350,9 @@
       document.getElementById('personalInfoSection').classList.remove('hidden');
       document.getElementById('v_covidTypeSection').classList.add('hidden');
       document.getElementById('v_btnCancel').classList.add('hidden');
+      // 🌟 ดึงข้อมูลจาก Session มาแสดงให้ผู้ใช้รีเช็ค
+      document.getElementById('display_idCard').innerText = session_idCard || '-';
+      document.getElementById('display_dob').innerText = session_dob || '-';
     }
 
     function renderVacHistory(data) {
