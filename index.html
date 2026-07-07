@@ -90,7 +90,7 @@
             </div>
             
             <div>
-              <label class="block text-sm text-gray-600 mb-1">วันเกิด (วว/ดด/ปปปป พ.ศ.) <span class="text-red-500">*</span></label>
+              <label class="block text-sm text-gray-600 mb-1">วัน/เดือน/ปีเกิด (พ.ศ.) <span class="text-red-500">*</span></label>
               <div class="relative">
                 <input type="text" id="f_dob" placeholder="กรอกเฉพาะตัวเลข เช่น 01012500" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                 <input type="date" id="f_dob_picker" class="absolute top-0 right-0 w-10 h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'f_dob'); removeError(document.getElementById('f_dob'))">
