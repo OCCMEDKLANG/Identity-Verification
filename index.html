@@ -25,10 +25,10 @@
 
   <div id="verifySection" class="hidden max-w-md mx-auto bg-white p-6 rounded-xl shadow-md mt-4">
     <h2 class="text-xl font-bold mb-2 text-gray-800">🔒 ยืนยันตัวตนเพื่อเข้าถึงข้อมูล</h2>
-    <p class="text-sm text-gray-500 mb-6">กรุณาระบุวันเดือนปีเกิดของท่านเพื่อเข้าดูเมนูข้อมูลของฉันค่ะ</p>
+    <p class="text-sm text-gray-500 mb-6">กรุณาระบุวันเดือนปีเกิดของท่านเพื่อยืนยันตัวตนค่ะ วัน/เดือน/ปีพ.ศ.</p>
     
     <div class="relative mb-4">
-      <input type="text" id="v_dob" placeholder="วว/ดด/ปปปป (เช่น 01/01/2542)" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+      <input type="text" id="v_dob" placeholder="กรอกเฉพาะตัวเลข เช่น 01012500" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
       <input type="date" class="absolute top-0 right-0 w-10 h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'v_dob'); removeError(document.getElementById('v_dob'))">
       <div class="absolute right-3 top-3 pointer-events-none text-gray-400">📅</div>
     </div>
@@ -92,7 +92,7 @@
             <div>
               <label class="block text-sm text-gray-600 mb-1">วันเกิด (วว/ดด/ปปปป พ.ศ.) <span class="text-red-500">*</span></label>
               <div class="relative">
-                <input type="text" id="f_dob" placeholder="เช่น 01/01/2542" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <input type="text" id="f_dob" placeholder="กรอกเฉพาะตัวเลข เช่น 01012500" maxlength="10" oninput="formatDate(this); removeError(this)" class="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                 <input type="date" id="f_dob_picker" class="absolute top-0 right-0 w-10 h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'f_dob'); removeError(document.getElementById('f_dob'))">
                 <div id="datePickerIcon" class="absolute right-3 top-2 pointer-events-none text-gray-400">📅</div>
               </div>
