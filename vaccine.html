@@ -52,7 +52,8 @@
       </div>
 
       <div id="vac-history" class="hidden">
-        <div class="bg-blue-50 p-4 text-center border-b border-blue-100 rounded-t-2xl -mx-4 -mt-4 mb-4">
+        <div class="bg-blue-50 p-4 text-center border-b border-blue-100 rounded-t-2xl -mx-4 -mt-4 mb-4 relative">
+          <div id="vh_timestamp" class="absolute top-3 right-3 text-[10px] text-blue-600 font-semibold"></div>
           <div class="text-4xl mb-2">💉</div>
           <h2 class="text-lg font-bold text-blue-700">ประวัติการได้รับวัคซีน</h2>
           <p class="text-sm font-semibold text-gray-700 mt-1" id="vh_name">-</p>
@@ -90,7 +91,8 @@
 
       <div id="vac-form" class="hidden">
         <form id="vForm" onsubmit="submitVacForm(event)">
-          <div id="personalInfoSection" class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div id="personalInfoSection" class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200 relative">
+            <div id="vf_timestamp" class="absolute top-3 right-3 text-[10px] text-gray-500 font-semibold"></div>
             <h3 class="font-bold text-gray-800 mb-3 text-sm border-b pb-2 text-blue-700">ข้อมูลบุคลากร</h3>
             <div class="space-y-3">
               
@@ -360,12 +362,15 @@
       // 🌟 ดึงข้อมูลจาก Session มาแสดงให้ผู้ใช้รีเช็ค
       document.getElementById('display_idCard').innerText = session_idCard || '-';
       document.getElementById('display_dob').innerText = session_dob || '-';
+      // 🌟 เพิ่มบรรทัดนี้ลงไป
+      if(document.getElementById('vf_timestamp')) document.getElementById('vf_timestamp').innerText = '';
     }
 
     function renderVacHistory(data) {
       document.getElementById('vac-nodata').classList.add('hidden'); document.getElementById('vac-form').classList.add('hidden'); document.getElementById('vac-history').classList.remove('hidden');
       // พิมพ์ชื่อแบบรวบตึง (เพราะคอลัมน์ B คือชื่อเต็มแล้ว)
       document.getElementById('vh_name').innerText = data[1] && data[1] !== "" ? data[1] : `${data[0]} ${data[1]}`;
+      document.getElementById('vh_timestamp').innerText = data[26] ? `(ข้อมูล ณ วันที่ ${data[26]})` : '';
       
       document.getElementById('vh_hepA').innerText = data[9] || '-'; document.getElementById('vh_hepB').innerText = data[10] || '-';
       document.getElementById('vh_flu').innerText = data[11] || '-'; document.getElementById('vh_mmr').innerText = data[12] || '-';
@@ -392,9 +397,9 @@
       document.getElementById('vac-history').classList.add('hidden');
       document.getElementById('vac-form').classList.remove('hidden');
       document.getElementById('v_btnCancel').classList.remove('hidden');
-      
       // ซ่อนส่วนข้อมูลส่วนบุคคล และปลดล็อค required เพื่อไม่ให้เบราว์เซอร์บล็อกการบันทึก
       document.getElementById('personalInfoSection').classList.add('hidden');
+      if(document.getElementById('vf_timestamp')) document.getElementById('vf_timestamp').innerText = globalVaccineData[26] ? `(ข้อมูล ณ วันที่ ${globalVaccineData[26]})` : '';
       document.getElementById('v_prefix').required = false;
       document.getElementById('v_fname').required = false;
       document.getElementById('v_lname').required = false;
