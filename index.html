@@ -954,12 +954,17 @@
       document.getElementById('vac-nodata').classList.add('hidden'); 
       document.getElementById('vac-history').classList.add('hidden'); 
       document.getElementById('vac-form').classList.add('hidden');
-      
+
       // 🌟 แก้ไข: ส่งวันเกิดแบบมีสแลชไปเลยครับ (01/01/2542) เพื่อให้ค้นหาเจอ
       callAPI(VACCINE_API_URL, 'checkLogin', { id: mainUserProfile.idCard, dob: mainUserProfile.dob })
         .then(res => {
           document.getElementById('vac-loading').classList.add('hidden');
-          if(res.status === 'found') {
+          
+          // 🌟 ดักจับ: เลขบัตรถูก แต่วันเกิดในฐานข้อมูลวัคซีนไม่ตรงกับในระบบผูกบัญชี
+          if (res.status === 'dob_mismatch') {
+            document.getElementById('vac-unlinked').classList.remove('hidden'); // ดีดกลับไปโชว์หน้าเดิม
+            Swal.fire('ข้อมูลไม่ตรงกัน', 'พบประวัติวัคซีนของคุณในระบบ แต่ "วันเกิด" ในฐานข้อมูลวัคซีนไม่ตรงกับที่ผูกบัญชีไว้ โปรดติดต่อแอดมินเพื่อตรวจสอบแก้ไข', 'error');
+          } else if(res.status === 'found') {
             globalVaccineData = res.data;
             renderVacHistory(res.data);
           } else {
