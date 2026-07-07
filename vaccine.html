@@ -317,6 +317,13 @@
 
       callAPI('checkLogin', { id: session_idCard, dob: cleanDob }).then(res => {
         Swal.close();
+        
+        // 🌟 ดักจับ: ถ้าเลขบัตรตรง แต่วันเกิดผิด ให้เด้งแจ้งเตือนและหยุดการทำงาน
+        if (res.status === 'dob_mismatch') {
+          Swal.fire('วันเกิดไม่ถูกต้อง', 'พบเลขบัตรประชาชนนี้ในระบบแล้ว แต่วันเดือนปีเกิดที่คุณกรอกไม่ตรงกับฐานข้อมูล กรุณาตรวจสอบอีกครั้งครับ', 'error');
+          return; 
+        }
+
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('mainDashboard').classList.remove('hidden');
 
